@@ -1,0 +1,31 @@
+# Unreal generated output; engine installations are external.
+**/Binaries/
+**/DerivedDataCache/
+**/Intermediate/
+**/Saved/
+**/.vs/
+*.sln
+*.xcodeproj/
+*.xcworkspace/
+Engine/
+
+# Local tools, generated packages, profiling and build evidence.
+.build/
+.work/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+dist/
+artifacts/
+
+# Restricted sources belong in access-controlled object storage, never Git.
+Restricted/
+VendorRaw/
+PrivateFacilities/
+.env
+.env.*
+*.pem
+*.key
+.DS_Store
