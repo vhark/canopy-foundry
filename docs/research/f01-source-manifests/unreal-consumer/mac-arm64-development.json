@@ -1,0 +1,154 @@
+{
+  "child_return_codes": {
+    "native": 0,
+    "ubt": 0,
+    "ubt_build": 0,
+    "ubt_publish": 0
+  },
+  "commands": {
+    "native": [
+      "/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/mac-arm64/Development/project/Binaries/Mac/CanopyCoreQualification"
+    ],
+    "ubt": [
+      "/Users/runner/work/_temp/ue581/Engine/Binaries/ThirdParty/DotNet/10.0/mac-arm64/dotnet",
+      "/Users/runner/work/_temp/ue581/Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll",
+      "CanopyCoreQualification",
+      "Mac",
+      "Development",
+      "-Project=/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/mac-arm64/Development/project/CanopyCoreQualificationConsumer.uproject",
+      "-Architecture=arm64",
+      "-NoUBA",
+      "-NoHotReload",
+      "-NoUBTMakefiles"
+    ],
+    "ubt_build": [
+      "/Users/runner/work/_temp/ue581/Engine/Binaries/ThirdParty/DotNet/10.0/mac-arm64/dotnet",
+      "build",
+      "/Users/runner/work/_temp/ue581/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj",
+      "-c",
+      "Development",
+      "-v",
+      "quiet"
+    ],
+    "ubt_publish": [
+      "/Users/runner/work/_temp/ue581/Engine/Binaries/ThirdParty/DotNet/10.0/mac-arm64/dotnet",
+      "publish",
+      "/Users/runner/work/_temp/ue581/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj",
+      "-c",
+      "Development",
+      "--output",
+      "/Users/runner/work/_temp/ue581/Engine/Binaries/DotNET/UnrealBuildTool",
+      "--no-build",
+      "-v",
+      "quiet"
+    ]
+  },
+  "compiler": {
+    "binary_sha256": "d5ba7be6de1bac17bfd018e1591711e69cb94d199a0ba763427c8b2d67c50697",
+    "id": "AppleClang",
+    "path": "/Applications/Xcode_26.1.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+    "version": "Apple clang version 17.0.0 (clang-1700.4.4.1)"
+  },
+  "configuration": "Development",
+  "core": {
+    "library": {
+      "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/core/libcanopy_core.a",
+      "sha256": "36cdc6888ee8d9e230e21a141166427fcada91ede45ea1fd0c2ff20946dd03a9"
+    },
+    "manifest_path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/core/release/canopy-core-manifest.json",
+    "manifest_sha256": "2ec07177470fb46171a86e0ab08ef5ffe78281ccb7fa384c84fd807978a58bb7",
+    "scope": "standalone-core"
+  },
+  "dotnet": {
+    "info_returncode": 0,
+    "info_sha256": "40de217b2ebc9011ad5e3e1af78bdc32da56cc50214545d81adf30427e58fb88",
+    "path": "Engine/Binaries/ThirdParty/DotNet/10.0/mac-arm64/dotnet",
+    "sha256": "36948d8aef33e97653d75217b1b83338666993ba66261aa05e210dc86d0890f7",
+    "version": "10.0.203",
+    "version_returncode": 0
+  },
+  "engine": {
+    "bootstrap": {
+      "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-bootstrap.json",
+      "sha256": "0b741db2f83c902fba902811497c3ed34610b06ae6434c441a3fc946c39bc217"
+    },
+    "build_version": {
+      "BranchName": "UE5",
+      "Changelist": 0,
+      "CompatibleChangelist": 55116800,
+      "IsLicenseeVersion": 0,
+      "IsPromotedBuild": 0,
+      "MajorVersion": 5,
+      "MinorVersion": 8,
+      "PatchVersion": 1
+    },
+    "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+    "root": "/Users/runner/work/_temp/ue581",
+    "source": {
+      "archive_root": "EpicGames-UnrealEngine-71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "archive_sha256": "712ae95d999d5e3e88f2e132b059ff360d089ef0a13df00418abedbc56841d89",
+      "build_version": {
+        "BranchName": "UE5",
+        "Changelist": 0,
+        "CompatibleChangelist": 55116800,
+        "IsLicenseeVersion": 0,
+        "IsPromotedBuild": 0,
+        "MajorVersion": 5,
+        "MinorVersion": 8,
+        "PatchVersion": 1
+      },
+      "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+      "commit": "71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "tag": "5.8.1-release"
+    },
+    "ubt": {
+      "path": "/Users/runner/work/_temp/ue581/Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll",
+      "sha256": "4c24be846b2642a45c5978d69b1659683e95141954dca1f910b7489e26ebe743"
+    },
+    "ubt_project": {
+      "path": "/Users/runner/work/_temp/ue581/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj",
+      "sha256": "a8ecb92b6cb1e79dd4ae7fbc2f4f877d98758479699655295f8b41538955fc1b"
+    }
+  },
+  "executable": {
+    "mach_o_build_version": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/mac-arm64/Development/project/Binaries/Mac/CanopyCoreQualification:\nLoad command 10\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform MACOS\n    minos 14.0\n      sdk 26.1\n   ntools 1\n     tool LD\n  version 1230.1\n",
+    "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/mac-arm64/Development/project/Binaries/Mac/CanopyCoreQualification",
+    "sha256": "f5ca2282aab21b6dcfe3f8aabc20dfed4acacb6ff03a10779df83df04626ed12"
+  },
+  "fixture_sha256": {
+    "CanopyCoreQualificationConsumer.uproject": "e72114d40ca4a0bb0a8045c2f8431b0bc6a576d422758199f3677e38a454a82f",
+    "Source/CanopyCoreQualification.Target.cs": "b93e4256d0ec0ef1c195024a8ed72e70c983a41be8ae8dd954d74536f53ec156",
+    "Source/CanopyCoreQualification/CanopyCoreQualification.Build.cs": "5400960da468b3b0c270a970a3e7a4a28fcaf0513e3e378ca6ff2010b5a7563e",
+    "Source/CanopyCoreQualification/Private/Main.cpp": "bfde7d5c43282efaf1b53873d88597bcb52043cc4c406f3c5b3e56b7653601b9"
+  },
+  "host_sdk": {
+    "macos_sdk": "26.1",
+    "macos_sdk_path": "/Applications/Xcode_26.1.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+    "xcode": "Xcode 26.1.1\nBuild version 17B100"
+  },
+  "native_stdout": "{\"area_square_metres\":5574.182400000001,\"platform\":\"mac-arm64\",\"cpp_version\":202002,\"pointer_bits\":64,\"rtti\":false,\"exceptions\":true,\"crt\":\"libc++\",\"compiler_id\":\"AppleClang\",\"compiler_version\":\"17.0.0\"}\n",
+  "output": {
+    "area_square_metres": 5574.182400000001,
+    "compiler_id": "AppleClang",
+    "compiler_version": "17.0.0",
+    "cpp_version": 202002,
+    "crt": "libc++",
+    "exceptions": true,
+    "platform": "mac-arm64",
+    "pointer_bits": 64,
+    "rtti": false
+  },
+  "platform": "mac-arm64",
+  "qualifier_sha256": "d32ef7c679f9d2621f785ce4d22d07b9eb63ab84e5da33aedd51da389fba66a5",
+  "receipt": {
+    "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/mac-arm64/Development/project/Binaries/Mac/CanopyCoreQualification.target",
+    "sha256": "5dd753d60ed8c7ce302e96975bea64fa089bd70bfd43a3b5127fc0974dc5c3d7"
+  },
+  "schema": 1,
+  "scope": "unreal-core-consumer",
+  "status": "success",
+  "working_descriptor": {
+    "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/mac-arm64/Development/project/CanopyCoreQualificationConsumer.uproject",
+    "sha256": "e72114d40ca4a0bb0a8045c2f8431b0bc6a576d422758199f3677e38a454a82f"
+  }
+}

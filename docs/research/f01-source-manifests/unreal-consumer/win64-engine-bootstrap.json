@@ -1,0 +1,61 @@
+{
+  "build_inputs": {
+    "Directory.Build.props": "7b2708f1f3e08ef5bf896049440942c5eb13d8630014bc0793b48f7668a256f3",
+    "Directory.Build.targets": "8abc24639808174f95e51ea71c790ad843294430876e25435ce893edaf97b24d",
+    "Engine/Binaries/Win64/UnrealBuildAccelerator/x64/UbaDetours.dll": "ca1580a7174c891e0914dd40d3d931d40265a9c7d6d09c596ac69365e59c1977",
+    "Engine/Binaries/Win64/UnrealBuildAccelerator/x64/UbaHost.dll": "6141dc5624c81bf5b3c12ce3ee2010a35b66e5942f361d95c6a58457b2c585d2",
+    "Engine/Build/Windows/Resources/Default.ico": "9b2765f543eb4e53a13eeb1b3248d7c24d3533e780e885ad4ef63eeb1928d222",
+    "Engine/Source/Programs/Shared/Directory.Build.props": "203a7e7bcec38c4c9fded2f65818b9cedf8f1c4c5298c4c5970d7fd4f6399c78",
+    "Engine/Source/Programs/Shared/EpicGames.Horde/Protos/horde/log_rpc.proto": "2c0a53b548f262c35e1b9c1be8ae09aa65494af74e72dfa6721af6fb93308ebf",
+    "Engine/Source/Programs/Shared/EpicGames.Horde/Protos/horde/log_rpc_messages.proto": "f403d49d0a496e8528516c9a28a5ac2979dc1c35f8ecc2a2da3b63dda41f4a49",
+    "Engine/Source/Programs/Shared/EpicGames.UBA/Library.props": "fb25e7239e5ff00cfb4e6ee36ab5d4c873855cb448dbe95f41e39322bd6ffbfe",
+    "Engine/Source/Programs/Shared/UnrealEngine.CSharp.targets": "790b4b232d51dcfbcc30b2ea6164c1834ac07571755b0441405e4dae3ac26f65",
+    "Engine/Source/Programs/Shared/UnrealEngine.csproj.props": "b4a4eabda9dbda18fb0f61fddb0286bf431834e7cd653c42433905d246e381e8"
+  },
+  "dotnet": {
+    "info_returncode": 0,
+    "info_sha256": "2c450a24ebf31d5ff68f2451226c68620cf9a691d1b70919fefd3a802f53912c",
+    "path": "Engine\\Binaries\\ThirdParty\\DotNet\\10.0\\win-x64\\dotnet.exe",
+    "sha256": "c1809e1f7fc603c2096efdfbc3f98c2123a398d3dff331096fdaebc3071ac32d",
+    "version": "10.0.203",
+    "version_returncode": 0
+  },
+  "engine_root": "D:\\a\\_temp\\ue581",
+  "gitdependencies": {
+    "arguments": [
+      "--root=D:\\a\\_temp\\.unreal-bootstrap-n2j0un5w\\source",
+      "--force",
+      "--no-cache"
+    ],
+    "filter_sha256": "86ec1b6d503adecb9cf66d86d35d86e88777876dcdbc35f4a85865fe3b93e09f",
+    "host_rid": "win-x64",
+    "path": "Engine\\Binaries\\DotNET\\GitDependencies\\win-x64\\GitDependencies.exe",
+    "returncode": 0,
+    "sha256": "33314d0845f6037c2bc9b04c2c4ea0694d7ea1121905529ec3472e66a1205c03"
+  },
+  "inputs": {
+    "bootstrap_sha256": "4141268e8861a1524571f13116ebc16e791e567c088c2cab02c23912c58d86a1",
+    "config_sha256": "d800187daf557819b77dbdc30f31c59ead0be7c8a42e06e169843c7c84e1ec75"
+  },
+  "platform": "win-x64",
+  "schema": 1,
+  "scope": "unreal-build-tools",
+  "source": {
+    "archive_root": "EpicGames-UnrealEngine-71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+    "archive_sha256": "712ae95d999d5e3e88f2e132b059ff360d089ef0a13df00418abedbc56841d89",
+    "build_version": {
+      "BranchName": "UE5",
+      "Changelist": 0,
+      "CompatibleChangelist": 55116800,
+      "IsLicenseeVersion": 0,
+      "IsPromotedBuild": 0,
+      "MajorVersion": 5,
+      "MinorVersion": 8,
+      "PatchVersion": 1
+    },
+    "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+    "commit": "71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+    "tag": "5.8.1-release"
+  },
+  "status": "success"
+}

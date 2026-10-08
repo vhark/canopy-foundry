@@ -1,6 +1,6 @@
-# F01 source-build evidence
+# F01 native build and core-consumer evidence
 
-**Case:** `F01-source-build`. **Status:** local checks and the three-platform native source matrix with approved SDK selections passed; F01 is not complete. This report does not qualify Unreal, a game package, BIM exchange, simulation accuracy or performance.
+**Cases:** `F01-source-build` and `F01-unreal-core-consumer`. **Status:** F01 complete: approved native source builds and UE5.8.1 Development/Shipping core consumers passed on Windows, Mac and Linux. This report does not qualify a game package, BIM exchange, simulation accuracy, rendering or performance.
 
 **Initial source checkpoint:** [`78ed18f2034c2c4a4769d1c244fb4694c29be302`](https://github.com/vhark/canopy-foundry/commit/78ed18f2034c2c4a4769d1c244fb4694c29be302). The approved-SDK checkpoint is recorded separately below. Native manifests bind the actual input files, compiler binary, dependency bootstrap and output library by SHA-256. No simulation model, recipe, random seed or rendering settings apply to this source-build case; gameplay and performance measurements are **not measured**.
 
@@ -81,8 +81,18 @@ The [third engine matrix](https://github.com/vhark/canopy-foundry/actions/runs/3
 
 The [fourth engine matrix](https://github.com/vhark/canopy-foundry/actions/runs/37743450260), at `2bc2d29be3b08838c65a6eb04d107675b265a551`, successfully built and ran both Windows configurations. Their downloaded manifests report MSVC19.50.35739, dynamic Release CRT, C++20, 64-bit pointers, no RTTI/exceptions, the correct public API result and zero UBT/native exit statuses. Mac's UBT build and executable also ran, but strict validation rejected `exceptions: true` against the initially assumed disabled core policy. The pinned engine's `MacToolChain.GetCompileArguments_Debugging` explicitly removes `-fno-exceptions` and adds `-fexceptions`; the core compilation/profile now matches that actual policy instead of weakening validation or changing engine source. Linux compiled and linked, then failed because its official postlink `dump_syms` was absent; the bootstrap now includes both `dump_syms` and `BreakpadSymbolEncoder` called by `LinuxToolChain.GetDumpEncodeDebugCommand`.
 
-## Remaining hard gate
+## Qualified native matrix and F01 closure
 
-The user retained the approved Unreal5.8.1 / Xcode26.1.1 / VS2026-MSVC14.50-SDK10.0.26100 / Linux v26 Clang20.1.8 fixed-sysroot baseline. Standalone builds with those compiler/SDK selections passed on all three native hosted runners. Authorized UE5.8.1 source access is cleared and Windows UBT Development/Shipping consumer qualification passed; matching Mac/Linux results remain pending after the observed corrections above. Local Xcode27 is not a substitute. The owner-only, opt-in engine workflow consumes a short-lived private archive URL and uploads only explicitly selected provenance/qualification manifests, never engine source or binaries.
+The [successful matrix](https://github.com/vhark/canopy-foundry/actions/runs/37746886997) at commit `ef149389528508fb74521aa65fa3ba31dd5fcca4` built and ran both UBT configurations on all three native hosts. Every executable called the actual Release core library and reported area `5574.182400000001`, C++20, 64-bit pointers and disabled RTTI. UBT build, publish, target build and native execution each returned zero.
 
-F01 remains open. F02 and the later implementation packages retain their hard completion prerequisites. The first-/third-person and overhead camera requirements are documented in architecture A13 and the F03/X04/native acceptance tasks; no camera runtime has been implemented or exercised.
+| Native host | Observed compiler/runtime | Exceptions | Development / Shipping |
+|---|---|---|---|
+| Apple Silicon, Xcode26.1.1 / SDK26.1 | AppleClang17.0.0 / libc++ | Enabled, matching UE's Mac toolchain | Both passed; Mach-O minimum14.0 |
+| Windows, VS2026 / SDK10.0.26100 | MSVC19.50.35739 / dynamic Release CRT | Disabled | Both passed |
+| Linux, pinned v26 fixed sysroot | Clang20.1.8 / bundled libc++ | Disabled | Both passed |
+
+All **18 downloaded JSON records** are preserved byte-for-byte in [`f01-source-manifests/unreal-consumer/`](f01-source-manifests/unreal-consumer/): native and engine bootstraps, Debug/Release core manifests and Development/Shipping consumer manifests for each platform. Each consumer's recorded bootstrap/core-manifest hash was checked against the downloaded bytes; each core's bootstrap hash and each consumer's referenced core-library hash matched. The six consumer manifests retain their executable/receipt hashes and native output. Standalone manifests remain `unreal_qualified: false`; consumer success has the separate `unreal-core-consumer` scope. No engine source or executable was copied into the evidence directory.
+
+The temporary source-download secret was deleted after the matrix. The latest local Mac Debug, Release and ASan/UBSan builds also passed all four native cases, and the build-orchestration suite passed 52 checks. Local Xcode27 is still not an approved engine host.
+
+F01 is complete under its native core/toolchain acceptance gate. F02 and B01 are the newly ready work packages; subsequent tasks retain their own hard prerequisites. Full engine/editor provisioning, packaged-game input/rendering, BIM round trips and reference-hardware performance remain distinct, unmeasured gates. The first-/third-person and overhead camera requirements remain assigned to architecture A13 and F03/X04; no camera runtime has been implemented or exercised.

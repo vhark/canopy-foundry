@@ -1,0 +1,161 @@
+{
+  "child_return_codes": {
+    "native": 0,
+    "ubt": 0,
+    "ubt_build": 0,
+    "ubt_publish": 0
+  },
+  "commands": {
+    "native": [
+      "/home/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/linux-x64/Development/project/Binaries/Linux/CanopyCoreQualification"
+    ],
+    "ubt": [
+      "/home/runner/work/_temp/ue581/Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet",
+      "/home/runner/work/_temp/ue581/Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll",
+      "CanopyCoreQualification",
+      "Linux",
+      "Development",
+      "-Project=/home/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/linux-x64/Development/project/CanopyCoreQualificationConsumer.uproject",
+      "-Architecture=x64",
+      "-NoUBA",
+      "-NoHotReload",
+      "-NoUBTMakefiles"
+    ],
+    "ubt_build": [
+      "/home/runner/work/_temp/ue581/Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet",
+      "build",
+      "/home/runner/work/_temp/ue581/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj",
+      "-c",
+      "Development",
+      "-v",
+      "quiet"
+    ],
+    "ubt_publish": [
+      "/home/runner/work/_temp/ue581/Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet",
+      "publish",
+      "/home/runner/work/_temp/ue581/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj",
+      "-c",
+      "Development",
+      "--output",
+      "/home/runner/work/_temp/ue581/Engine/Binaries/DotNET/UnrealBuildTool",
+      "--no-build",
+      "-v",
+      "quiet"
+    ]
+  },
+  "compiler": {
+    "binary_sha256": "e6166786aee0388cc170ab761d8d51d6e0d708cc5ca533b0330f356ca99468cf",
+    "id": "Clang",
+    "path": "/home/runner/work/_temp/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/bin/clang++",
+    "version": "clang version 20.1.8 (github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)"
+  },
+  "configuration": "Development",
+  "core": {
+    "library": {
+      "path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/libcanopy_core.a",
+      "sha256": "8e6fcd95e8f900c7ad09d3f14d39594ce7c3a7feedbbc1f9deb61485a34ee4e8"
+    },
+    "manifest_path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/release/canopy-core-manifest.json",
+    "manifest_sha256": "df165e67f0b9358fd73f6207cc6f3c5fb239e66867dbe93a17f3a569c9eaa86c",
+    "scope": "standalone-core"
+  },
+  "dotnet": {
+    "info_returncode": 0,
+    "info_sha256": "28d286c6d465076ea730b0d7baaf740dffd7ecd1b1dbb8896b13c9eccd1f9caa",
+    "path": "Engine/Binaries/ThirdParty/DotNet/10.0/linux-x64/dotnet",
+    "sha256": "1c121dbde456ab6e24f6d04eb10ac732d142b72b8a9415b7637a1e9daff212f0",
+    "version": "10.0.203",
+    "version_returncode": 0
+  },
+  "engine": {
+    "bootstrap": {
+      "path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/engine-bootstrap.json",
+      "sha256": "2497c1d12c82fc25f3d9f32700b9dab7442e3123b0de683ee048f605b352bc52"
+    },
+    "build_version": {
+      "BranchName": "UE5",
+      "Changelist": 0,
+      "CompatibleChangelist": 55116800,
+      "IsLicenseeVersion": 0,
+      "IsPromotedBuild": 0,
+      "MajorVersion": 5,
+      "MinorVersion": 8,
+      "PatchVersion": 1
+    },
+    "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+    "root": "/home/runner/work/_temp/ue581",
+    "source": {
+      "archive_root": "EpicGames-UnrealEngine-71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "archive_sha256": "712ae95d999d5e3e88f2e132b059ff360d089ef0a13df00418abedbc56841d89",
+      "build_version": {
+        "BranchName": "UE5",
+        "Changelist": 0,
+        "CompatibleChangelist": 55116800,
+        "IsLicenseeVersion": 0,
+        "IsPromotedBuild": 0,
+        "MajorVersion": 5,
+        "MinorVersion": 8,
+        "PatchVersion": 1
+      },
+      "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+      "commit": "71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "tag": "5.8.1-release"
+    },
+    "ubt": {
+      "path": "/home/runner/work/_temp/ue581/Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll",
+      "sha256": "c7ca1a36bcfeec0dec9b04f4621599ff8f7fe8e91a5f97bc4735c7a8ac9d09ad"
+    },
+    "ubt_project": {
+      "path": "/home/runner/work/_temp/ue581/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj",
+      "sha256": "a8ecb92b6cb1e79dd4ae7fbc2f4f877d98758479699655295f8b41538955fc1b"
+    }
+  },
+  "executable": {
+    "path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/linux-x64/Development/project/Binaries/Linux/CanopyCoreQualification",
+    "sha256": "b4340fbec4ab9d5ce00f591974134c9902c54cfa7897c21d6d51fbd24c7e166b"
+  },
+  "fixture_sha256": {
+    "CanopyCoreQualificationConsumer.uproject": "e72114d40ca4a0bb0a8045c2f8431b0bc6a576d422758199f3677e38a454a82f",
+    "Source/CanopyCoreQualification.Target.cs": "b93e4256d0ec0ef1c195024a8ed72e70c983a41be8ae8dd954d74536f53ec156",
+    "Source/CanopyCoreQualification/CanopyCoreQualification.Build.cs": "5400960da468b3b0c270a970a3e7a4a28fcaf0513e3e378ca6ff2010b5a7563e",
+    "Source/CanopyCoreQualification/Private/Main.cpp": "bfde7d5c43282efaf1b53873d88597bcb52043cc4c406f3c5b3e56b7653601b9"
+  },
+  "host_sdk": {
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "libcxx_headers_sha256": "109abdf9e544f7d3b21147d73508d83c07df9642a4ccf052f96baa78a395642d",
+    "libcxx_include": "/home/runner/work/_temp/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/include/c++/v1",
+    "libcxx_library": "/home/runner/work/_temp/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/lib64/libc++.a",
+    "libcxx_library_sha256": "3cabd6a04da7e688cde121995e84e15b1641a6a0f281cec6f7c2bddac776b2af",
+    "libcxxabi_library": "/home/runner/work/_temp/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu/lib64/libc++abi.a",
+    "libcxxabi_library_sha256": "b4ee49917bedb69b2063f41aa90d06d9de35be8bced8d50e9bc0305d01ba691a",
+    "sysroot": "/home/runner/work/_temp/v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu"
+  },
+  "native_stdout": "{\"area_square_metres\":5574.182400000001,\"platform\":\"linux-x64\",\"cpp_version\":202002,\"pointer_bits\":64,\"rtti\":false,\"exceptions\":false,\"crt\":\"libc++\",\"compiler_id\":\"Clang\",\"compiler_version\":\"20.1.8\"}\n",
+  "output": {
+    "area_square_metres": 5574.182400000001,
+    "compiler_id": "Clang",
+    "compiler_version": "20.1.8",
+    "cpp_version": 202002,
+    "crt": "libc++",
+    "exceptions": false,
+    "platform": "linux-x64",
+    "pointer_bits": 64,
+    "rtti": false
+  },
+  "platform": "linux-x64",
+  "qualifier_sha256": "d32ef7c679f9d2621f785ce4d22d07b9eb63ab84e5da33aedd51da389fba66a5",
+  "receipt": {
+    "path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/linux-x64/Development/project/Binaries/Linux/CanopyCoreQualification.target",
+    "sha256": "ceda56af69d7c0ab3770b5cda5e49fccb393d337bacb25f24e457205e57e546d"
+  },
+  "schema": 1,
+  "scope": "unreal-core-consumer",
+  "status": "success",
+  "working_descriptor": {
+    "path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/engine-qualification/linux-x64/Development/project/CanopyCoreQualificationConsumer.uproject",
+    "sha256": "e72114d40ca4a0bb0a8045c2f8431b0bc6a576d422758199f3677e38a454a82f"
+  }
+}

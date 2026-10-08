@@ -1,6 +1,7 @@
 * text=auto eol=lf
 # Preserve downloaded evidence bytes: core manifests hash their bootstrap JSON.
 docs/research/f01-source-manifests/approved-sdk/*.json -text
+docs/research/f01-source-manifests/unreal-consumer/*.json -text
 *.uasset filter=lfs diff=lfs merge=lfs -text lockable
 *.umap filter=lfs diff=lfs merge=lfs -text lockable
 *.blend filter=lfs diff=lfs merge=lfs -text lockable

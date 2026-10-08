@@ -1,0 +1,80 @@
+{
+  "abi": {
+    "crt": "libc++",
+    "exceptions": true,
+    "rtti": false
+  },
+  "bootstrap_sha256": "5934f31d4931ec4718a5184618b768452dca7f9e530775031624a2645fbe6e1d",
+  "child_return_codes": {
+    "build": 0,
+    "configure": 0
+  },
+  "compiler": {
+    "binary_sha256": "d5ba7be6de1bac17bfd018e1591711e69cb94d199a0ba763427c8b2d67c50697",
+    "id": "AppleClang",
+    "path": "/Applications/Xcode_26.1.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+    "version": "Apple clang version 17.0.0 (clang-1700.4.4.1)"
+  },
+  "config": "Release",
+  "deployment_target": "14.0",
+  "host_sdk": {
+    "macos_sdk": "26.1",
+    "macos_sdk_path": "/Applications/Xcode_26.1.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+    "xcode": "Xcode 26.1.1\nBuild version 17B100"
+  },
+  "inputs_sha256": {
+    "CMakeLists.txt": "d6a6c2eb7004eb6c944b926f1dc2c5ceea1d030e92bbfff49cdd5848003b8335",
+    "CMakePresets.json": "a3e13290a6524dedbf277c9506f76d9728688f7fb0cc30f8d5cf4daf4754aeca",
+    "config/toolchains.json": "d800187daf557819b77dbdc30f31c59ead0be7c8a42e06e169843c7c84e1ec75",
+    "core/include/canopy/units.hpp": "5061f5c8fd144ef7517e8ac412cfcd3f3b402d2395a60e156d2afd7928bdfdc6",
+    "core/src/units.cpp": "5e51f3b39760f2fb74689ae35e3fc564a6ce24f8903edf5b6fe74c2390c15165",
+    "core/tests/units_test.cpp": "814bd480b42082ece30a7e4f82bf636bd5b6e7287ea5765f6dc630c28bf9a9db",
+    "dependencies/native-lock.json": "a2b54ad2fc26ac9454e543822678be45215eac28d3f3af8107d681acf325eb0f",
+    "dependencies/triplets/arm64-osx-ue58.cmake": "5a6e4c99c4a44b9b4b00c55f8d8472889f935fe696e07eebc7e564ee06b98f3d",
+    "dependencies/triplets/v26-chainload.cmake": "4203e9097e0962291ca3d3e685f9c6c5a213229e9b6eef556d6171737dd59d5b",
+    "dependencies/triplets/x64-linux-ue-v26.cmake": "4310426fbe9c9404a42b1410371e80d93fe39d76d72d5db4c10c2615abcebf7b",
+    "dependencies/triplets/x64-windows-msvc.cmake": "a485236ee71bb464a51783df05a293dfe9346486344590d75f35ed216426a7c9",
+    "dependencies/upstream/growbim-0.1.0-py3-none-any.whl": "1e4999bef0cfecc86a95e58d0915fac29b0d6f1c6f80621a59e86cc8126428f2",
+    "dependencies/upstream/opencea-0.1.0-py3-none-any.whl": "6bc833fcf21644c260aeeb21ce6912443a36a8926ccf48a6fdd173550dcfbbb9",
+    "dependencies/vcpkg-configuration.json": "999609a3cf1d6d33129e754912ea6f0b0f820f7ee1fe78a0bf0d139f160b46a1",
+    "dependencies/vcpkg.json": "2f7363cbf0af4fff0da51758cd1c7be657f4216c1abd7ab482e21cae2de79dd6",
+    "pyproject.toml": "78b11bcb21f53e650e7f942b71b8a3098a487811086b27eb6a49d7e2b85c2932",
+    "scripts/bootstrap_native.py": "36d326a557dcad130e9082fe611de43d1aceac77f711b22cf502e4bd053adb31",
+    "scripts/build_common.py": "fa7a95cd2cdf839c47d07560c0d90e3f4fe918fa042fff67bbeb600bb31a5b97",
+    "scripts/build_core.py": "2704742627454bb798484e243455c71a81efe69fe996162dd097333647f8a399",
+    "scripts/build_game.py": "928574ca01fafc2de454f613d905e6a36fe4c06df3c0b0a46aa58d9eb20c75ad",
+    "uv.lock": "ed9389427c16691ced778b4d67a41c567564b34a2b8e5e1d0ede4dfeb5163689"
+  },
+  "library": {
+    "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.build/core/libcanopy_core.a",
+    "sha256": "36cdc6888ee8d9e230e21a141166427fcada91ede45ea1fd0c2ff20946dd03a9"
+  },
+  "platform": "mac-arm64",
+  "schema": 1,
+  "scope": "standalone-core",
+  "tools": {
+    "cmake": {
+      "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.venv/bin/cmake",
+      "sha256": "52d35cd1a4b87da548e21acba1404574e97dec833cc094813b723ac9aecd6082",
+      "version": "cmake version 4.4.4"
+    },
+    "ninja": {
+      "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.venv/bin/ninja",
+      "sha256": "78db38d68dde4904f4a7a9cae2dfd0ef47f5f00e2ec88462b0f24d85ac610586",
+      "version": "1.13.2.git.kitware.jobserver-pipe-1"
+    },
+    "python": {
+      "path": "/Users/runner/work/canopy-foundry/canopy-foundry/.venv/bin/python3",
+      "sha256": "71720f1fc66989ebd691e81c96111b47ae6ff3f1a478666084d1cacbf0fccbf2",
+      "version": "3.12.13"
+    },
+    "uv": {
+      "path": "/Users/runner/hostedtoolcache/uv/0.12.3/aarch64/uv",
+      "sha256": "2b4ccdac26598ca8c300e5c36d24297fa1471c350c46d2f34c835bf06be303ab",
+      "version": "uv 0.12.3 (507230998 2026-08-07 aarch64-apple-darwin)"
+    }
+  },
+  "unreal_qualified": false,
+  "vcpkg_commit": "2750401336fb7c95f6619657a46a7e798661341c",
+  "vcpkg_triplet": "arm64-osx-ue58"
+}

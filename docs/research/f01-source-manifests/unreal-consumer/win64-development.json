@@ -1,0 +1,153 @@
+{
+  "child_return_codes": {
+    "native": 0,
+    "ubt": 0,
+    "ubt_build": 0,
+    "ubt_publish": 0
+  },
+  "commands": {
+    "native": [
+      "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\engine-qualification\\win64\\Development\\project\\Binaries\\Win64\\CanopyCoreQualification.exe"
+    ],
+    "ubt": [
+      "D:\\a\\_temp\\ue581\\Engine\\Binaries\\ThirdParty\\DotNet\\10.0\\win-x64\\dotnet.exe",
+      "D:\\a\\_temp\\ue581\\Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.dll",
+      "CanopyCoreQualification",
+      "Win64",
+      "Development",
+      "-Project=D:\\a\\canopy-foundry\\canopy-foundry\\.build\\engine-qualification\\win64\\Development\\project\\CanopyCoreQualificationConsumer.uproject",
+      "-Architecture=x64",
+      "-NoUBA",
+      "-NoHotReload",
+      "-NoUBTMakefiles"
+    ],
+    "ubt_build": [
+      "D:\\a\\_temp\\ue581\\Engine\\Binaries\\ThirdParty\\DotNet\\10.0\\win-x64\\dotnet.exe",
+      "build",
+      "D:\\a\\_temp\\ue581\\Engine\\Source\\Programs\\UnrealBuildTool\\UnrealBuildTool.csproj",
+      "-c",
+      "Development",
+      "-v",
+      "quiet"
+    ],
+    "ubt_publish": [
+      "D:\\a\\_temp\\ue581\\Engine\\Binaries\\ThirdParty\\DotNet\\10.0\\win-x64\\dotnet.exe",
+      "publish",
+      "D:\\a\\_temp\\ue581\\Engine\\Source\\Programs\\UnrealBuildTool\\UnrealBuildTool.csproj",
+      "-c",
+      "Development",
+      "--output",
+      "D:\\a\\_temp\\ue581\\Engine\\Binaries\\DotNET\\UnrealBuildTool",
+      "--no-build",
+      "-v",
+      "quiet"
+    ]
+  },
+  "compiler": {
+    "binary_sha256": "cb461b804d4792db79046c59e17c42a0214cd5112560486114ebe52fcec107ad",
+    "id": "MSVC",
+    "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\cl.exe",
+    "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35739 for x64"
+  },
+  "configuration": "Development",
+  "core": {
+    "library": {
+      "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\core\\canopy_core.lib",
+      "sha256": "ebd05ca59691e3c5e59a4f486d22a2f626feddf44fced48c4aade4a692e75213"
+    },
+    "manifest_path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\core\\release\\canopy-core-manifest.json",
+    "manifest_sha256": "41ba7657004436d5c08b40931e79d99caf48018239adf1c6d42a0be11813812c",
+    "scope": "standalone-core"
+  },
+  "dotnet": {
+    "info_returncode": 0,
+    "info_sha256": "2c450a24ebf31d5ff68f2451226c68620cf9a691d1b70919fefd3a802f53912c",
+    "path": "Engine\\Binaries\\ThirdParty\\DotNet\\10.0\\win-x64\\dotnet.exe",
+    "sha256": "c1809e1f7fc603c2096efdfbc3f98c2123a398d3dff331096fdaebc3071ac32d",
+    "version": "10.0.203",
+    "version_returncode": 0
+  },
+  "engine": {
+    "bootstrap": {
+      "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\engine-bootstrap.json",
+      "sha256": "f9f66959f928059620a7734803cbd4d996ec761e14802bd0c50424a381a3e6f1"
+    },
+    "build_version": {
+      "BranchName": "UE5",
+      "Changelist": 0,
+      "CompatibleChangelist": 55116800,
+      "IsLicenseeVersion": 0,
+      "IsPromotedBuild": 0,
+      "MajorVersion": 5,
+      "MinorVersion": 8,
+      "PatchVersion": 1
+    },
+    "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+    "root": "D:\\a\\_temp\\ue581",
+    "source": {
+      "archive_root": "EpicGames-UnrealEngine-71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "archive_sha256": "712ae95d999d5e3e88f2e132b059ff360d089ef0a13df00418abedbc56841d89",
+      "build_version": {
+        "BranchName": "UE5",
+        "Changelist": 0,
+        "CompatibleChangelist": 55116800,
+        "IsLicenseeVersion": 0,
+        "IsPromotedBuild": 0,
+        "MajorVersion": 5,
+        "MinorVersion": 8,
+        "PatchVersion": 1
+      },
+      "build_version_sha256": "29f7a3e61c24327147037ee15928d1bd1603fb65bcd19058e8381e26a12d38bd",
+      "commit": "71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "tag": "5.8.1-release"
+    },
+    "ubt": {
+      "path": "D:\\a\\_temp\\ue581\\Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.dll",
+      "sha256": "33075f94dba2b9f4f85244b592101307123195cb46bb2f053a178d71ea73609c"
+    },
+    "ubt_project": {
+      "path": "D:\\a\\_temp\\ue581\\Engine\\Source\\Programs\\UnrealBuildTool\\UnrealBuildTool.csproj",
+      "sha256": "a8ecb92b6cb1e79dd4ae7fbc2f4f877d98758479699655295f8b41538955fc1b"
+    }
+  },
+  "executable": {
+    "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\engine-qualification\\win64\\Development\\project\\Binaries\\Win64\\CanopyCoreQualification.exe",
+    "sha256": "cfe465224f784db26afc391c61f1bb49c7fc0404836b78afa94493a59c8a453d"
+  },
+  "fixture_sha256": {
+    "CanopyCoreQualificationConsumer.uproject": "e72114d40ca4a0bb0a8045c2f8431b0bc6a576d422758199f3677e38a454a82f",
+    "Source/CanopyCoreQualification.Target.cs": "b93e4256d0ec0ef1c195024a8ed72e70c983a41be8ae8dd954d74536f53ec156",
+    "Source/CanopyCoreQualification/CanopyCoreQualification.Build.cs": "5400960da468b3b0c270a970a3e7a4a28fcaf0513e3e378ca6ff2010b5a7563e",
+    "Source/CanopyCoreQualification/Private/Main.cpp": "bfde7d5c43282efaf1b53873d88597bcb52043cc4c406f3c5b3e56b7653601b9"
+  },
+  "host_sdk": {
+    "msvc": "14.50.35717",
+    "visual_studio": "18.0",
+    "windows_sdk": "10.0.26100.0\\"
+  },
+  "native_stdout": "{\"area_square_metres\":5574.182400000001,\"platform\":\"win64\",\"cpp_version\":202002,\"pointer_bits\":64,\"rtti\":false,\"exceptions\":false,\"crt\":\"MD\",\"compiler_id\":\"MSVC\",\"compiler_version\":\"19.50.35739\"}\n",
+  "output": {
+    "area_square_metres": 5574.182400000001,
+    "compiler_id": "MSVC",
+    "compiler_version": "19.50.35739",
+    "cpp_version": 202002,
+    "crt": "MD",
+    "exceptions": false,
+    "platform": "win64",
+    "pointer_bits": 64,
+    "rtti": false
+  },
+  "platform": "win64",
+  "qualifier_sha256": "d32ef7c679f9d2621f785ce4d22d07b9eb63ab84e5da33aedd51da389fba66a5",
+  "receipt": {
+    "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\engine-qualification\\win64\\Development\\project\\Binaries\\Win64\\CanopyCoreQualification.target",
+    "sha256": "bb35eaf01d008dabe87810a632b2e88421544765e4dd1426fd42951f6ea8509d"
+  },
+  "schema": 1,
+  "scope": "unreal-core-consumer",
+  "status": "success",
+  "working_descriptor": {
+    "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\engine-qualification\\win64\\Development\\project\\CanopyCoreQualificationConsumer.uproject",
+    "sha256": "e72114d40ca4a0bb0a8045c2f8431b0bc6a576d422758199f3677e38a454a82f"
+  }
+}

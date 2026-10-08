@@ -2,7 +2,7 @@
 
 Build your growing operation, master its environment, and scale from your first crop to an industrial growing business.
 
-**Status: implementation started; F01 is in progress. No executable game is included yet.** The standalone C++ core passes native source checks on Linux, Windows and Apple Silicon macOS; approved Unreal/toolchain and runtime qualification are not complete. This is a new game repository, not a rename or fork of the existing Grownetics Sim training study. The title is a working commercial name, pending trademark/domain clearance.
+**Status: F01's native build/toolchain gate is complete. No executable game is included yet.** The C++ core passes native source checks and real UE5.8.1 Development/Shipping consumer execution on Linux, Windows and Apple Silicon macOS. Game packaging, rendering and runtime qualification remain separate future gates. This is a new game repository, not a rename or fork of the existing Grownetics Sim training study. The title is a working commercial name, pending trademark/domain clearance.
 
 ## Product decisions
 
@@ -43,9 +43,9 @@ uv run --frozen python -m pytest tests/build -q
 
 Local macOS arm64 verification passed: four native conversion cases in each of Debug, Release and ASan/UBSan builds. The current build-orchestration suite passes 52 checks. The separately linked API smoke produced `60000 square feet = 5574.1824 square metres`. Core and dependency builds use the UE 5.8 macOS14 deployment floor through `arm64-osx-ue58`; the emitted manifest is checked against the actual archive architecture, deployment target and selected SDK. These local results do not qualify an Unreal ABI or another platform.
 
-The approved-SDK hosted source matrix also passed Debug and Release on all three native platforms: four native cases per configuration; at that checkpoint, 30 Python checks on Linux/Mac and 26 passed plus four POSIX-only skips on Windows. The [F01 execution report](docs/research/f01-build-evidence.md) records source checkpoints, compiler/SDK and artifact hashes, failure/recovery evidence, preserved manifests and the remaining native engine-consumer gate.
+The [qualified native matrix](https://github.com/vhark/canopy-foundry/actions/runs/37746886997) passed Debug/Release core checks and built and ran six UBT consumers: Development and Shipping on each approved host. The [F01 execution report](docs/research/f01-build-evidence.md) retains the source checkpoints, failure/recovery evidence and all 18 bootstrap/core/consumer records with verified hash links. F02 and B01 may now proceed under the plan's dependency ledger.
 
-The approved game baseline remains Unreal **5.8.1**, Mac Xcode **26.1.1**, Windows VS2026/MSVC14.50/SDK10.0.26100 and Linux v26 Clang20.1.8 with its fixed sysroot. Those compiler/SDK selections are exercised in source CI; they are not Unreal qualification. The pre-existing local editor is Unreal **5.8.3**; local Xcode **27.0** and SDK **27.0** are not the approved profile. Game packaging must reject an incompatible host or missing game project; do not edit engine metadata or relabel a standalone manifest to pass the gate.
+The approved game baseline remains Unreal **5.8.1**, Mac Xcode **26.1.1**, Windows VS2026/MSVC14.50/SDK10.0.26100 and Linux v26 Clang20.1.8 with its fixed sysroot. Those selections now have native UBT core-consumer proof, not a UAT game or GPU result. The pre-existing local editor is Unreal **5.8.3**; local Xcode **27.0** and SDK **27.0** are not the approved profile. Game packaging must reject an incompatible host or missing game project; do not edit engine metadata or relabel a standalone manifest to pass the gate.
 
 Authorized Epic GitHub access is now available. `config/toolchains.json` pins the exact UE5.8.1 source commit, archive root and SHA-256; the archive and extracted source remain private and ignored. No engine metadata is edited and no standalone manifest is relabeled as engine-qualified.
 
