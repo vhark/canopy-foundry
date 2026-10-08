@@ -1,4 +1,4 @@
-name: Native core source checks
+name: Native core compatibility checks
 on:
   push:
   pull_request:
@@ -11,12 +11,22 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2025, macos-15]
     runs-on: ${{ matrix.os }}
+    env:
+      CANOPY_QUALIFY_ENGINE: ${{ github.event_name == 'push' && github.actor == github.repository_owner && contains(github.event.head_commit.message, '[qualify-engine]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v7.1.4
         with:
           version: '0.12.3'
           enable-cache: false
+      - name: Provision authorized pinned Unreal build tools
+        if: env.CANOPY_QUALIFY_ENGINE == 'true'
+        env:
+          CANOPY_UE_SOURCE_ARCHIVE_URL: ${{ secrets.CANOPY_UE_SOURCE_ARCHIVE_URL }}
+        shell: bash
+        run: |
+          uv run --frozen python scripts/bootstrap_engine.py --engine-root "$RUNNER_TEMP/ue581"
+          echo "CANOPY_UE_ROOT=$RUNNER_TEMP/ue581" >> "$GITHUB_ENV"
       - name: Select approved Apple toolchain
         if: runner.os == 'macOS'
         shell: bash
@@ -86,8 +96,11 @@ jobs:
             'uv run --frozen python scripts/build_core.py --config Release'
             'uv run --frozen ctest --test-dir .build/core --output-on-failure'
             'uv run --frozen python -m pytest tests/build -q'
-          ) -join ' && '
-          & cmd.exe /d /c $commands
+          )
+          if ($env:CANOPY_QUALIFY_ENGINE -eq 'true') {
+            $commands += 'uv run --frozen python scripts/qualify_engine_core.py --engine-root "%CANOPY_UE_ROOT%"'
+          }
+          & cmd.exe /d /c ($commands -join ' && ')
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Bootstrap pinned native dependencies
         if: runner.os != 'Windows'
@@ -107,7 +120,11 @@ jobs:
       - name: Build preflight behavior tests
         if: runner.os != 'Windows'
         run: uv run --frozen python -m pytest tests/build -q
-      - name: Retain source build evidence
+      - name: Qualify Development and Shipping engine core consumers
+        if: runner.os != 'Windows' && env.CANOPY_QUALIFY_ENGINE == 'true'
+        shell: bash
+        run: uv run --frozen python scripts/qualify_engine_core.py --engine-root "$CANOPY_UE_ROOT"
+      - name: Retain scoped native build evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -117,6 +134,8 @@ jobs:
             .build/native-bootstrap-attempt.json
             .build/core/*/canopy-core-manifest.json
             .build/core/Testing/Temporary/LastTest.log
+            .build/engine-bootstrap.json
+            .build/engine-qualification/*/*/manifest.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30

@@ -24,12 +24,12 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def run(argv: list[str], *, cwd: Path) -> str:
+def run(argv: list[str], *, cwd: Path, env: dict[str, str] | None = None) -> str:
     if not argv or not all(isinstance(arg, str) and arg for arg in argv):
         raise BuildFailure("Invalid process argument vector")
     print("argv: " + json.dumps(argv), flush=True)
     try:
-        result = subprocess.run(argv, cwd=cwd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
+        result = subprocess.run(argv, cwd=cwd, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
     except OSError as error:
         raise BuildFailure(f"Cannot run {argv[0]}: {error}") from error
     print(result.stdout, end="", flush=True)

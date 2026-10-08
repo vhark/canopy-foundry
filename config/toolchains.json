@@ -9,6 +9,13 @@
   },
   "unreal": {
     "engine": {"major": 5, "minor": 8, "patch": 1},
+    "source": {
+      "tag": "5.8.1-release",
+      "commit": "71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "archive_root": "EpicGames-UnrealEngine-71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
+      "archive_sha256": "712ae95d999d5e3e88f2e132b059ff360d089ef0a13df00418abedbc56841d89",
+      "dotnet_directory": "10.0"
+    },
     "win64": {"visual_studio": "18.0", "msvc": "14.50", "windows_sdk": "10.0.26100", "qualified_triplet": "x64-windows-msvc", "crt_debug": "MDd", "crt_release": "MD", "rtti": false, "exceptions": false},
     "linux-x64": {
       "clang": "20.1.8",
@@ -24,6 +31,6 @@
         "root": "v26_clang-20.1.8-rockylinux8"
       }
     },
-    "mac-arm64": {"xcode": "26.1.1", "crt": "libc++", "rtti": false, "exceptions": false}
+    "mac-arm64": {"xcode": "26.1.1", "deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58", "crt": "libc++", "rtti": false, "exceptions": false}
   }
 }

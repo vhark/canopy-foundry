@@ -6,6 +6,8 @@ import pytest
 
 from scripts import build_common, build_core, build_game
 
+MACOS_PROFILE = {"deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58"}
+
 
 def test_child_failure_preserves_exit_code(tmp_path):
     child = tmp_path / "tool with spaces.py"
@@ -209,11 +211,11 @@ def test_unapproved_windows_toolchain_fails_preflight(vs, msvc, sdk):
 @pytest.mark.parametrize(
     ("architecture", "sdk", "triplet", "error"),
     [
-        ("x86_64", "/SDK/selected", "arm64-osx", "architecture"),
-        (None, "/SDK/selected", "arm64-osx", "architecture"),
-        ("arm64", "/SDK/other", "arm64-osx", "sysroot"),
-        ("arm64", None, "arm64-osx", "sysroot"),
-        ("arm64", "/SDK/selected", "x64-osx", "triplet"),
+        ("x86_64", "/SDK/selected", "arm64-osx-ue58", "architecture"),
+        (None, "/SDK/selected", "arm64-osx-ue58", "architecture"),
+        ("arm64", "/SDK/other", "arm64-osx-ue58", "sysroot"),
+        ("arm64", None, "arm64-osx-ue58", "sysroot"),
+        ("arm64", "/SDK/selected", "arm64-osx", "triplet"),
     ],
 )
 def test_macos_core_rejects_mismatched_effective_target(architecture, sdk, triplet, error):
@@ -223,4 +225,23 @@ def test_macos_core_rejects_mismatched_effective_target(architecture, sdk, tripl
     if sdk:
         command += ["-isysroot", sdk]
     with pytest.raises(build_common.BuildFailure, match=error):
-        build_core.validate_macos_target([command], "/SDK/selected", triplet)
+        build_core.validate_macos_target([command], "/SDK/selected", triplet, MACOS_PROFILE)
+
+
+def test_macos_core_rejects_a_newer_os_deployment_target():
+    command = ["clang++", "-arch", "arm64", "-isysroot", "/SDK/selected",
+               "-mmacosx-version-min=15.0"]
+    with pytest.raises(build_common.BuildFailure, match="deployment target"):
+        build_core.validate_macos_target([command], "/SDK/selected", "arm64-osx-ue58", MACOS_PROFILE)
+
+
+def test_linux_qualification_rejects_a_separate_core_sysroot(tmp_path, monkeypatch):
+    toolchain = tmp_path / "v26_clang-20.1.8-rockylinux8/x86_64-unknown-linux-gnu"
+    sysroot = tmp_path / "different-sysroot"
+    toolchain.mkdir(parents=True)
+    sysroot.mkdir()
+    monkeypatch.setenv("CANOPY_LINUX_TOOLCHAIN_ROOT", str(toolchain))
+    monkeypatch.setenv("CANOPY_LINUX_SYSROOT", str(sysroot))
+    profile = {"archive": {"root": toolchain.parent.name}, "clang": "20.1.8"}
+    with pytest.raises(build_common.BuildFailure, match="same.*sysroot"):
+        build_game.qualified_compiler(tmp_path, "linux-x64", profile)

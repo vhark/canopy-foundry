@@ -104,13 +104,14 @@ def preflight(root: Path, config: str) -> dict:
     return {"tools": tools, "vcpkg_commit": commit, "bootstrap_sha256": common.sha256(bootstrap), "host_sdk": host_sdk}
 
 
-def validate_macos_target(commands: list[list[str]], sdk: str, triplet: str) -> None:
-    if triplet != "arm64-osx":
+def validate_macos_target(commands: list[list[str]], sdk: str, triplet: str, profile: dict) -> None:
+    if triplet != profile["qualified_triplet"]:
         raise common.BuildFailure("Compiled macOS core dependency triplet mismatch")
     expected_sdk = Path(sdk).resolve()
     for argv in commands:
         architectures = []
         sysroots = []
+        deployment_targets = []
         for index, argument in enumerate(argv):
             if argument == "-arch":
                 architectures.append(argv[index + 1] if index + 1 < len(argv) else "")
@@ -120,10 +121,14 @@ def validate_macos_target(commands: list[list[str]], sdk: str, triplet: str) -> 
                 sysroots.append(argument.removeprefix("-isysroot"))
             elif argument.startswith("--sysroot="):
                 sysroots.append(argument.removeprefix("--sysroot="))
+            elif argument.startswith("-mmacosx-version-min="):
+                deployment_targets.append(argument.removeprefix("-mmacosx-version-min="))
         if architectures != ["arm64"]:
             raise common.BuildFailure("Compiled macOS core architecture mismatch")
         if not sysroots or any(not root or Path(root).resolve() != expected_sdk for root in sysroots):
             raise common.BuildFailure("Compiled macOS core SDK sysroot mismatch")
+        if deployment_targets != [profile["deployment_target"]]:
+            raise common.BuildFailure("Compiled macOS core deployment target mismatch")
 
 
 def build(root: Path, config: str) -> Path:
@@ -140,9 +145,13 @@ def build(root: Path, config: str) -> Path:
     # Preserve the driver name: resolving clang++ to clang changes C++ link defaults.
     if host == "mac-arm64":
         sdk_path = evidence["host_sdk"]["macos_sdk_path"]
+        profile = common.load_json(root / "config/toolchains.json")["unreal"]["mac-arm64"]
+        deployment_target = profile["deployment_target"]
         selected_compiler = Path(common.run(["xcrun", "--sdk", sdk_path, "--find", "clang++"], cwd=root).strip()).absolute()
         configure += ["-DCMAKE_CXX_FLAGS=-stdlib=libc++", "-DCMAKE_OSX_ARCHITECTURES=arm64",
-                      f"-DCMAKE_OSX_SYSROOT={sdk_path}", "-DVCPKG_TARGET_TRIPLET=arm64-osx"]
+                      f"-DCMAKE_OSX_SYSROOT={sdk_path}", f"-DCMAKE_OSX_DEPLOYMENT_TARGET={deployment_target}",
+                      f"-DVCPKG_OVERLAY_TRIPLETS={root / 'dependencies/triplets'}",
+                      f"-DVCPKG_TARGET_TRIPLET={profile['qualified_triplet']}"]
     elif host == "win64":
         binary = shutil.which("cl.exe")
         if not binary:
@@ -188,9 +197,13 @@ def build(root: Path, config: str) -> Path:
                           "-DVCPKG_TARGET_TRIPLET=x64-linux",
                           "-DCMAKE_CXX_FLAGS=-stdlib=libstdc++" if "clang" in version.lower() else "-DCMAKE_CXX_FLAGS="]
     cache_path = build_dir / "CMakeCache.txt"
-    if selected_compiler and cache_path.exists():
-        old = re.search(r"^CMAKE_CXX_COMPILER:[^=]+=(.+)$", cache_path.read_text(encoding="utf-8"), re.MULTILINE)
-        if old and Path(old.group(1)).absolute() != selected_compiler:
+    if cache_path.exists():
+        previous_cache = cache_path.read_text(encoding="utf-8")
+        old = re.search(r"^CMAKE_CXX_COMPILER:[^=]+=(.+)$", previous_cache, re.MULTILINE)
+        old_triplet = re.search(r"^VCPKG_TARGET_TRIPLET:[^=]+=(.+)$", previous_cache, re.MULTILINE)
+        selected_triplet = next(arg.split("=", 1)[1] for arg in configure if arg.startswith("-DVCPKG_TARGET_TRIPLET="))
+        if ((selected_compiler and old and Path(old.group(1)).absolute() != selected_compiler)
+                or (old_triplet and old_triplet.group(1) != selected_triplet)):
             shutil.rmtree(build_dir)
     if selected_compiler:
         configure.append(f"-DCMAKE_CXX_COMPILER={selected_compiler}")
@@ -228,7 +241,7 @@ def build(root: Path, config: str) -> Path:
         raise common.BuildFailure("Missing canopy_core compiler invocation evidence")
     args = [shlex.split(entry["command"], posix=host != "win64") for entry in core_commands]
     if host == "mac-arm64":
-        validate_macos_target(args, evidence["host_sdk"]["macos_sdk_path"], triplet)
+        validate_macos_target(args, evidence["host_sdk"]["macos_sdk_path"], triplet, profile)
     if host == "win64":
         crt = "MDd" if config == "Debug" else "MD"
         flags = [{arg[1:] for arg in argv if arg.startswith(("/", "-"))} for argv in args]
@@ -265,6 +278,8 @@ def build(root: Path, config: str) -> Path:
         raise common.BuildFailure("Core inputs changed during build")
     abi = {"crt": crt, "rtti": False, "exceptions": False}
     data = {"schema": 1, "scope": "standalone-core", "platform": host, "config": config, "compiler": {"id": compiler_match.group(1), "version": compiler_version, "path": str(compiler), "binary_sha256": common.sha256(compiler)}, "abi": abi, "vcpkg_triplet": triplet, "host_sdk": evidence["host_sdk"], "tools": evidence["tools"], "vcpkg_commit": evidence["vcpkg_commit"], "bootstrap_sha256": evidence["bootstrap_sha256"], "inputs_sha256": original_inputs, "library": {"path": str(library.resolve()), "sha256": common.sha256(library)}, "child_return_codes": {"configure": 0, "build": 0}, "unreal_qualified": False}
+    if host == "mac-arm64":
+        data["deployment_target"] = deployment_target
     common.write_manifest(manifest, data)
     return manifest
 

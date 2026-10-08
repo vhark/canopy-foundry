@@ -1,0 +1,7 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "",
+  "Description": "Standalone core static-library ABI qualification; no game modules or plugins",
+  "Modules": []
+}

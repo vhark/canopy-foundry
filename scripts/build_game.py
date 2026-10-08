@@ -161,6 +161,8 @@ def qualified_compiler(root: Path, host: str, requirements: dict) -> dict:
                 or Path(tc).name != "x86_64-unknown-linux-gnu"
                 or Path(tc).parent.name != requirements["archive"]["root"] or not Path(sysroot).is_dir()):
             raise common.BuildFailure("Missing explicitly qualified v26 Linux toolchain/fixed sysroot")
+        if Path(tc).resolve() != Path(sysroot).resolve():
+            raise common.BuildFailure("Core and Unreal must use the same fixed Linux sysroot")
         compiler_path = (Path(tc) / "bin/clang++").resolve()
         if not compiler_path.is_file():
             raise common.BuildFailure("Missing v26 clang++ executable")
@@ -205,8 +207,10 @@ def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
         raise common.BuildFailure("core manifest library path is outside the native build tree")
     sdk = core.get("host_sdk", {})
     if host == "mac-arm64":
-        if core.get("vcpkg_triplet") != "arm64-osx":
+        if core.get("vcpkg_triplet") != profile["qualified_triplet"]:
             raise common.BuildFailure("core manifest macOS dependency triplet mismatch")
+        if core.get("deployment_target") != profile["deployment_target"]:
+            raise common.BuildFailure("core manifest macOS deployment target mismatch")
         if any(sdk.get(key) != value for key, value in tool["qualification"].items()):
             raise common.BuildFailure("core manifest Xcode/SDK mismatch")
     if host == "win64" and core.get("vcpkg_triplet") != profile["qualified_triplet"]:

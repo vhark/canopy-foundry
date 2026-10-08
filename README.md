@@ -41,13 +41,25 @@ uv run --frozen python -m pytest tests/build -q
 
 `--config Release` selects the release build. The CMake preset `native-asan-ubsan` uses a separate `.build/core-sanitized` directory. Build outputs, dependency caches and machine-specific manifests remain under ignored `.build/` and `.work/`.
 
-Local macOS arm64 verification passed: four native conversion cases in each of Debug, Release and ASan/UBSan builds, plus 30 build-orchestration tests. The separately linked API smoke produced `60000 square feet = 5574.1824 square metres`. A stale Intel CMake target was corrected to arm64; the emitted manifest is checked against the actual archive architecture and selected SDK. These results do not qualify an Unreal ABI or another platform.
+Local macOS arm64 verification passed: four native conversion cases in each of Debug, Release and ASan/UBSan builds. The current build-orchestration suite passes 52 checks. The separately linked API smoke produced `60000 square feet = 5574.1824 square metres`. Core and dependency builds use the UE 5.8 macOS14 deployment floor through `arm64-osx-ue58`; the emitted manifest is checked against the actual archive architecture, deployment target and selected SDK. These local results do not qualify an Unreal ABI or another platform.
 
-The approved-SDK hosted matrix also passed Debug and Release on all three native platforms: four native cases per configuration; 30 Python checks on Linux/Mac and 26 passed plus four POSIX-only skips on Windows. The [F01 execution report](docs/research/f01-build-evidence.md) records both source checkpoints, compiler/SDK and artifact hashes, failure/recovery evidence, preserved manifests and the remaining engine-access gate.
+The approved-SDK hosted source matrix also passed Debug and Release on all three native platforms: four native cases per configuration; at that checkpoint, 30 Python checks on Linux/Mac and 26 passed plus four POSIX-only skips on Windows. The [F01 execution report](docs/research/f01-build-evidence.md) records source checkpoints, compiler/SDK and artifact hashes, failure/recovery evidence, preserved manifests and the remaining native engine-consumer gate.
 
-The approved game baseline remains Unreal **5.8.1**, Mac Xcode **26.1.1**, Windows VS2026/MSVC14.50/SDK10.0.26100 and Linux v26 Clang20.1.8 with its fixed sysroot. Those compiler/SDK selections are exercised in source CI; they are not Unreal qualification. The latest inspected local engine is Unreal **5.8.3**, with Xcode **27.0** and SDK **27.0**. Game packaging must reject an incompatible host or missing game project; do not edit engine metadata or relabel a standalone manifest to pass the gate.
+The approved game baseline remains Unreal **5.8.1**, Mac Xcode **26.1.1**, Windows VS2026/MSVC14.50/SDK10.0.26100 and Linux v26 Clang20.1.8 with its fixed sysroot. Those compiler/SDK selections are exercised in source CI; they are not Unreal qualification. The pre-existing local editor is Unreal **5.8.3**; local Xcode **27.0** and SDK **27.0** are not the approved profile. Game packaging must reject an incompatible host or missing game project; do not edit engine metadata or relabel a standalone manifest to pass the gate.
 
-Execution decision: retain this approved baseline. Engine-dependent implementation remains gated on authorized UE5.8.1 access and native engine qualification. Complete [Epic's account-link and invitation procedure](https://www.unrealengine.com/en-US/ue-on-github), or provide authorized UE5.8.1 artifacts on engine-capable native build hosts. The installed versions are not an experimental substitute; account/legal acceptance is an owner action.
+Authorized Epic GitHub access is now available. `config/toolchains.json` pins the exact UE5.8.1 source commit, archive root and SHA-256; the archive and extracted source remain private and ignored. No engine metadata is edited and no standalone manifest is relabeled as engine-qualified.
+
+On a native host with the approved SDK selected, provision the build tools from an authorized local archive and run the real UBT consumer:
+
+```sh
+uv run --frozen python scripts/bootstrap_engine.py --engine-root /absolute/new/ue581 --archive /absolute/authorized-source.tar.gz
+uv run --frozen python scripts/build_core.py --config Release
+uv run --frozen python scripts/qualify_engine_core.py --engine-root /absolute/new/ue581
+```
+
+The bootstrap installs only official host .NET and UBT managed dependencies, not an editor or game installation. The qualifier builds official UnrealBuildTool, uses it to link Development and Shipping C++20 Program executables against the actual Release core archive, and runs both programs. Each must report the expected public API result and matching compiler, CRT, pointer width, RTTI and exception policy. Receipt/executable hashes and runtime output are written separately under `.build/engine-qualification/`; this is core-consumer evidence, not UAT/game/GPU qualification.
+
+Ordinary source CI needs no Epic credential. Engine qualification is opt-in: an owner-authored push with `[qualify-engine]` in the commit message and the short-lived `CANOPY_UE_SOURCE_ARCHIVE_URL` repository secret. The secret is an authorized GitHub codeload URL for the exact pinned commit, available only to the bootstrap step; remove it after the run. No long-lived Epic/GitHub token, engine archive, source tree or engine binary is uploaded as a CI artifact.
 
 ## Repository policy
 
