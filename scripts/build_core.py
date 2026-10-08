@@ -175,7 +175,7 @@ def build(root: Path, config: str) -> Path:
             runtime = f'-nodefaultlibs "{libcxx["libcxx_library"]}" "{libcxx["libcxxabi_library"]}" -lm -lc -lpthread -lgcc_s -lgcc'
             configure += [f"-DCMAKE_SYSROOT={Path(sysroot).resolve()}",
                           f'-DCMAKE_CXX_FLAGS=-nostdinc++ -isystem "{Path(sysroot) / "include"}" -isystem "{include}"',
-                          f"-DCMAKE_EXE_LINKER_FLAGS={runtime}",
+                          "-DCMAKE_EXE_LINKER_FLAGS=", f"-DCMAKE_CXX_STANDARD_LIBRARIES={runtime}",
                           f"-DCMAKE_C_COMPILER={c_compiler}",
                           f"-DVCPKG_OVERLAY_TRIPLETS={overlay}", f"-DVCPKG_TARGET_TRIPLET={triplet}"]
         else:
@@ -184,7 +184,7 @@ def build(root: Path, config: str) -> Path:
                 raise common.BuildFailure("Missing native Linux C++ compiler")
             selected_compiler = Path(binary).absolute()
             version = common.run([str(selected_compiler), "--version"], cwd=root).splitlines()[0]
-            configure += ["-DCMAKE_SYSROOT=", "-DCMAKE_EXE_LINKER_FLAGS=", "-DVCPKG_OVERLAY_TRIPLETS=",
+            configure += ["-DCMAKE_SYSROOT=", "-DCMAKE_EXE_LINKER_FLAGS=", "-DCMAKE_CXX_STANDARD_LIBRARIES=", "-DVCPKG_OVERLAY_TRIPLETS=",
                           "-DVCPKG_TARGET_TRIPLET=x64-linux",
                           "-DCMAKE_CXX_FLAGS=-stdlib=libstdc++" if "clang" in version.lower() else "-DCMAKE_CXX_FLAGS="]
     cache_path = build_dir / "CMakeCache.txt"
@@ -246,10 +246,10 @@ def build(root: Path, config: str) -> Path:
             if os.environ.get("CANOPY_LINUX_TOOLCHAIN_ROOT"):
                 include = evidence["host_sdk"]["libcxx_include"]
                 sdk_include = str(Path(evidence["host_sdk"]["sysroot"]) / "include")
-                linker = re.search(r"^CMAKE_EXE_LINKER_FLAGS:[^=]+=(.*)$", cache, flags=re.MULTILINE)
+                runtime_libraries = re.search(r"^CMAKE_CXX_STANDARD_LIBRARIES:[^=]+=(.*)$", cache, flags=re.MULTILINE)
                 if (evidence["host_sdk"]["sysroot"] != str(Path(os.environ["CANOPY_LINUX_SYSROOT"]).resolve())
                         or not all("-nostdinc++" in argv and include in argv and sdk_include in argv for argv in args)
-                        or not linker or not all(item in linker.group(1) for item in ("-nodefaultlibs", evidence["host_sdk"]["libcxx_library"], evidence["host_sdk"]["libcxxabi_library"]))
+                        or not runtime_libraries or not all(item in runtime_libraries.group(1) for item in ("-nodefaultlibs", evidence["host_sdk"]["libcxx_library"], evidence["host_sdk"]["libcxxabi_library"]))
                         or any(evidence["host_sdk"][key] != value for key, value in common.linux_libcxx().items())):
                     raise common.BuildFailure("Qualified Linux compiler ABI/sysroot/libc++ evidence mismatch")
                 crt = "libc++"

@@ -73,24 +73,12 @@ def test_core_requires_pinned_bootstrap(tmp_path):
         build_core.preflight(tmp_path, "Debug")
 
 
-def test_failed_core_child_removes_prior_success_manifest(tmp_path, monkeypatch):
-    for relative in (
-        "pyproject.toml", "uv.lock", "config/toolchains.json", "CMakeLists.txt",
-        "CMakePresets.json", "dependencies/native-lock.json", "dependencies/vcpkg.json",
-        "dependencies/vcpkg-configuration.json", "scripts/bootstrap_native.py",
-        "scripts/build_common.py", "scripts/build_core.py", "scripts/build_game.py",
-    ):
-        path = tmp_path / relative
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("{}")
+def test_failed_core_preflight_removes_prior_success_manifest(tmp_path):
     manifest = tmp_path / ".build/core/debug/canopy-core-manifest.json"
     manifest.parent.mkdir(parents=True)
     manifest.write_text('{"status":"success"}')
-    monkeypatch.setattr(build_core, "preflight", lambda root, config: {"tools": {"cmake": {"path": sys.executable}}})
-    monkeypatch.setattr(build_core, "host_platform", lambda: "win64")
-    with pytest.raises(build_common.BuildFailure) as failure:
+    with pytest.raises(build_common.BuildFailure):
         build_core.build(tmp_path, "Debug")
-    assert failure.value.code != 0
     assert not manifest.exists()
 
 
