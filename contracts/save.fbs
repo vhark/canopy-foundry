@@ -1,0 +1,20 @@
+namespace canopy.disk;
+
+table Id { high:ulong; low:ulong; }
+table Initial { id:Id; value:double; }
+table Deadline { id:Id; entity:Id; second:long; }
+table Control { id:Id; requested:double; applied:double; }
+table Command { id:Id; actor:Id; expected:ulong; issued:long; kind:ubyte; entity:Id; value:double; decision_second:long; }
+table Receipt { id:Id; revision:ulong; accepted:long; }
+table Event { second:long; kind:ubyte; entity:Id; command:Id; value:double; }
+table State {
+  max_entities:uint; max_receipts:uint; max_events:uint; max_decisions:uint;
+  second:long; decision_index:uint; pending:bool; revision:ulong; seed:ulong;
+  climate:ulong; crop:ulong;
+  initial:[Initial]; deadlines:[Deadline]; controls:[Control];
+  commands:[Command]; receipts:[Receipt]; events:[Event];
+}
+table Identity { campaign:Id; branch:Id; source_campaign:Id; source:string; model:string; render:string; parent_branch:Id; }
+table Save { version:uint; identity:Identity; state:State; }
+root_type Save;
+file_identifier "CPS2";

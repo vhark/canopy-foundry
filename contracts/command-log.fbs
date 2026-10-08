@@ -1,0 +1,18 @@
+include "save.fbs";
+namespace canopy.disk;
+table Transition {
+  kind:ubyte;
+  command:Command;
+  error:ubyte;
+  receipt:Receipt;
+  target:long;
+  max_substeps:uint;
+  reached:long;
+  stop:ubyte;
+}
+table Journal {
+  version:uint; start_revision:ulong; start_second:long; entries:[Transition];
+  campaign:Id; branch:Id; checkpoint_sha256:[ubyte]; predecessor_sha256:[ubyte];
+}
+root_type Journal;
+file_identifier "CPJ2";

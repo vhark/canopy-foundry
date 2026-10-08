@@ -20,12 +20,14 @@ struct DecisionDeadline {
     Id id;
     Id entity_id;
     SimSecond second;
+    friend bool operator==(const DecisionDeadline&, const DecisionDeadline&) = default;
 };
 enum class LoadError {
     None, AlreadyLoaded, CapacityExceeded, DuplicateEntity,
     DuplicateDecision, UnknownEntity, InvalidId, InvalidTime, InvalidValue
 };
 
+struct WorldState;
 // One owner mutates this model; load admits all storage before normal operations.
 // Rejected commands have no receipt and do not claim an ID; accepted IDs never expire.
 class World {
@@ -49,6 +51,9 @@ public:
                                        std::uint64_t counter) const noexcept {
         return random_sample(seed_, entity, stream, counter);
     }
+    [[nodiscard]] WorldState capture() const;
+    // A corrupt state is never installed; the destination remains unchanged.
+    [[nodiscard]] static LoadError restore(const WorldState& state, World& destination);
 
 private:
     WorldLimits limits_;
@@ -61,6 +66,7 @@ private:
     std::uint64_t climate_boundaries_{};
     std::uint64_t crop_boundaries_{};
     std::vector<DecisionDeadline> deadlines_;
+    std::vector<InitialControl> initial_controls_;
     std::vector<ControlView> controls_;
     std::vector<Command> commands_;
     std::vector<Receipt> receipts_;

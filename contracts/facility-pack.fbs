@@ -1,0 +1,48 @@
+// Game-only semantic projection. Coordinates are RH Z-up metres; no game instance IDs.
+namespace canopy.facility;
+
+table Point { x:double; y:double; z:double; }
+// Row-major affine matrix; position is the last column in RH Z-up metres.
+table Frame { m00:double; m01:double; m02:double; m03:double;
+              m10:double; m11:double; m12:double; m13:double;
+              m20:double; m21:double; m22:double; m23:double;
+              m30:double; m31:double; m32:double; m33:double; }
+table Envelope { length_m:double; width_m:double; height_m:double; }
+table Identity { source_uuid:string; ifc_global_id:string; ifc_class:string; evidence_kind:string; state:string; }
+table Storey { ifc_global_id:string; name:string; floor_polygon:[Point]; gross_floor_m2:double; }
+table Room { ifc_global_id:string; name:string; storey_global_id:string; zone:string; polygon:[Point]; area_m2:double; height_m:double; }
+table Zone { name:string; room_global_ids:[string]; area_m2:double; }
+table Equipment { source_uuid:string; ifc_global_id:string; type_uuid:string; name:string; position:Point; evidence_kind:string; frame:Frame; envelope:Envelope; front_clearance_m:double; }
+table Canopy { ifc_global_id:string; polygon:[Point]; area_m2:double; }
+table Port { source_uuid:string; ifc_global_id:string; host_global_id:string; peer_global_id:string; system:string; kind:string; flow:string; position:Point; frame:Frame; }
+table CatalogType { type_uuid:string; name:string; evidence_status:string; source_ids:[string]; }
+table FileDigest { name:string; sha256:string; }
+table SourceProvenance { source_uuid:string; author:string; recorded_at:string; description:string; }
+table FacilityPack {
+  version:uint;
+  project_uuid:string;
+  accepted_revision:string;
+  accepted_design_revision:string;
+  // Exact IFC model byte SHA-256; accepted_revision binds all four source files.
+  source_digest:string;
+  profile:string;
+  valid_from:string;
+  valid_until:string;
+  reviewer:string;
+  decision_reason:string;
+  decision_source_ids:[string];
+  files:[FileDigest];
+  identities:[Identity];
+  storeys:[Storey];
+  rooms:[Room];
+  zones:[Zone];
+  equipment:[Equipment];
+  canopies:[Canopy];
+  ports:[Port];
+  catalog:[CatalogType];
+  sources:[SourceProvenance];
+  // Upstream profile has no design validity interval; false means unknown, not expired.
+  validity_known:bool;
+}
+root_type FacilityPack;
+file_identifier "CFP2";

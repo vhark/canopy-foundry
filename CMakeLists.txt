@@ -80,14 +80,48 @@ function(canopy_instrument target)
     endif()
 endfunction()
 
+set(flatbuffers_DIR "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/flatbuffers")
+set(zstd_DIR "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/zstd")
+find_package(flatbuffers 25.12.19 EXACT CONFIG REQUIRED PATHS "${flatbuffers_DIR}" NO_DEFAULT_PATH)
+find_package(zstd 1.5.7 EXACT CONFIG REQUIRED PATHS "${zstd_DIR}" NO_DEFAULT_PATH)
+set(CANOPY_FLATC_TRIPLET "${VCPKG_HOST_TRIPLET}")
+if(CANOPY_FLATC_TRIPLET STREQUAL "")
+    string(REGEX REPLACE "-ue58$" "" CANOPY_FLATC_TRIPLET "${VCPKG_TARGET_TRIPLET}")
+endif()
+set(CANOPY_FLATC "${VCPKG_INSTALLED_DIR}/${CANOPY_FLATC_TRIPLET}/tools/flatbuffers/flatc${CMAKE_EXECUTABLE_SUFFIX}")
+if(NOT EXISTS "${CANOPY_FLATC}")
+    message(FATAL_ERROR "Pinned host flatc 25.12.19 is missing from isolated vcpkg install")
+endif()
+set(CANOPY_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+add_custom_command(OUTPUT "${CANOPY_GENERATED_DIR}/save_generated.h" "${CANOPY_GENERATED_DIR}/command-log_generated.h"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CANOPY_GENERATED_DIR}"
+    COMMAND "${CANOPY_FLATC}" --cpp -I "${CMAKE_CURRENT_SOURCE_DIR}/contracts"
+        -o "${CANOPY_GENERATED_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/contracts/save.fbs"
+        "${CMAKE_CURRENT_SOURCE_DIR}/contracts/command-log.fbs"
+    DEPENDS contracts/save.fbs contracts/command-log.fbs VERBATIM)
+add_custom_target(canopy_save_schemas DEPENDS "${CANOPY_GENERATED_DIR}/save_generated.h" "${CANOPY_GENERATED_DIR}/command-log_generated.h")
 add_library(canopy_core STATIC
     core/src/units.cpp
     core/src/clock.cpp
     core/src/world.cpp
     core/src/receipts.cpp
+    core/src/world_state.cpp
+)
+add_library(canopy_persistence STATIC
+    core/src/persistence/snapshot.cpp
+    core/src/persistence/journal.cpp
+    core/src/persistence/digest.cpp
+    core/src/persistence/manifest.cpp
+    core/src/persistence/atomic_file.cpp
 )
 target_include_directories(canopy_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
 target_compile_features(canopy_core PUBLIC cxx_std_20)
+add_dependencies(canopy_persistence canopy_save_schemas)
+target_include_directories(canopy_persistence PRIVATE "${CANOPY_GENERATED_DIR}")
+target_include_directories(canopy_persistence PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
+target_link_libraries(canopy_persistence PUBLIC canopy_core PRIVATE flatbuffers::flatbuffers zstd::libzstd_static)
+canopy_strict_warnings(canopy_persistence)
+canopy_instrument(canopy_persistence)
 canopy_strict_warnings(canopy_core)
 canopy_instrument(canopy_core)
 # Match UE 5.8's native policy: no RTTI, with exceptions enabled on Mac.
@@ -99,6 +133,14 @@ elseif(APPLE)
     target_compile_options(canopy_core PRIVATE -fno-rtti -fexceptions)
 else()
     target_compile_options(canopy_core PRIVATE -fno-rtti -fno-exceptions)
+endif()
+if(MSVC)
+    target_compile_options(canopy_persistence PRIVATE /GR- /EHs-c-)
+    set_property(TARGET canopy_persistence PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+elseif(APPLE)
+    target_compile_options(canopy_persistence PRIVATE -fno-rtti -fexceptions)
+else()
+    target_compile_options(canopy_persistence PRIVATE -fno-rtti -fno-exceptions)
 endif()
 
 include(CTest)
@@ -117,8 +159,11 @@ if(BUILD_TESTING)
         core/tests/clock_test.cpp
         core/tests/commands_test.cpp
         core/tests/replay_test.cpp
+        core/tests/save_test.cpp
+        core/tests/save_migration_test.cpp
     )
-    target_link_libraries(canopy_core_tests PRIVATE canopy_core Catch2::Catch2WithMain)
+    target_link_libraries(canopy_core_tests PRIVATE canopy_persistence Catch2::Catch2WithMain)
+    target_compile_definitions(canopy_core_tests PRIVATE CANOPY_SAVE_FIXTURE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/saves")
     if(MSVC)
         set_property(TARGET canopy_core_tests PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
     endif()
@@ -127,4 +172,11 @@ if(BUILD_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}")
     include(Catch)
     catch_discover_tests(canopy_core_tests)
+    add_executable(canopy_save_crash core/tests/save_crash.cpp)
+    target_link_libraries(canopy_save_crash PRIVATE canopy_persistence)
+    canopy_strict_warnings(canopy_save_crash)
+    canopy_instrument(canopy_save_crash)
+    if(MSVC)
+        set_property(TARGET canopy_save_crash PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    endif()
 endif()

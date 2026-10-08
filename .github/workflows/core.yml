@@ -93,8 +93,12 @@ jobs:
             'uv run --frozen python scripts/bootstrap_native.py'
             'uv run --frozen python scripts/build_core.py --config Debug'
             'uv run --frozen ctest --test-dir .build/core --output-on-failure'
+            'uv run --frozen cmake --build .build/core --target canopy_save_crash'
+            '.build\core\canopy_save_crash.exe qualify .work\qualification\f04-debug'
             'uv run --frozen python scripts/build_core.py --config Release'
             'uv run --frozen ctest --test-dir .build/core --output-on-failure'
+            'uv run --frozen cmake --build .build/core --target canopy_save_crash'
+            '.build\core\canopy_save_crash.exe qualify .work\qualification\f04-release'
             'uv run --frozen python -m pytest tests/build -q'
           )
           if ($env:CANOPY_QUALIFY_ENGINE -eq 'true') {
@@ -111,12 +115,22 @@ jobs:
       - name: Debug native core tests
         if: runner.os != 'Windows'
         run: uv run --frozen ctest --test-dir .build/core --output-on-failure
+      - name: Debug native process-kill recovery
+        if: runner.os != 'Windows'
+        run: |
+          uv run --frozen cmake --build .build/core --target canopy_save_crash
+          .build/core/canopy_save_crash qualify .work/qualification/f04-debug
       - name: Build Release standalone core (not Unreal qualified)
         if: runner.os != 'Windows'
         run: uv run --frozen python scripts/build_core.py --config Release
       - name: Release native core tests
         if: runner.os != 'Windows'
         run: uv run --frozen ctest --test-dir .build/core --output-on-failure
+      - name: Release native process-kill recovery
+        if: runner.os != 'Windows'
+        run: |
+          uv run --frozen cmake --build .build/core --target canopy_save_crash
+          .build/core/canopy_save_crash qualify .work/qualification/f04-release
       - name: Build preflight behavior tests
         if: runner.os != 'Windows'
         run: uv run --frozen python -m pytest tests/build -q

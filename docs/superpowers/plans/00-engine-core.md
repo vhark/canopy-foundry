@@ -122,6 +122,11 @@ missing optional logo   -> neutral visual, identical domain hash
 
 **Check:** `ctest --test-dir .build/core -R 'Save|Migration' --output-on-failure`; native fault-injection save smoke on each target. Expected: no duplicate transaction and no unrecoverable loss of the previous committed save.
 
+**Execution record (qualification in progress):** the current F02 authority has owned capture/validated restore, bounded FlatBuffers snapshots, zstd/checksums, checkpoint-bound journal provenance, retained daily/manual/branch history and forward v1 migration into a new destination. Local macOS arm64 Debug, Release and ASan/UBSan each passed 41 native cases and all 15 actual process-kill scenarios (three writer modes × five durability stages). Recovery compares the complete canonical authority digest, rejects foreign or rewritten audit identity, retains a valid fallback after repeated interruption, and resumes journal writes. Tests also cover corrupt decoded snapshots, orphan segments, exact historical generations, migration capacity and audit retention beyond 512 segments.
+
+The three-host source workflow now invokes the real crash helper in both configurations; those new hosted results are not yet recorded. Local Xcode27 is standalone evidence only. The persisted authority currently consists of F02 controls, commands/receipts, clocks, deadlines, seed and events; inventory, cash, crops and construction must extend this same schema and recovery proof when their domain tasks introduce those fields. No crop/economic recovery result is claimed here.
+
+
 ## F05 — Headless runner, diagnostics and qualification protocol
 
 **Dependencies:** F02/F04.

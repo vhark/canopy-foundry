@@ -1,4 +1,5 @@
 #include <canopy/world.hpp>
+#include <canopy/world_state.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -36,6 +37,7 @@ void World::swap(World& other) noexcept {
     swap(climate_boundaries_, other.climate_boundaries_);
     swap(crop_boundaries_, other.crop_boundaries_);
     swap(deadlines_, other.deadlines_);
+    swap(initial_controls_, other.initial_controls_);
     swap(controls_, other.controls_);
     swap(commands_, other.commands_);
     swap(receipts_, other.receipts_);
@@ -73,6 +75,7 @@ LoadError World::load(std::span<const InitialControl> controls,
             if (deadlines[i].id == deadlines[j].id) return LoadError::DuplicateDecision;
         }
     }
+    initial_controls_.reserve(limits_.max_entities);
     controls_.reserve(limits_.max_entities);
     deadlines_.reserve(limits_.max_decisions);
     commands_.reserve(limits_.max_receipts);
@@ -82,6 +85,7 @@ LoadError World::load(std::span<const InitialControl> controls,
     for (const auto& control : controls) {
         controls_.push_back({control.id, control.initial, control.initial});
     }
+    initial_controls_.assign(controls.begin(), controls.end());
     std::sort(controls_.begin(), controls_.end(), [](const auto& a, const auto& b) { return a.id < b.id; });
     deadlines_.assign(deadlines.begin(), deadlines.end());
     std::sort(deadlines_.begin(), deadlines_.end(), [](const auto& a, const auto& b) {
