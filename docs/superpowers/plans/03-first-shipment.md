@@ -16,11 +16,11 @@ Dependencies: F03/F06, B03/B04/B06, S01–S08. Art and interaction prototypes ca
 
 **Create:** `game/Content/Maps/FirstShipment.umap`, `game/Source/CanopyFoundry/Interaction/{Inspectable,InteractionResolver}.{h,cpp}`, `game/Source/CanopyFoundry/UI/{InspectionViewModel,FacilityHUD}.{h,cpp}`, `game/Content/UI/Inspection/`, `tests/qualification/first_person.py`.
 
-- [ ] Assemble the exact 216 m² small-facility layout from B02/B03 content with real doors, benches, rails, duct connections, service access and processing space. Preserve semantic instance selection in both first-person and overhead modes.
+- [ ] Assemble the exact 216 m² facility with real doors, benches, rails, utility connections, service access and processing. Preserve semantic selection in third-person, first-person and overhead. Render actual character locomotion/work and carried items in third-person; first-person local visibility must not hide the held tray/tool or change its ownership.
 - [ ] Implement contextual focus and reach rules: identify nearby equipment, cohort, tray or station; show compatible actions with reasons for unavailable ones. Prevent interaction through a wall/locked service panel solely because an ID is known.
 - [ ] Display short name, operating state and one actionable issue first. Expose source/model validity and technical IDs only in deeper inspection. Show owned versus ordered versus preview equipment distinctly.
 - [ ] Add believable scale cues, lighting, footsteps, equipment audio and interactable doors. Reserve collision for relevant geometry; no collision on every bolt or visible leaf.
-- [ ] Register `floor-inspection`: walk the route, operate a door, inspect the same bench in first-person/plan, open technical details, then use controller-only input. Capture 1080p and 4K UI evidence.
+- [ ] Register `floor-inspection`: walk/operate/inspect the same bench in third-person, first-person and overhead with both input devices; exercise view changes beside walls and service panels, safe camera collision and avatar-bound reach. Capture 1080p/4K UI and body/tool readability.
 - [ ] Commit the playable map and approved assets; record first-person camera/art/interaction issues before increasing facility size.
 
 **Check:** `python scripts/qualify.py --case floor-inspection`. Expected: the owned room is navigable and understandable without the old shift dashboard or UUID navigation.
@@ -75,6 +75,7 @@ commission without power/drain       -> unavailable with named reasons
 **Create:** `game/Source/CanopyFoundry/Work/{PlayerWork,CarryableInventory,CartInteraction,WorkerPresenter,JobBoard}.{h,cpp}`, `game/Content/Workers/`, `content/definitions/progression/labor.json`, `tests/qualification/manual_and_worker.py`.
 
 - [ ] Implement carrying one tray, cart loading, nursery-to-room transfer and harvesting/processing station actions against S05 reservations. Work progress and input consumption are explicit and interruptible.
+- [ ] Switch first-/third-person during tray carrying, cart pushing and active station work; preserve the same held item, reservation, progress and movement authority. Overhead/time-lapse returns to the remembered hands-on view. No duplicated mesh-owned stock, lost held object or restarted work animation may complete another task.
 - [ ] Add one hired helper able to perform the same supported jobs. The player can inspect job/route/blocking cause and reassign priorities; hiring creates wages and shift limits.
 - [ ] Build pooled nearby worker animation/navigation from logical routes. Despawn/respawn distant visual workers without changing arrival times, inventory or job progress.
 - [ ] Add a purchasable automation rule for a repeated transfer task after the player has completed that workflow. Automation respects stock, capacity, schedules and shared resources; no free off-map labor.
@@ -109,7 +110,7 @@ commission without power/drain       -> unavailable with named reasons
 
 - [ ] Integrate G01–G07 into a continuous career: construction, commissioning, nursery/crop work, diagnosis, processing, sale and reinvestment. Goals respond to actual domain state rather than executing the actions for the player.
 - [ ] Add a second crop cycle and mutually affordable upgrade choices: commission room B, increase shared capacity or automate transfers. The purchased change affects the next cycle through the real simulation and ledger.
-- [ ] Run controller and mouse/keyboard walkthroughs from a clean save in each packaged target; exercise pause, fast-forward, save/reload and recovery. No direct debug command may be required for a normal player to finish.
+- [ ] Run controller and mouse/keyboard walkthroughs on every native target in both hands-on views, including repeated view changes during work, overhead return, camera obstruction, pause, fast-forward, save/reload and recovery. No view requires debug commands or permits reach through walls.
 - [ ] Register `first-shipment-native`; capture a full playable trace with a real failure, correction, sale and next investment. Compare its domain outcome with the equivalent headless command stream.
 - [ ] Conduct the five-person formative playtest specified in the product spec. Record task completion, unprompted causal explanation, confusion, repeated-action burden and desire/choice to start another cycle. Fix failed usability/loop goals before producing flagship art.
 - [ ] Commit the release candidate for the small facility and its evidence. Only this gate establishes the first game loop; F06's walkable room and S08's headless sale are not substitutes.

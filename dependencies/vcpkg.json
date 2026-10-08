@@ -1,0 +1,14 @@
+{
+  "name": "canopy-foundry-native",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "catch2",
+    "flatbuffers",
+    "zstd"
+  ],
+  "overrides": [
+    { "name": "catch2", "version": "3.16.0" },
+    { "name": "flatbuffers", "version": "25.12.19" },
+    { "name": "zstd", "version": "1.5.7" }
+  ]
+}

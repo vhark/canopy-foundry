@@ -1,0 +1,32 @@
+{
+  "vcpkg": {
+    "repository": "https://github.com/microsoft/vcpkg.git",
+    "commit": "2750401336fb7c95f6619657a46a7e798661341c"
+  },
+  "ports": {
+    "catch2": {
+      "version": "3.16.0",
+      "upstream": "https://github.com/catchorg/Catch2",
+      "source_ref": "v3.16.0",
+      "portfile": "https://raw.githubusercontent.com/microsoft/vcpkg/2750401336fb7c95f6619657a46a7e798661341c/ports/catch2/portfile.cmake",
+      "source_sha512": "b17a1d03bd206ec2a006bfd2cb6a40cb641dd6c3ee192f4e4830ecc2c7fe60ffb2d98397adbb7c039b065c891ebc5dcd0e02331dff472ced7411f8263e1d7b29",
+      "license": "BSL-1.0"
+    },
+    "flatbuffers": {
+      "version": "25.12.19",
+      "upstream": "https://github.com/google/flatbuffers",
+      "source_ref": "v25.12.19",
+      "portfile": "https://raw.githubusercontent.com/microsoft/vcpkg/2750401336fb7c95f6619657a46a7e798661341c/ports/flatbuffers/portfile.cmake",
+      "source_sha512": "808c77536fbfb1c8a1145506873a2b4e5cb508e48bf35f8502a2d1349b64e7581bfe7ff2f587b3edb2642cc885c60c0170a8875fad245240a1288057f4c07a42",
+      "license": "Apache-2.0"
+    },
+    "zstd": {
+      "version": "1.5.7",
+      "upstream": "https://github.com/facebook/zstd",
+      "source_ref": "v1.5.7",
+      "portfile": "https://raw.githubusercontent.com/microsoft/vcpkg/2750401336fb7c95f6619657a46a7e798661341c/ports/zstd/portfile.cmake",
+      "source_sha512": "26e441267305f6e58080460f96ab98645219a90d290a533410b1b0b1d2f870721c95f8384e342ee647c5e968385a5b7e30c2d04340c37f59b3e6d86762c3260c",
+      "license": "BSD-3-Clause OR GPL-2.0-only"
+    }
+  }
+}

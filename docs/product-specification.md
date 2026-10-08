@@ -4,7 +4,7 @@ Decision baseline: 2026-10-07. These are implementation requirements, not claims
 
 ## 1. Identity and promise
 
-**Grownetics: Canopy Foundry** is a first-person growing-facility construction, operations and business game. Build an operation, engineer its environment, grow valuable crops and expand into an automated horticultural business. The working title requires commercial name clearance before announcement.
+**Grownetics: Canopy Foundry** is a growing-facility construction, operations and business game with switchable third-person and first-person gameplay. Build an operation, engineer its environment, grow valuable crops and expand into an automated horticultural business. The working title requires commercial name clearance before announcement.
 
 Reference principles: Farming Simulator's equipment ownership and hands-on work; Satisfactory's spatial construction; Stationeers' commissioning and environmental dependencies; Oxygen Not Included's readable consequences; crop-business progression without making cannabis the whole product. Do not copy their assets, interfaces, names or balance tables.
 
@@ -20,7 +20,7 @@ The world is primary. Players walk through rooms, inspect plants, operate rollin
 | Platforms | Windows 11 x64, macOS 15+ Apple Silicon with M2 Pro reference tier, Linux x64 Ubuntu 24.04; Ubuntu 22.04 is additional qualification, not an untested launch promise |
 | Launch | Paid offline single-player desktop game; no account required; no always-online economy |
 | Multiplayer | Separate post-single-player gate for host-authoritative 2–4 player co-op; no deterministic peer lockstep |
-| Controls | Mouse/keyboard and controller, rebindable; first-person and overhead design/operations views |
+| Controls | Mouse/keyboard and controller, rebindable; switchable third-person/first-person on foot and in vehicles plus overhead design/operations view; third-person default |
 | Modes | Career, Sandbox and Training on the same simulation; Watch/replay is a tool, not the game's identity |
 | Initial crop | Whole-head lettuce with propagation, transplant, growth, harvest, grading and dispatch |
 | Contrasting crop | Greenhouse tomato with support/training labor, fruit cohorts and repeated harvests |
@@ -119,11 +119,13 @@ Replay supports pause, timeline inspection and a new scenario branch. Inspecting
 
 ## 9. Presentation and accessibility
 
-First-person sight lines, crop development and equipment motion convey state before a table does. Inspection has three depths: short actionable status; diagnostic overlay; sourced trends/technical record. Technical identifiers are available for engineering/debugging but never default player labels.
+Third-person character/work animation, first-person sight lines, crop development and equipment motion convey state before a table does. Inspection has three depths: short actionable status; diagnostic overlay; sourced trends/technical record. Technical identifiers are available for engineering/debugging but never default player labels.
 
 Use Grownetics visual identity for instruments/menus while the world uses believable metal, glazing, hoses, rails, ducts, machinery and crops. Branded assets follow their own approved brand treatment. Audio distinguishes pumps/fans, load and faults without falsely presenting sound as a measurement.
 
 Controller parity; scalable text/UI at 1080p through 4K; subtitles; color-independent alarms; rebindable controls; adjustable FOV; toggle/hold options; head-bob and motion-blur controls; no mandatory rapid input. Localize using message keys and locale-aware unit/currency formatting. English ships first; no localized text is baked into core simulation or textures where avoidable.
+
+Camera interaction follows GTA/Farming Simulator's viewpoint flexibility, not their assets or unrelated combat/crime mechanics: a single rebindable action switches third-person/first-person in the current on-foot or vehicle context, while overhead management is a separate action. Persist on-foot and vehicle preferences separately. Third-person provides orbit/chase distance and obstruction handling; first-person uses the actual eye/seat position; supported vehicles offer operator/cab and chase views. Adjustable per-view FOV, sensitivity/inversion and reduced-motion settings apply. Return from overhead/time-lapse to the previous hands-on view safely. Switching never respawns the actor, teleports it, duplicates carried inventory, resets work or changes speed/control authority; avatar reach/line-of-sight remains authoritative even when a third-person camera sees around a corner. All actions must remain usable in both hands-on views with controller and mouse/keyboard.
 
 ## 10. Guardrails
 

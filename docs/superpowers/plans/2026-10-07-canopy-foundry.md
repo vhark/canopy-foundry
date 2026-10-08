@@ -2,20 +2,20 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship a high-fidelity, cross-platform growing-facility game: personally build and operate realistic equipment, grow crops, diagnose failures, sell output and expand a business. Reuse GrowBIM/OpenCEA and Blender/Bonsai/IFC authoring without making engineering authoring tools runtime dependencies.
+**Goal:** Ship a high-fidelity, cross-platform growing-facility game with switchable third-person/first-person work and driving plus overhead management: build, operate, grow, diagnose, sell and expand. Reuse GrowBIM/OpenCEA and Blender/Bonsai/IFC authoring without runtime tool dependencies.
 
 **Architecture:** Unreal Engine 5.8.1 for world presentation, input and interaction; engine-independent C++20 CanopySim for authoritative fixed-clock simulation; an offline Python3.12 creator/compiler pipeline emits versioned semantic and cooked render packs from accepted BIM and approved equipment sources. Single-player first, host-authoritative 2–4-player co-op later.
 
 **Tech stack:** UE/UBT; C++20/CMake/Ninja; FlatBuffers and zstd; Catch2/CTest; Python3.12/uv/pytest; pinned GrowBIM/OpenCEA/IfcOpenShell; separately installed Blender/Bonsai; Git/Git LFS; private S3-compatible object storage; GitHub Actions with isolated native Windows/Linux/Mac build workers. Dependencies are selected here; exact installed artifacts and hashes are verified and locked in F01 rather than invented in a plan.
 
-**Status:** planning deliverable dated 2026-10-07. No game executable, qualified runtime benchmark, signed vendor deal or commercial title clearance exists as a result of this plan. All implementation checkboxes below and in subplans are future work. This repository is separate from the existing Grownetics Sim study.
+**Status:** implementation started from the 2026-10-07 planning deliverable. F01's standalone native core/build tooling is under implementation and review; approved engine/toolchain and native-platform qualification remain open. No game executable, qualified runtime benchmark, signed vendor deal or commercial title clearance exists. Unchecked work packages remain pending; this repository is separate from the existing Grownetics Sim study.
 
 ## 1. Decisions already made
 
 | Critical aspect | Decision |
 |---|---|
 | Name | **Grownetics: Canopy Foundry**, working commercial title; repository `canopy-foundry`; name clearance before announcement |
-| Experience | First-person work + overhead spatial design + operations/business progression; not a management dashboard with a decorative room |
+| Experience | Third-person default with switchable first-person on foot/in vehicles, overhead spatial design and operations/business progression; one actor/state authority across views |
 | Initial proof | **First Shipment**: 216 m² original facility, two production rooms sharing plant capacity, lettuce, real construction/commissioning, a crop cycle, diagnosis, sale and next investment |
 | Platforms | Windows11 x64; macOS15+ Apple Silicon with M2 Pro reference tier; Linux x64 Ubuntu24.04 reference; 22.04 additional qualification |
 | Rendering | Conventional LOD/raster baseline on all platforms; optional supported Lumen/Nanite enhancements; no required hardware RT or vendor-only upscaler |
@@ -50,20 +50,22 @@ The seven subplans contain **60 work packages**, concrete future file paths, ord
 
 One integration owner owns each shared boundary: F02 core command/time/IDs; F03 runtime bridge; F04 save schema; F05 qualification dispatcher; B02 facility-pack schema/crosswalk; B04 equipment/port contract; B06 construction; S04 domain orchestration; T05 mod manifest; R01 native build/release artifact orchestration. Consumers extend these contracts rather than creating competing schemas, clocks, ledgers, port types, pack loaders or runners.
 
-### Common future commands and evidence
+User camera addition: F03 owns the shared camera component and on-foot input/collision/preferences; G01/G05 qualify character, tool and work continuity; X04 supplies real vehicle operator/chase views; F06/P06/R03 qualify perspective transitions, obstruction handling, saved preferences and controller parity natively. Architecture A13 is normative; camera-only changes never alter the domain clock, work or inventory.
+
+### Common commands and evidence
 
 Run from this repository unless a task explicitly says upstream:
 
 ```text
-python scripts/build_core.py --config Debug
-ctest --test-dir .build/core --output-on-failure
-python scripts/build_game.py --platform win64 --configuration Development
+uv run --frozen python scripts/build_core.py --config Debug
+uv run --frozen ctest --test-dir .build/core --output-on-failure
+uv run --frozen python scripts/build_game.py --platform win64 --configuration Development --engine-root "$CANOPY_UE_ROOT"
 python scripts/qualify.py --case CASE_ID --platform win64 --output .work/qualification/CASE_ID
 ```
 
-F01/F05 implement these entrypoints. `--platform` defaults to the native host, `--output` to `.work/qualification`; shortened task commands use those documented defaults. Platform IDs are `win64`, `linux-x64`, `mac-arm64`. The rights checker separately uses the rights-manifest platform vocabulary; its scope mapping must be explicit, not stringly inferred.
+F01 supplies build entrypoints; F05 supplies the future qualification entrypoint. Build platform/configuration and the authorized engine installation path are explicit. For `qualify.py`, `--platform` defaults to the native host and `--output` to `.work/qualification`; shortened qualification commands use those defaults. Platform IDs are `win64`, `linux-x64`, `mac-arm64`. The rights checker separately uses the rights-manifest platform vocabulary; its scope mapping must be explicit, not stringly inferred.
 
-Reports require case/status/commit/engine/model/seed/platform/settings/measurements/evidence; missing measurements are **not measured**, not zero. Unknown/skipped mandatory cases exit nonzero. Commands shown in these documents are future acceptance contracts, not scripts that currently exist or checks already run. Benchmarks must name source/model/recipe hashes, hardware, internal/output resolution and raw evidence. Native packaged interaction plus visual review is required for player-facing work; a headless pass is insufficient.
+Reports require case/status/commit/engine/model/seed/platform/settings/measurements/evidence; missing measurements are **not measured**, not zero. Unknown/skipped mandatory cases exit nonzero. A command listed in an uncompleted task is an acceptance contract, not evidence it ran successfully. Current source-build instructions and observed limits are in the [README](../../../README.md#native-source-build). Benchmarks must name source/model/recipe hashes, hardware, internal/output resolution and raw evidence. Native packaged interaction plus visual review is required for player-facing work; a headless pass is insufficient.
 
 ## 3. Dependency ledger
 

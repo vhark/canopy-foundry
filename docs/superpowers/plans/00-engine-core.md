@@ -10,21 +10,23 @@
 
 ---
 
-This document defines future implementation work, not an existing executable. The [master plan](2026-10-07-canopy-foundry.md) owns sequencing. Follow the architecture's authority/units rules. Each task ends with a focused commit, runtime smoke and its recorded evidence; do not substitute unit tests for a packaged-game check.
+F01 implementation has started; later tasks still define future work, not an existing game executable. The [master plan](2026-10-07-canopy-foundry.md) owns sequencing. Follow the architecture's authority/units rules. Each task ends with a focused commit, runtime smoke and its recorded evidence; do not substitute unit tests for a packaged-game check.
 
 ## F01 — Reproducible native build and dependency lock
 
 **Dependencies:** none; authorized Unreal access and Windows/Mac/Linux build machines are real prerequisites.
 
-**Create:** `CMakeLists.txt`, `CMakePresets.json`, `dependencies/vcpkg.json`, `dependencies/vcpkg-configuration.json`, `config/toolchains.json`, `scripts/build_core.py`, `scripts/build_game.py`, `.github/workflows/core.yml`, `core/include/canopy/units.hpp`, `core/tests/{test_main,units_test}.cpp`.
+**Create:** `CMakeLists.txt`, `CMakePresets.json`, `dependencies/{vcpkg.json,vcpkg-configuration.json,native-lock.json}`, `config/toolchains.json`, `scripts/{bootstrap_native,build_common,build_core,build_game}.py`, `.github/workflows/core.yml`, `core/include/canopy/units.hpp`, `core/tests/units_test.cpp`. Use Catch2's supplied `Catch2WithMain` rather than a duplicate test entrypoint.
 
 - [ ] Provision UE **5.8.1** from the authorized release; record engine Build.version/build ID and installation artifact hashes privately. Do not commit Epic engine source/binaries. Select Windows VS2026 18.0/MSVC14.50/SDK10.0.26100, Mac Xcode26.1.1 and Linux v26 clang20.1.8 fixed sysroot; reject Xcode26.4 for this baseline. Capture patch/build identifiers for each compiler/SDK, not only product names.
-- [ ] Lock CMake, Ninja, Catch2, FlatBuffers/flatc and zstd to exact versions and source hashes through one committed vcpkg baseline and toolchain record. Resolve licenses before accepting the lock; no `latest`, unpinned Git branch or network package resolution during a reproducible rebuild. The lock is produced from actually installed/verified artifacts, not fabricated checksums in this plan.
-- [ ] Create root `pyproject.toml`/`uv.lock` with the creator member `apps/canopy-author/pyproject.toml`; pin Python3.12, uv, authoring/test dependencies and immutable approved GrowBIM/OpenCEA artifacts. Use `uv sync --frozen --all-packages --all-extras` for the single authoring/qualification environment. Update the upstream artifact hash only after B01 lands; do not rely on a sibling editable checkout in reproducible CI. Blender/Bonsai run in their separately pinned application environment. None of these Python dependencies ships as a gameplay prerequisite.
+- [x] Lock CMake, Ninja, Catch2, FlatBuffers/flatc and zstd to exact versions and source hashes through one committed vcpkg baseline and toolchain record. Resolve licenses before accepting the lock; no `latest`, unpinned Git branch or network package resolution during a reproducible rebuild. The lock is produced from actually installed/verified artifacts, not fabricated checksums in this plan.
+- [x] Create root `pyproject.toml`/`uv.lock` with the creator member `apps/canopy-author/pyproject.toml`; pin Python3.12, uv, authoring/test dependencies and immutable approved GrowBIM/OpenCEA artifacts. Use `uv sync --frozen --all-packages --all-extras` for the single authoring/qualification environment. Update the upstream artifact hash only after B01 lands; do not rely on a sibling editable checkout in reproducible CI. Blender/Bonsai run in their separately pinned application environment. None of these Python dependencies ships as a gameplay prerequisite.
 - [ ] Create CMake presets `native-debug`, `native-release` and sanitizer configurations. Match Unreal's target compiler, CRT/standard-library ABI, exception and RTTI policy when producing its static core library; reject incompatible triplets rather than linking a conveniently installed library.
 - [ ] Implement `build_core.py --config Debug|Release` and `build_game.py --platform win64|linux-x64|mac-arm64 --configuration Development|Shipping`. They check the lock, propagate nonzero tool exit status, print exact invocations and write a build manifest. Native Mac builds run on Mac; Linux native/cross builds use the qualified toolchain.
 - [ ] Configure source-only CI for core tests without engine or vendor credentials. Implement the public area-unit conversion below and test it through that API; do not test only build-file wording or a copied arithmetic expression. F02 extends this units header; B02 uses it for facility accounting.
 - [ ] Build a library and test binary on each OS; record compiler and ABI metadata. Commit the lock, build rules and successful reports.
+
+Current evidence: pinned uv environment and immutable upstream wheels installed; the GrowBIM CLI starts; local arm64 Debug, Release and ASan/UBSan builds each passed all four native conversion cases; 30 build-orchestration tests passed. The separately linked API smoke produced `60000 square feet = 5574.1824 square metres`. Native/bootstrap and build-orchestration spec and quality reviews passed after corrections, including actual arm64 archive and selected-SDK verification. F01 remains open: the host has UE5.8.0/Xcode27 rather than UE5.8.1/Xcode26.1.1, and approved Windows/Linux engine qualification is unavailable. Source-only CI is configured but its native hosted results are not yet recorded; it cannot close the Unreal ABI gate.
 
 Initial concrete boundary test in `core/tests/units_test.cpp`; the function under test must be implemented in the core, not supplied as a fixture echo:
 
@@ -40,7 +42,7 @@ TEST_CASE("square-foot conversion uses squared length units") {
 
 B02 adds the distinct facility invariant: three 20,000 ft² storeys total 60,000 ft², independently of the number of rack tiers. It must call the shared conversion API rather than reimplement the constant in fixtures.
 
-**Checks:** `python scripts/build_core.py --config Debug`; `ctest --test-dir .build/core --output-on-failure`. Expected: native test executable runs; toolchain mismatch exits nonzero. `.build/core` is the common native build directory used by all subplans.
+**Checks:** `uv run --frozen python scripts/build_core.py --config Debug`; `uv run --frozen ctest --test-dir .build/core --output-on-failure`. Expected: native test executable runs; toolchain mismatch exits nonzero. `.build/core` is the common native build directory used by all subplans.
 
 ## F02 — Typed state, commands, receipts and fixed clock
 
@@ -66,20 +68,20 @@ Fixture specification, implemented as actual state transitions rather than expec
 
 **Check:** `ctest --test-dir .build/core -R 'Clock|Command|Replay' --output-on-failure`. Expected: receipt/ordering/stop cases pass; original failing-before traces retained in the implementation review.
 
-## F03 — Native first-person game and state bridge
+## F03 — Native first-/third-person game and state bridge
 
 **Dependencies:** F01/F02. Replace the original qualification room with B02/B03 output before F06.
 
 **Create:** `game/CanopyFoundry.uproject`, `game/Source/CanopyFoundry/{CanopyFoundry.Build.cs,CanopyFoundry.Target.cs,CanopyFoundryEditor.Target.cs}`, `game/Plugins/CanopyRuntime/CanopyRuntime.uplugin`, `game/Plugins/CanopyRuntime/Source/CanopySimExternal/CanopySimExternal.Build.cs`, `game/Plugins/CanopyRuntime/Source/CanopyRuntime/{CanopyRuntime.Build.cs,Public/SimulationSubsystem.h,Private/SimulationSubsystem.cpp}`, `game/Source/CanopyFoundry/Player/{FacilityCharacter,InteractionComponent}.{h,cpp}`, `game/Config/{DefaultInput,DefaultEngine}.ini`, `game/Content/Maps/FacilityQualification.umap`.
 
-- [ ] Build an actual packaged first-person scene using original geometry, player capsule, collision, basic controls, interact/inspect and an overhead camera. Original qualification art is not to be presented as a completed realistic equipment pack.
+- [ ] Build a packaged scene with one visible original/licensed character, third-person default, first-person eye view and overhead camera. Create `game/Source/CanopyFoundry/Player/FacilityCameraComponent.{h,cpp}` for architecture A13: collision-tested orbit/chase, smooth bounded transitions, local head/body visibility, per-context persisted preferences and rebindable perspective/management actions. Do not clone or respawn the actor to change cameras. Qualification art is not a completed realistic equipment pack.
 - [ ] Implement one domain worker and bounded command/view queues. Resolve immutable IDs to presentation proxies; apply views only on the game thread. Emit completion/error events for interaction feedback.
-- [ ] Implement start/pause/time multiplier/skip controls using target domain time and pending-command reconciliation. Prevent first-person carrying/driving while in management time-lapse; return safely to hands-on mode without changing task state.
+- [ ] Implement start/pause/time multiplier/skip using target domain time and pending-command reconciliation. Prevent physical carrying/driving in either hands-on view during management time-lapse; return to the prior first-/third-person view safely without changing work state. Camera switching itself never changes time speed.
 - [ ] Bind input through Enhanced Input actions; configure mouse/keyboard/controller in the same action model. Retain focus and accessibility semantics in UI; no document IDs in default inspection.
-- [ ] Smoke the packaged program: walk, inspect an instance, issue a valid control change, pause while a command is pending, resume and confirm the authoritative view. Repeat in baseline non-Nanite/non-HWRT rendering.
+- [ ] Smoke the actual package using both controller and mouse/keyboard: first-/third-person/overhead transitions, narrow door and bench camera collision, avatar-to-target reach despite camera corner visibility, valid control change, pending-command pause/resume, camera preference save/relaunch and safe shutdown. Compare domain state before/after view-only changes. Repeat without Nanite/HWRT. X04 adds real vehicle seat/chase integration rather than an unused vehicle-camera stub here.
 - [ ] Shut down during queued work and confirm worker lifetime/drain behavior without use-after-free. Commit the real project and approved original assets through LFS.
 
-**Check:** `python scripts/build_game.py --platform win64 --configuration Development` and the corresponding Mac/Linux commands. Expected: three native packages start and input works. Editor play-in-editor alone does not pass.
+**Check:** `uv run --frozen python scripts/build_game.py --platform win64 --configuration Development --engine-root "$CANOPY_UE_ROOT"` and the corresponding Mac/Linux commands, with `CANOPY_UE_ROOT` naming the authorized approved engine installation on that host. Expected: three native packages start and input works. Editor play-in-editor alone does not pass.
 
 ## F04 — Crash-safe saves and replay authority
 
@@ -128,7 +130,7 @@ missing optional logo   -> neutral visual, identical domain hash
 
 **Create:** `tests/qualification/native_room.py`, `benchmarks/routes/room-inspection.json`, `game/Source/CanopyFoundry/Tests/ImportedRoomScenario.cpp`.
 
-- [ ] Register `native-imported-room`: load the compiled accepted IFC room, inspect the mapped rack, verify metre-to-centimetre scale/handedness, walk through the real door, switch floorplan/first-person and select the same semantic entity.
+- [ ] Register `native-imported-room`: load the accepted IFC-derived room, inspect the mapped rack, verify scale/handedness, walk the door and switch third-person/first-person/overhead while selecting the same entity. Exercise camera obstruction at racks/walls and saved preference without changing domain state.
 - [ ] Save/reload the fixture state and camera/selection, verifying the selected semantic entity and accepted source digest remain unchanged. Full construction/movement transactions are qualified later in B06/G02; do not introduce a second unvalidated geometry-edit implementation to pass this early platform proof.
 - [ ] Run the room on Windows/Linux and Apple Silicon Mac with the conventional LOD/raster baseline, then enable supported higher-tier features. Capture camera-route evidence at 1080p and 4K output, including readable UI and collision.
 - [ ] Verify the packaged runtime works with Python/Blender/Bonsai and the authoring service absent. Verify native Windows does not import or shell out to the POSIX store.

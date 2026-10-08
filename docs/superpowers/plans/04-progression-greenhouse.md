@@ -56,6 +56,7 @@ Base release includes X01–X05 and X07. X06 is the separately cleared cannabis 
 
 - [ ] Expand staffing into roles/skills/shifts, onboarding costs, fatigue/availability game rules and task priorities. Avoid simulating every thought; jobs/reservations remain the authority.
 - [ ] Add drivable/pushable carts and a licensed/original lift/forklift interaction model with the same transport/load/clearance rules as automated fleet work. State clearly that this is not an operator safety certification simulator.
+- [ ] Extend F03's camera component for actual vehicle seat/operator and third-person chase views, shared driving input and context-specific saved preference. Exercise enter/exit, drive with load, switch views while moving, obstruction recovery and save/reload without resetting throttle/load/ownership. Seat view follows the real operator anchor even when a machine has no enclosed cab. Never build a second vehicle simulation for a different camera.
 - [ ] Add maintenance scheduling, spares, contractor callouts and equipment downtime. Repairs consume time/parts/funds; deferred maintenance affects a seeded failure model, not secretly random punishment.
 - [ ] Implement declarative automation rules for transfers, harvest queues and condition-based maintenance. Bound rule execution and detect loops/conflicting control actions; avoid a general code-execution language at this stage.
 - [ ] Test staff shortage, simultaneous harvest queues, failed lift recovery, automation cancellation and camera-independent completion times.

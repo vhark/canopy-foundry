@@ -1,10 +1,10 @@
 # Source register and observed boundaries
 
-Research date: 2026-10-07. This register separates inspected capability from decisions and future work. No game implementation, performance benchmark, vendor asset download, partnership, trademark clearance or new Bonsai run was performed for this planning deliverable.
+Initial research date: 2026-10-07. This register separates inspected capability from decisions and future work. The planning research did not execute a game, qualify performance, acquire vendor rights or run Bonsai. Implementation has since started; see the [current build status](../../README.md#native-source-build) and [skill evaluation](skill-evaluation.md). A standalone core build is not a game or BIM qualification.
 
 ## Local authoritative evidence
 
-The following are inspected paths in the existing sibling repositories, **not files copied into this repository**. Their local working state is evidence of interfaces, not a reproducible released dependency. F01/B01 must publish/pin an immutable approved dependency artifact before implementation builds depend on it.
+The following table records inspected interfaces in the existing sibling repositories. F01 now retains immutable OpenCEA/GrowBIM wheels built from source commit `91b3b6b855cea542667fcd9794fd3aaccb208e1f`; [artifact provenance and hashes](../../dependencies/upstream/README.md) distinguish those approved bytes from a sibling editable checkout. These artifacts preserve the existing narrow functionality, not B01's future general-facility/MEP profile.
 
 | ID | Existing repository/path | Observed scope |
 |---|---|---|

@@ -188,3 +188,12 @@ Grownetics OS, live telemetry and external AI are not runtime prerequisites. Rea
 Git holds source, plans, schemas, original definitions and approved LFS art; content-addressed object storage holds restricted masters, builds and profiling evidence. Each sponsor has access isolation and retention rules. Self-hosted trusted Windows, Linux and Mac runners cook native builds with licensed SDKs; untrusted pull requests never access them or secrets. No engine binaries or restricted source assets go to public CI artifacts.
 
 Code signing/notarization, store/age ratings, SBOM and notices, engine royalties, trademark clearance, content rights and privacy review are launch gates. Engine licensing is an accepted commercial dependency, not proof all Unreal-adjacent assets are covered. See [licensing](licensing.md) for the separation.
+
+## A13 — One actor, three presentation views
+
+F03 owns a `FacilityCameraComponent` on the possessed character/vehicle presentation, not inside CanopySim. Use explicit `FirstPerson`, `ThirdPerson` and `Overhead` view states with remembered on-foot/vehicle hands-on preference. Third-person is default; a collision-tested spring arm retracts against walls/benches/ceilings and restores distance without changing the actor position. First-person uses authored eye/seat anchors, a local mesh/head visibility policy and correct carried-tool/tray presentation. Camera collision and smoothing must not conceal geometry or erase a world obstruction.
+
+Enhanced Input provides `TogglePerspective` separately from `ToggleManagementView`; both remap on keyboard/controller. Overhead preserves the prior hands-on state; management time-lapse suspends physical carrying/driving according to A05 and restores the prior view on safe return. Camera transitions never issue purchases, complete jobs, re-possess/duplicate an actor or change time rate. Store FOV/distance/input preferences in local user settings; save campaign position/vehicle/work state through its existing ownership path. A multiplayer client's view remains local and does not alter host authority.
+
+Aim/focus may originate at the camera, but interaction acceptance checks avatar reach, target ownership and unobstructed actor-to-target geometry. A camera that can see around a corner does not confer remote reach. F03/F06 qualify on-foot view/collision/persistence, G05 qualifies carried objects and tasks, X04 integrates real seat/chase vehicle views, and P06/R03 exercise all available views on each native platform and controller.
+
