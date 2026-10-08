@@ -180,7 +180,7 @@ def qualify(engine_root: Path) -> list[Path]:
     core_manifest_hash = common.sha256(core_path)
     qualifier_hash = common.sha256(Path(__file__))
     host = core["platform"]
-    fixture_hashes = {str(p.relative_to(FIXTURE)): common.sha256(p) for p in sorted(FIXTURE.rglob("*")) if p.is_file()}
+    fixture_hashes = {p.relative_to(FIXTURE).as_posix(): common.sha256(p) for p in sorted(FIXTURE.rglob("*")) if p.is_file()}
     if set(fixture_hashes) != {f"{NAME}Consumer.uproject", f"Source/{NAME}.Target.cs",
                                f"Source/{NAME}/{NAME}.Build.cs", f"Source/{NAME}/Private/Main.cpp"}:
         raise common.BuildFailure("Qualification fixture has unexpected inputs")
@@ -206,8 +206,11 @@ def qualify(engine_root: Path) -> list[Path]:
         environment["LINUX_MULTIARCH_ROOT"] = str(architecture.parent)
     ubt_command = [str(dotnet), "build", str(ubt_project), "-c", "Development", "-v", "quiet"]
     common.run(ubt_command, cwd=engine_root, env=environment)
+    publish_command = [str(dotnet), "publish", str(ubt_project), "-c", "Development",
+                       "--output", str(ubt.parent), "--no-build", "-v", "quiet"]
+    common.run(publish_command, cwd=engine_root, env=environment)
     if not ubt.is_file():
-        raise common.BuildFailure("Official UBT build did not produce UnrealBuildTool.dll")
+        raise common.BuildFailure("Official UBT build/publish did not produce UnrealBuildTool.dll")
     ubt_hash = common.sha256(ubt)
     results = []
     for config in ("Development", "Shipping"):
@@ -217,7 +220,7 @@ def qualify(engine_root: Path) -> list[Path]:
         if project.exists():
             shutil.rmtree(project)
         shutil.copytree(FIXTURE, project)
-        copied = {str(p.relative_to(project)): common.sha256(p) for p in project.rglob("*") if p.is_file()}
+        copied = {p.relative_to(project).as_posix(): common.sha256(p) for p in project.rglob("*") if p.is_file()}
         if copied != fixture_hashes:
             raise common.BuildFailure("Copied qualification fixture differs from original")
         # UE 5.8 keeps Program receipts project-local only when the project
@@ -249,7 +252,7 @@ def qualify(engine_root: Path) -> list[Path]:
                 or common.sha256(version_path) != boot["source"]["build_version_sha256"]
                 or common.sha256(working_descriptor) != fixture_hashes[NAME + "Consumer.uproject"]
                 or any(common.sha256(project / relative) != digest for relative, digest in fixture_hashes.items())
-                or {str(p.relative_to(FIXTURE)): common.sha256(p) for p in FIXTURE.rglob("*") if p.is_file()} != fixture_hashes):
+                or {p.relative_to(FIXTURE).as_posix(): common.sha256(p) for p in FIXTURE.rglob("*") if p.is_file()} != fixture_hashes):
             raise common.BuildFailure("Qualification source, build tool, or library changed during execution")
         evidence = {"schema": 1, "status": "success", "scope": "unreal-core-consumer", "platform": host,
                     "configuration": config, "engine": {"root": str(engine_root), "source": boot["source"],
@@ -261,9 +264,9 @@ def qualify(engine_root: Path) -> list[Path]:
                     "fixture_sha256": fixture_hashes, "working_descriptor": {"path": str(working_descriptor), "sha256": common.sha256(working_descriptor)},
                     "receipt": {"path": str(receipt), "sha256": common.sha256(receipt)},
                     "executable": executable_evidence, "qualifier_sha256": qualifier_hash,
-                    "commands": {"ubt_build": ubt_command, "ubt": args, "native": [str(executable)]},
+                    "commands": {"ubt_build": ubt_command, "ubt_publish": publish_command, "ubt": args, "native": [str(executable)]},
                     "output": measured, "native_stdout": native_output,
-                    "child_return_codes": {"ubt_build": 0, "ubt": 0, "native": 0}}
+                    "child_return_codes": {"ubt_build": 0, "ubt_publish": 0, "ubt": 0, "native": 0}}
         common.write_manifest(success, evidence)
         results.append(success)
     return results
