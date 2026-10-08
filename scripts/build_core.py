@@ -143,6 +143,14 @@ def build(root: Path, config: str) -> Path:
         selected_compiler = Path(common.run(["xcrun", "--sdk", sdk_path, "--find", "clang++"], cwd=root).strip()).absolute()
         configure += ["-DCMAKE_CXX_FLAGS=-stdlib=libc++", "-DCMAKE_OSX_ARCHITECTURES=arm64",
                       f"-DCMAKE_OSX_SYSROOT={sdk_path}", "-DVCPKG_TARGET_TRIPLET=arm64-osx"]
+    elif host == "win64":
+        binary = shutil.which("cl.exe")
+        if not binary:
+            raise common.BuildFailure("MSVC cl.exe missing from the selected developer environment")
+        selected_compiler = Path(binary).absolute()
+        triplet = common.load_json(root / "config/toolchains.json")["unreal"]["win64"]["qualified_triplet"]
+        configure += [f"-DVCPKG_OVERLAY_TRIPLETS={root / 'dependencies/triplets'}",
+                      f"-DVCPKG_TARGET_TRIPLET={triplet}", f"-DVCPKG_HOST_TRIPLET={triplet}"]
     elif host == "linux-x64":
         tc = os.environ.get("CANOPY_LINUX_TOOLCHAIN_ROOT", "")
         sysroot = os.environ.get("CANOPY_LINUX_SYSROOT", "")
@@ -166,7 +174,7 @@ def build(root: Path, config: str) -> Path:
             include = libcxx["libcxx_include"]
             runtime = f'-nodefaultlibs "{libcxx["libcxx_library"]}" "{libcxx["libcxxabi_library"]}" -lm -lc -lpthread -lgcc_s -lgcc'
             configure += [f"-DCMAKE_SYSROOT={Path(sysroot).resolve()}",
-                          f'-DCMAKE_CXX_FLAGS=-stdlib=libc++ -nostdinc++ -isystem "{Path(sysroot) / "include"}" -isystem "{include}"',
+                          f'-DCMAKE_CXX_FLAGS=-nostdinc++ -isystem "{Path(sysroot) / "include"}" -isystem "{include}"',
                           f"-DCMAKE_EXE_LINKER_FLAGS={runtime}",
                           f"-DCMAKE_C_COMPILER={c_compiler}",
                           f"-DVCPKG_OVERLAY_TRIPLETS={overlay}", f"-DVCPKG_TARGET_TRIPLET={triplet}"]
@@ -199,6 +207,8 @@ def build(root: Path, config: str) -> Path:
     if not triplet_match:
         raise common.BuildFailure("Missing resolved vcpkg target triplet in CMake cache")
     triplet = triplet_match.group(1)
+    if host == "win64" and triplet != common.load_json(root / "config/toolchains.json")["unreal"]["win64"]["qualified_triplet"]:
+        raise common.BuildFailure("Compiled core Windows dependency triplet mismatch")
     if host == "linux-x64":
         expected_triplet = (common.load_json(root / "config/toolchains.json")["unreal"]["linux-x64"]["qualified_triplet"]
                             if os.environ.get("CANOPY_LINUX_TOOLCHAIN_ROOT") else "x64-linux")
@@ -237,11 +247,12 @@ def build(root: Path, config: str) -> Path:
                 include = evidence["host_sdk"]["libcxx_include"]
                 sdk_include = str(Path(evidence["host_sdk"]["sysroot"]) / "include")
                 linker = re.search(r"^CMAKE_EXE_LINKER_FLAGS:[^=]+=(.*)$", cache, flags=re.MULTILINE)
-                if (crt != "libc++" or evidence["host_sdk"]["sysroot"] != str(Path(os.environ["CANOPY_LINUX_SYSROOT"]).resolve())
+                if (evidence["host_sdk"]["sysroot"] != str(Path(os.environ["CANOPY_LINUX_SYSROOT"]).resolve())
                         or not all("-nostdinc++" in argv and include in argv and sdk_include in argv for argv in args)
                         or not linker or not all(item in linker.group(1) for item in ("-nodefaultlibs", evidence["host_sdk"]["libcxx_library"], evidence["host_sdk"]["libcxxabi_library"]))
                         or any(evidence["host_sdk"][key] != value for key, value in common.linux_libcxx().items())):
                     raise common.BuildFailure("Qualified Linux compiler ABI/sysroot/libc++ evidence mismatch")
+                crt = "libc++"
     candidates = [p for p in build_dir.rglob("canopy_core.lib" if host == "win64" else "libcanopy_core.a") if p.is_file()]
     if len(candidates) != 1:
         raise common.BuildFailure(f"Expected exactly one static canopy_core output, found {len(candidates)}")

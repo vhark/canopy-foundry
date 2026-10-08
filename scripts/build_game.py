@@ -209,6 +209,8 @@ def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
             raise common.BuildFailure("core manifest macOS dependency triplet mismatch")
         if any(sdk.get(key) != value for key, value in tool["qualification"].items()):
             raise common.BuildFailure("core manifest Xcode/SDK mismatch")
+    if host == "win64" and core.get("vcpkg_triplet") != profile["qualified_triplet"]:
+        raise common.BuildFailure("core manifest Windows dependency triplet mismatch")
     if host == "win64" and (sdk.get("visual_studio") != tool["qualification"]["visual_studio"] or sdk.get("windows_sdk", "").rstrip("\\/") != tool["qualification"]["windows_sdk"] or sdk.get("msvc") != tool["qualification"]["msvc"]):
         raise common.BuildFailure("core manifest Windows SDK/MSVC mismatch")
     if host == "linux-x64":

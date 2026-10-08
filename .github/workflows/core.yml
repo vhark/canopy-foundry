@@ -76,16 +76,32 @@ jobs:
           $vsdev = Join-Path $vs 'Common7\Tools\VsDevCmd.bat'
           if (-not (Test-Path $vsdev)) { throw 'VsDevCmd.bat is missing' }
           $check = 'uv run --frozen python -c "from pathlib import Path; from scripts import build_common as c, build_game as g; print(g.qualified_compiler(Path.cwd(), ''win64'', c.load_json(Path(''config/toolchains.json''))[''unreal''][''win64'']))"'
-          $commands = 'call "' + $vsdev + '" -arch=amd64 -host_arch=amd64 -vcvars_ver=14.50 -winsdk=10.0.26100.0 && uv sync --frozen --all-packages --all-extras && ' + $check + ' && uv run --frozen python scripts/bootstrap_native.py && uv run --frozen python scripts/build_core.py --config Debug && uv run --frozen ctest --test-dir .build/core --output-on-failure && uv run --frozen python -m pytest tests/build -q'
+          $commands = @(
+            ('call "' + $vsdev + '" -arch=amd64 -host_arch=amd64 -vcvars_ver=14.50 -winsdk=10.0.26100.0')
+            'uv sync --frozen --all-packages --all-extras'
+            $check
+            'uv run --frozen python scripts/bootstrap_native.py'
+            'uv run --frozen python scripts/build_core.py --config Debug'
+            'uv run --frozen ctest --test-dir .build/core --output-on-failure'
+            'uv run --frozen python scripts/build_core.py --config Release'
+            'uv run --frozen ctest --test-dir .build/core --output-on-failure'
+            'uv run --frozen python -m pytest tests/build -q'
+          ) -join ' && '
           & cmd.exe /d /c $commands
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Bootstrap pinned native dependencies
         if: runner.os != 'Windows'
         run: uv run --frozen python scripts/bootstrap_native.py
-      - name: Build standalone core (not Unreal qualified)
+      - name: Build Debug standalone core (not Unreal qualified)
         if: runner.os != 'Windows'
         run: uv run --frozen python scripts/build_core.py --config Debug
-      - name: Native core tests
+      - name: Debug native core tests
+        if: runner.os != 'Windows'
+        run: uv run --frozen ctest --test-dir .build/core --output-on-failure
+      - name: Build Release standalone core (not Unreal qualified)
+        if: runner.os != 'Windows'
+        run: uv run --frozen python scripts/build_core.py --config Release
+      - name: Release native core tests
         if: runner.os != 'Windows'
         run: uv run --frozen ctest --test-dir .build/core --output-on-failure
       - name: Build preflight behavior tests
