@@ -31,6 +31,6 @@
         "root": "v26_clang-20.1.8-rockylinux8"
       }
     },
-    "mac-arm64": {"xcode": "26.1.1", "deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58", "crt": "libc++", "rtti": false, "exceptions": false}
+    "mac-arm64": {"xcode": "26.1.1", "deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58", "crt": "libc++", "rtti": false, "exceptions": true}
   }
 }

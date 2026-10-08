@@ -85,11 +85,13 @@ target_include_directories(canopy_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/core/
 target_compile_features(canopy_core PUBLIC cxx_std_20)
 canopy_strict_warnings(canopy_core)
 canopy_instrument(canopy_core)
-# Core mirrors Unreal's default no-exceptions/no-RTTI policy. Catch2 is kept
-# outside this target and retains its own exception-enabled implementation.
+# Match UE 5.8's native policy: no RTTI, with exceptions enabled on Mac.
+# Catch2 stays outside this target and retains its own exception support.
 if(MSVC)
     target_compile_options(canopy_core PRIVATE /GR- /EHs-c-)
     set_property(TARGET canopy_core PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+elseif(APPLE)
+    target_compile_options(canopy_core PRIVATE -fno-rtti -fexceptions)
 else()
     target_compile_options(canopy_core PRIVATE -fno-rtti -fno-exceptions)
 endif()

@@ -7,7 +7,7 @@ public class CanopyCoreQualification : ModuleRules
     public CanopyCoreQualification(ReadOnlyTargetRules Target) : base(Target)
     {
         bUseRTTI = false;
-        bEnableExceptions = false;
+        bEnableExceptions = Target.Platform == UnrealTargetPlatform.Mac;
         string include = Environment.GetEnvironmentVariable("CANOPY_CORE_INCLUDE")
             ?? throw new BuildException("Qualified core include directory is required");
         string library = Environment.GetEnvironmentVariable("CANOPY_CORE_LIBRARY")

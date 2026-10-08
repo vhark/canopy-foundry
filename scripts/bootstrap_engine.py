@@ -239,6 +239,11 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
         )
         if host == "win-x64":
             build_inputs += ("Engine/Build/Windows/Resources/Default.ico",)
+        elif host == "linux-x64":
+            build_inputs += (
+                "Engine/Binaries/Linux/dump_syms",
+                "Engine/Binaries/Linux/BreakpadSymbolEncoder",
+            )
         ignore.write_text(
             "# Host .NET, native UBA and official UBT inputs; not an editor installation.\n"
             "**\n"

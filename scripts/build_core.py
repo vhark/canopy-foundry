@@ -242,13 +242,17 @@ def build(root: Path, config: str) -> Path:
     args = [shlex.split(entry["command"], posix=host != "win64") for entry in core_commands]
     if host == "mac-arm64":
         validate_macos_target(args, evidence["host_sdk"]["macos_sdk_path"], triplet, profile)
+    exceptions = host == "mac-arm64"
     if host == "win64":
         crt = "MDd" if config == "Debug" else "MD"
         flags = [{arg[1:] for arg in argv if arg.startswith(("/", "-"))} for argv in args]
         if not all({crt, "GR-", "EHs-c-"}.issubset(options) for options in flags):
             raise common.BuildFailure("Cannot confirm core MSVC CRT/RTTI/exception compile flags")
     else:
-        if not all("-fno-rtti" in argv and "-fno-exceptions" in argv for argv in args):
+        exception_option = "-fexceptions" if exceptions else "-fno-exceptions"
+        if not all("-fno-rtti" in argv and
+                   [arg for arg in argv if arg in ("-fexceptions", "-fno-exceptions")][-1:] == [exception_option]
+                   for argv in args):
             raise common.BuildFailure("Cannot confirm core RTTI/exception compile flags")
         crt = "libc++" if all("-stdlib=libc++" in argv for argv in args) else "libstdc++"
         if host == "linux-x64":
@@ -276,7 +280,7 @@ def build(root: Path, config: str) -> Path:
             raise common.BuildFailure("Compiled macOS core library architecture mismatch")
     if original_inputs != common.input_checksums(root):
         raise common.BuildFailure("Core inputs changed during build")
-    abi = {"crt": crt, "rtti": False, "exceptions": False}
+    abi = {"crt": crt, "rtti": False, "exceptions": exceptions}
     data = {"schema": 1, "scope": "standalone-core", "platform": host, "config": config, "compiler": {"id": compiler_match.group(1), "version": compiler_version, "path": str(compiler), "binary_sha256": common.sha256(compiler)}, "abi": abi, "vcpkg_triplet": triplet, "host_sdk": evidence["host_sdk"], "tools": evidence["tools"], "vcpkg_commit": evidence["vcpkg_commit"], "bootstrap_sha256": evidence["bootstrap_sha256"], "inputs_sha256": original_inputs, "library": {"path": str(library.resolve()), "sha256": common.sha256(library)}, "child_return_codes": {"configure": 0, "build": 0}, "unreal_qualified": False}
     if host == "mac-arm64":
         data["deployment_target"] = deployment_target
