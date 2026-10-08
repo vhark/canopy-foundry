@@ -1,7 +1,9 @@
 """Preflight and package an existing game on a qualified native UE 5.8.1 host."""
 
 import argparse
+import hashlib
 import json
+import math
 import os
 import platform
 import re
@@ -10,13 +12,86 @@ import sys
 from pathlib import Path
 
 try:
-    from . import build_common as common, build_core
+    from . import build_common as common, build_core, bootstrap_engine
 except ImportError:
     import build_common as common
     import build_core
+    import bootstrap_engine
 
 ROOT = Path(__file__).resolve().parent.parent
 PLATFORMS = {"win64": "Win64", "linux-x64": "Linux", "mac-arm64": "Mac"}
+F03_TESTS = frozenset({"Canopy.F03.ManagementDebt", "Canopy.F03.ViewOnly",
+                       "Canopy.F03.BoundedHandoff", "Canopy.F03.ViewBindings",
+                       "Canopy.F03.MenuFirstOpen", "Canopy.F03.TargetBatchCompletion"})
+
+
+def editor_command(engine: Path, host: str) -> Path:
+    # Epic AutomationTool/AutomationUtils/CommandletUtils.cs:GetEditorCommandletExe.
+    return engine / {"mac-arm64": "Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor",
+                     "linux-x64": "Engine/Binaries/Linux/UnrealEditor",
+                     "win64": "Engine/Binaries/Win64/UnrealEditor-Cmd.exe"}[host]
+
+
+def editor_build_command(engine: Path, project: Path, host: str) -> list[str]:
+    relative = {"win64": "Build.bat", "mac-arm64": "Mac/Build.sh", "linux-x64": "Linux/Build.sh"}[host]
+    script = engine / "Engine/Build/BatchFiles" / relative
+    bootstrap = [] if host == "win64" else ["-buildubt", "-buildscw"]
+    return [str(script), "CanopyFoundryEditor", PLATFORMS[host], "Development",
+            f"-Project={project}", "-NoHotReload", "-NoUBTMakefiles", *bootstrap]
+
+
+def read_engine_report(path: Path) -> dict:
+    """Epic ForceUTF8 reports include a BOM; repository manifests remain strict UTF-8."""
+    try:
+        value = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as error:
+        raise common.BuildFailure(f"Invalid or missing engine report {path}: {error}") from error
+    if not isinstance(value, dict):
+        raise common.BuildFailure(f"Expected engine report object: {path}")
+    return value
+
+
+def validate_automation_report(report: dict) -> None:
+    tests = report.get("tests")
+    if not isinstance(tests, list) or len(tests) != len(F03_TESTS):
+        raise common.BuildFailure("UE automation report does not contain every F03 test")
+    if (type(report.get("failed")) is not int or report["failed"] != 0
+            or type(report.get("notRun")) is not int or report["notRun"] != 0
+            or type(report.get("succeeded")) is not int or report["succeeded"] != len(F03_TESTS)):
+        raise common.BuildFailure("F03 automation reported failed, skipped or incomplete tests")
+    if {item.get("fullTestPath") for item in tests} != F03_TESTS or any(
+            item.get("state") != "Success" or item.get("errors") != 0 for item in tests):
+        raise common.BuildFailure("F03 automation cases did not all succeed")
+
+
+def validate_packaged_report(report: dict, case: str) -> None:
+    if (type(report.get("schema")) is not int or report["schema"] != 1
+            or report.get("case") != case or report.get("status") != "pass"
+            or not isinstance(report.get("engine"), str) or not report["engine"].startswith("5.8.1-")
+            or not isinstance(report.get("measurements"), dict)):
+        raise common.BuildFailure(f"Invalid packaged qualification report for {case}")
+    measurements = report["measurements"]
+    if case == "f03-native-room":
+        valid = (measurements.get("completedStage") == 4 and measurements.get("second") == 60
+                 and type(measurements.get("revision")) is int and measurements["revision"] >= 3
+                 and measurements.get("appliedControl") == .75)
+    elif case == "b02-cooked-fiducial":
+        ports = measurements.get("ports")
+        valid = (type(measurements.get("renderVertices")) is int and measurements["renderVertices"] >= 18
+                 and type(measurements.get("collisionVertices")) is int and measurements["collisionVertices"] >= 4
+                 and measurements.get("collisionUniqueCorners") == 4
+                 and measurements.get("collisionRayBlocked") is True
+                 and isinstance(ports, list) and len(ports) == 2
+                 and all(isinstance(port, dict) and all(
+                     isinstance(port.get(key), list) and len(port[key]) == 3
+                     and all(type(value) in (int, float) and math.isfinite(value) for value in port[key])
+                     for key in ("position", "direction")) for port in ports))
+    else:
+        raise common.BuildFailure(f"Unknown packaged qualification case: {case}")
+    if not valid:
+        raise common.BuildFailure(f"Incomplete packaged qualification state for {case}")
+
+
 
 
 def native_platform() -> str:
@@ -198,7 +273,42 @@ def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
     if not uat.is_file():
         raise common.BuildFailure(f"Missing official Unreal Automation Tool {uat}")
     profile = expected_engine[host]
+    bootstrap_path = root / ".build/engine-bootstrap.json"
+    boot = common.load_json(bootstrap_path)
+    source = expected_engine["source"]
+    if (boot.get("scope") != "unreal-full-editor" or boot.get("status") != "success"
+            or boot.get("engine_root") != str(engine.resolve())
+            or boot.get("platform") != ("win-x64" if host == "win64" else host)
+            or any(boot.get("source", {}).get(k) != source[k] for k in
+                   ("tag", "commit", "archive_root", "archive_sha256"))
+            or boot.get("source", {}).get("build_version_sha256") != common.sha256(version_path)
+            or boot.get("inputs", {}).get("config_sha256") != common.sha256(root / "config/toolchains.json")
+            or boot.get("inputs", {}).get("bootstrap_sha256") != common.sha256(root / "scripts/bootstrap_engine.py")):
+        raise common.BuildFailure("Game requires this checkout's pinned full-editor bootstrap evidence")
+    deps = boot.get("gitdependencies", {})
+    manifest = engine / "Engine/Build/Commit.gitdeps.xml"
+    working = engine / ".uedependencies"
+    gitdeps = engine / deps.get("path", "")
+    if (deps.get("original_manifests_sha256", {}).get("Engine/Build/Commit.gitdeps.xml") != common.sha256(manifest)
+            or deps.get("working_manifest_sha256") != common.sha256(working)
+            or not isinstance(deps.get("selected_file_count"), int) or deps["selected_file_count"] < 1
+            or deps.get("filter_sha256") is not None or (engine / ".gitdepsignore").exists()
+            or deps.get("returncode") != 0 or deps.get("sha256") != common.sha256(gitdeps)):
+        raise common.BuildFailure("Official full-editor dependency manifest/client changed")
+    dependency_manifest = bootstrap_engine._dependency_manifest(engine)
+    if any(deps.get(key) != value for key, value in dependency_manifest.items()):
+        raise common.BuildFailure("Full-editor selected dependency payloads changed")
+    editor = editor_command(engine, host)
+    build_script = Path(editor_build_command(engine, project, host)[0])
+    if not build_script.is_file():
+        raise common.BuildFailure("Official Editor build script missing")
+    bundled = engine / boot.get("dotnet", {}).get("path", "")
+    if (boot.get("dotnet", {}).get("sha256") != common.sha256(bundled)
+            or boot.get("dotnet", {}).get("version_returncode") != 0):
+        raise common.BuildFailure("Provisioned Editor .NET SDK changed")
     tool = qualified_compiler(root, host, profile)
+    if boot.get("native_toolchain") != tool:
+        raise common.BuildFailure("Native compiler differs from full-editor provision")
     config = "Release"
     manifest_path = root / ".build/core" / config.lower() / "canopy-core-manifest.json"
     core = common.load_json(manifest_path)
@@ -228,10 +338,12 @@ def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
         raise common.BuildFailure("core manifest bootstrap evidence mismatch")
     if core.get("inputs_sha256") != common.input_checksums(root):
         raise common.BuildFailure("core manifest stale or incomplete source input checksums")
-    return {"project": project, "version_path": version_path, "core_path": manifest_path, "core": core, **tool}
+    return {"project": project, "version_path": version_path, "core_path": manifest_path,
+            "core": core, "boot_path": bootstrap_path, "editor": editor,
+            "dependency_manifest": dependency_manifest, **tool}
 
 
-def game_input_checksums(root: Path) -> dict[str, str]:
+def game_input_checksums(root: Path, *, include_authored_outputs: bool = True) -> dict[str, str]:
     generated = {"Binaries", "Intermediate", "Saved", "DerivedDataCache", ".vs"}
     inputs = {}
     for directory, children, filenames in os.walk(root / "game"):
@@ -239,6 +351,11 @@ def game_input_checksums(root: Path) -> dict[str, str]:
                        and not name.endswith((".xcodeproj", ".xcworkspace"))]
         for name in filenames:
             path = Path(directory) / name
+            relative = path.relative_to(root / "game")
+            if not include_authored_outputs and (
+                    relative == Path("Content/Maps/FacilityQualification.umap")
+                    or relative.is_relative_to(Path("Content/B02"))):
+                continue
             if path.is_file():
                 inputs[str(path.relative_to(root))] = common.sha256(path)
     return inputs
@@ -246,24 +363,106 @@ def game_input_checksums(root: Path) -> dict[str, str]:
 
 def build(root: Path, host: str, configuration: str, engine: Path) -> Path:
     archive_base = root / ".build/game" / host / configuration
+    evidence = preflight(root, host, configuration, engine)
     for previous in archive_base.glob("uat-*/canopy-game-manifest.json"):
         previous.unlink()
-    evidence = preflight(root, host, configuration, engine)
     import tempfile
     archive_base.mkdir(parents=True, exist_ok=True)
     archive = Path(tempfile.mkdtemp(prefix="uat-", dir=archive_base))
     manifest_path = archive / "canopy-game-manifest.json"
-    game_inputs = game_input_checksums(root)
+    game_sources = game_input_checksums(root, include_authored_outputs=False)
     core_inputs = common.input_checksums(root)
     core_hash = common.sha256(evidence["core_path"])
+    boot_hash = common.sha256(evidence["boot_path"])
+    fixture_sources = [root / "scripts/generate_cooked_fiducial.py",
+                       *sorted((root / "apps/canopy-author/src").rglob("*.py"))]
+    fixture_source_hashes = {str(path.relative_to(root)): common.sha256(path) for path in fixture_sources}
+    environment = os.environ.copy()
+    environment.pop("CANOPY_UE_SOURCE_ARCHIVE_URL", None)
+    dotnet = engine / common.load_json(evidence["boot_path"])["dotnet"]["path"]
+    environment["DOTNET_ROOT"] = str(dotnet.parent)
+    environment["PATH"] = str(dotnet.parent) + os.pathsep + environment.get("PATH", "")
+    environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1"
+    environment["DOTNET_GENERATE_ASPNET_CERTIFICATE"] = "false"
+    if host == "linux-x64":
+        environment["LINUX_MULTIARCH_ROOT"] = str(Path(environment["CANOPY_LINUX_TOOLCHAIN_ROOT"]).resolve().parent)
+    if host == "win64":
+        environment["CANOPY_UBT_MSVC_VERSION"] = evidence["qualification"]["msvc"].rstrip("\\/")
+        environment["CANOPY_UBT_WINDOWS_SDK"] = evidence["qualification"]["windows_sdk"].rstrip("\\/")
+    build_command = editor_build_command(engine, evidence["project"], host)
+    common.run(build_command, cwd=root, env=environment, capture=False)
+    editor = evidence["editor"]
+    if not editor.is_file():
+        raise common.BuildFailure("Editor build returned without its native executable")
+    editor_hash = common.sha256(editor)
+    map_path = root / "game/Content/Maps/FacilityQualification.umap"
+    map_path.unlink(missing_ok=True)
+    commandlet = [str(editor), str(evidence["project"]), "-run=FacilityRoom", "-unattended", "-nop4", "-nullrhi"]
+    common.run(commandlet, cwd=root, env=environment, capture=False)
+    if not map_path.is_file() or not map_path.stat().st_size:
+        raise common.BuildFailure("FacilityRoom commandlet did not author the required native map")
+    fixture_dir = archive / "fiducial-input"
+    generate = ["uv", "run", "--frozen", "--package", "canopy-author", "python",
+                str(root / "scripts/generate_cooked_fiducial.py"), "--output", str(fixture_dir)]
+    common.run(generate, cwd=root, env=environment, capture=False)
+    fixture_hashes = {str(path.relative_to(fixture_dir)): common.sha256(path)
+                      for path in sorted(fixture_dir.iterdir()) if path.is_file()}
+    imported = [str(editor), str(evidence["project"]), "-run=CookedFiducialImport",
+                f"-FixtureDir={fixture_dir}", "-unattended", "-nop4", "-nullrhi"]
+    common.run(imported, cwd=root, env=environment, capture=False)
+    map_hash = common.sha256(map_path)
+    game_inputs = game_input_checksums(root)
+    if game_sources != game_input_checksums(root, include_authored_outputs=False):
+        raise common.BuildFailure("Game source inputs changed during Editor build/map authoring")
+    report_dir = archive / "automation"
+    automation = [str(editor), str(evidence["project"]), "-unattended", "-nop4", "-nullrhi",
+                  f"-ReportExportPath={report_dir}",
+                  "-ExecCmds=Automation RunTests Canopy.F03", "-testexit=Automation Test Queue Empty"]
+    common.run(automation, cwd=root, env=environment, capture=False)
+    report = report_dir / "index.json"
+    validate_automation_report(read_engine_report(report))
     command = uat_command(engine, evidence["project"], host, configuration, archive)
-    common.run(command, cwd=root)
-    packaged = [p for p in archive.rglob("*") if p.is_file() and p != manifest_path]
-    if not packaged_executable(packaged, host):
-        raise common.BuildFailure(f"UAT returned success without a packaged CanopyFoundry executable in {archive}")
-    if game_inputs != game_input_checksums(root) or core_inputs != common.input_checksums(root) or core_hash != common.sha256(evidence["core_path"]):
-        raise common.BuildFailure("Game or native core inputs changed during package")
-    data = {"schema": 1, "scope": "native-game-package", "platform": host, "configuration": configuration, "engine_version_sha256": common.sha256(evidence["version_path"]), "uat_sha256": common.sha256(Path(command[0])), "project_sha256": common.sha256(evidence["project"]), "game_inputs_sha256": game_inputs, "core_manifest_sha256": common.sha256(evidence["core_path"]), "config_sha256": common.sha256(root / "config/toolchains.json"), "compiler": evidence["compiler"], "qualification": evidence["qualification"], "uat_argv": command, "uat_return_code": 0, "outputs_sha256": {str(p.relative_to(archive)): common.sha256(p) for p in packaged}}
+    common.run(command, cwd=root, env=environment, capture=False)
+    packaged = [p for p in archive.rglob("*") if p.is_file()
+                and not p.is_relative_to(report_dir) and not p.is_relative_to(fixture_dir)]
+    executables = sorted((p for p in packaged if packaged_executable([p], host)), key=str)
+    if len(executables) != 1:
+        raise common.BuildFailure(f"UAT did not produce exactly one native CanopyFoundry executable in {archive}")
+    native_runs = {}
+    for case, mode in (("f03-native-room", "-FacilityQualify"),
+                       ("b02-cooked-fiducial", "-CookedFiducialQualify")):
+        result_path = archive / f"{case}.json"
+        native = [str(executables[0]), "/Game/Maps/FacilityQualification", mode,
+                  f"-QualificationReport={result_path}", "-unattended",
+                  "-nullrhi" if case == "f03-native-room" else "-RenderOffscreen",
+                  "-stdout", "-FullStdOutLogOutput"]
+        native_output = common.run(native, cwd=executables[0].parent, env=environment)
+        validate_packaged_report(read_engine_report(result_path), case)
+        native_runs[case] = {"argv": native, "returncode": 0, "report_sha256": common.sha256(result_path),
+                             "stdout_sha256": hashlib.sha256(native_output.encode("utf-8")).hexdigest()}
+    if (game_inputs != game_input_checksums(root) or core_inputs != common.input_checksums(root)
+            or core_hash != common.sha256(evidence["core_path"]) or boot_hash != common.sha256(evidence["boot_path"])
+            or editor_hash != common.sha256(editor) or map_hash != common.sha256(map_path)
+            or fixture_source_hashes != {str(path.relative_to(root)): common.sha256(path) for path in fixture_sources}
+            or fixture_hashes != {str(path.relative_to(fixture_dir)): common.sha256(path)
+                                 for path in sorted(fixture_dir.iterdir()) if path.is_file()}
+            or bootstrap_engine._dependency_manifest(engine) != evidence["dependency_manifest"]):
+        raise common.BuildFailure("Game, engine, or native core inputs changed during package")
+    data = {"schema": 1, "scope": "native-game-package", "platform": host, "configuration": configuration,
+            "engine_version_sha256": common.sha256(evidence["version_path"]),
+            "engine_bootstrap_sha256": boot_hash, "editor_sha256": editor_hash,
+            "uat_sha256": common.sha256(Path(command[0])), "project_sha256": common.sha256(evidence["project"]),
+            "game_inputs_sha256": game_inputs, "core_manifest_sha256": core_hash,
+            "config_sha256": common.sha256(root / "config/toolchains.json"), "compiler": evidence["compiler"],
+            "qualification": evidence["qualification"], "editor_build_argv": build_command,
+            "room_commandlet_argv": commandlet, "map_sha256": map_hash, "automation_argv": automation,
+            "automation_report_sha256": common.sha256(report), "uat_argv": command,
+            "fiducial_generator_argv": generate, "fiducial_import_argv": imported,
+            "fiducial_sources_sha256": fixture_source_hashes, "fiducial_inputs_sha256": fixture_hashes,
+            "packaged_qualifications": native_runs,
+            "child_return_codes": {"editor_build": 0, "room_commandlet": 0, "automation": 0,
+                                   "fiducial_generator": 0, "fiducial_import": 0, "uat": 0},
+            "outputs_sha256": {str(p.relative_to(archive)): common.sha256(p) for p in packaged}}
     common.write_manifest(manifest_path, data)
     return manifest_path
 

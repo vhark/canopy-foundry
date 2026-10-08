@@ -1,0 +1,11 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Games",
+  "Description": "Canopy Foundry native qualification room",
+  "Modules": [
+    { "Name": "CanopyFoundry", "Type": "Runtime", "LoadingPhase": "Default" },
+    { "Name": "CanopyFoundryEditor", "Type": "Editor", "LoadingPhase": "Default" }
+  ],
+  "Plugins": [ { "Name": "CanopyRuntime", "Enabled": true }, { "Name": "EnhancedInput", "Enabled": true }, { "Name": "Interchange", "Enabled": true }, { "Name": "PlatformCrypto", "Enabled": true } ]
+}

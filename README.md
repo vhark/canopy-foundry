@@ -65,6 +65,24 @@ The bootstrap installs only official host .NET, native UnrealBuildAccelerator (r
 
 Ordinary source CI needs no Epic credential. Engine qualification is opt-in: an owner-authored push with `[qualify-engine]` in the commit message and the short-lived `CANOPY_UE_SOURCE_ARCHIVE_URL` repository secret. The secret is an authorized GitHub codeload URL for the exact pinned commit, available only to the bootstrap step; remove it after the run. No long-lived Epic/GitHub token, engine archive, source tree or engine binary is uploaded as a CI artifact.
 
+### Full Editor, room and cooked-coordinate gate
+
+Use a fresh checkout and a new engine directory; minimal-tool bootstrap evidence is not accepted as an Editor installation. The full build requires an approved native SDK and at least **100 GiB free** on its build volume:
+
+```sh
+uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root /absolute/new/ue581-editor --archive /absolute/authorized-source.tar.gz
+uv run --frozen python scripts/build_core.py --config Release
+uv run --frozen python scripts/build_game.py --platform mac-arm64 --configuration Development --engine-root /absolute/new/ue581-editor
+```
+
+The full bootstrap uses Epic's original GitDependencies selection without a dependency filter, verifies every selected payload against its recorded SHA-1 and records a SHA-256 inventory. Packaging rechecks that inventory, builds the Editor/ShaderCompileWorker, authors the qualification room, imports the generated RH Y-up metre GLB through Interchange, checks Editor automation, cooks/packages and invokes separate F03 and B02 native qualification modes. The cooked B02 mode requires a rendering RHI, not NullRHI, to retain the render buffers it measures. Each executable invocation must exit successfully and publish its own fresh JSON result; Shipping acceptance does not depend on compiled-out log messages. The pipeline accepts Epic's UTF-8-BOM automation report without weakening repository manifest parsing.
+
+The manual `native-game.yml` workflow requires an explicitly selected trusted native runner label, platform and Development/Shipping configuration. Standard GitHub-hosted runners' [14 GB job storage](https://docs.github.com/en/actions/reference/runners/github-hosted-runners) is insufficient for this source build; no high-capacity runners are registered for this repository. Locally, the actual full-Editor command rejects Xcode27; the [approved Xcode26.1.1 download](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_26.1.1/Xcode_26.1.1_Apple_silicon.xip) currently requires Apple sign-in.
+
+Observed source evidence: **86 Python checks passed**, including payload-tamper rejection, authentic BOM/camel-case automation parsing and packaged-report rejection. The original generated GLB's binary positions/winding/normals, four collision corners and two asymmetric port frames passed an independent decoder smoke; its SHA-256 is `8d23b10703d75297d12c5c6bde159eecb95b47525268c5cbc7a69b38614682b2`. These are **not native import/cook, interactive input or visual results**. F03 and B02 remain open.
+
+The latest F04 core rebuild passes 41 local tests and all 15 real process-kill recovery scenarios. Windows/Linux portability fixes are pushed, but [run 37777558997](https://github.com/vhark/canopy-foundry/actions/runs/37777558997) could not start any job: GitHub reports failed account payments or a spending limit. Restore Actions capacity or supply authorized native hosts; F04's three-platform crash-safety gate remains open.
+
 ## Accepted-source semantic compiler
 
 The offline authoring package verifies immutable accepted GrowBIM revisions, then emits a game-only FlatBuffers definition in right-handed Z-up metres. It preserves source hashes and UUID/IFC crosswalks, rooms/storeys/zones, physical equipment envelopes and clearances, complete equipment/connector frames and referenced provenance. It never imports an installed asset ID as a campaign instance ID. An absent upstream validity interval remains explicitly unknown, not an invented approval.

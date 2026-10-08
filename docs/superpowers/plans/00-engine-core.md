@@ -96,6 +96,8 @@ receipt_revision=1 duplicate_deliveries=2 control=0.75 stop_second=60 resumed_se
 
 **Check:** `uv run --frozen python scripts/build_game.py --platform win64 --configuration Development --engine-root "$CANOPY_UE_ROOT"` and the corresponding Mac/Linux commands, with `CANOPY_UE_ROOT` naming the authorized approved engine installation on that host. Expected: three native packages start and input works. Editor play-in-editor alone does not pass.
 
+**F03 source qualification work (native acceptance still open):** the build driver now requires a full approved Editor dependency inventory, authors the room, runs the required Editor automation suite, packages and requires a fresh structured result from the executable. Worker updates mark the final event packet explicitly: an intermediate packet no longer clears target admission or movement restrictions. The target-batch regression and modifier-free key selectors are covered by native automation source, not by an observed Editor run. Local full-Editor preflight rejects Xcode27 instead of relaxing the pinned26.1.1 requirement; no approved high-capacity runner is registered. Packaged controller/keyboard/visual acceptance remains unexecuted.
+
 ## F04 — Crash-safe saves and replay authority
 
 **Dependencies:** F02.
@@ -129,6 +131,8 @@ The three-host source workflow now invokes the real crash helper in both configu
 The [first portability rerun](https://github.com/vhark/canopy-foundry/actions/runs/37773159698) passed macOS but exposed two native configuration defects after the portable `zstd::libzstd` target repair. Linux's pthread probe invoked missing `clang-scan-deps`; the header-based core now explicitly disables C++ module scanning. MSVC's `<chrono>` required `_HAS_EXCEPTIONS=0` alongside disabled unwinding, exactly as UE5.8.1's `VCToolChain.AddExceptionArguments` configures its platform headers. The updated policy again passed 41 local cases and all 15 real process-kill scenarios; Windows/Linux still require their next native rerun before F04 closes.
 
 The [next rerun](https://github.com/vhark/canopy-foundry/actions/runs/37775271163) confirmed Linux pthread detection and MSVC standard-library compilation. It then exposed host-tool selection incorrectly retaining Linux's `-ue-v26` target suffix, and MSVC rejecting the fault hook's `getenv` calls. Host `flatc` selection now strips either approved target-only suffix; Windows fault injection reads its stage through the bounded native API and its sentinel path through the Unicode API. Local rebuilding again passed 41 cases and 15 kill/recovery paths; the new Windows/Linux paths remain subject to native execution.
+
+**External stop:** [run 37777558997](https://github.com/vhark/canopy-foundry/actions/runs/37777558997), containing those fixes at `a422667`, did not start any native job. All three check annotations report: “The job was not started because recent account payments have failed or your spending limit needs to be increased.” No self-hosted repository runners or configured SSH hosts are available. Restore Actions capacity or supply authorized native hosts before attempting the Windows/Linux acceptance rerun; this infrastructure refusal is not a test pass.
 
 
 ## F05 — Headless runner, diagnostics and qualification protocol

@@ -1,0 +1,112 @@
+name: Private native Editor and game qualification
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Trusted native runner label with approved SDK and at least 100 GiB free'
+        required: true
+        type: string
+      platform:
+        description: 'Native target platform (must match runner)'
+        required: true
+        type: choice
+        options: [mac-arm64, linux-x64, win64]
+      configuration:
+        description: 'Native package configuration'
+        required: true
+        type: choice
+        options: [Development, Shipping]
+permissions:
+  contents: read
+jobs:
+  native-game:
+    if: github.actor == github.repository_owner
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v7.1.4
+        with:
+          version: '0.12.3'
+          enable-cache: false
+      - name: Select approved Apple toolchain
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          test -d /Applications/Xcode_26.1.1.app/Contents/Developer
+          echo 'DEVELOPER_DIR=/Applications/Xcode_26.1.1.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Provision pinned Linux v26 SDK
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          url="$(jq -er '.unreal["linux-x64"].archive.url' config/toolchains.json)"
+          digest="$(jq -er '.unreal["linux-x64"].archive.sha256' config/toolchains.json)"
+          root="$(jq -er '.unreal["linux-x64"].archive.root' config/toolchains.json)"
+          archive="$RUNNER_TEMP/native-linux-v26.tar.gz"
+          curl --fail --location --proto '=https' --tlsv1.2 --output "$archive" "$url"
+          printf '%s  %s\n' "$digest" "$archive" | sha256sum --check --strict
+          tar -xzf "$archive" -C "$RUNNER_TEMP" "$root/x86_64-unknown-linux-gnu"
+          sdk="$RUNNER_TEMP/$root/x86_64-unknown-linux-gnu"
+          {
+            echo "CANOPY_LINUX_TOOLCHAIN_ROOT=$sdk"
+            echo "CANOPY_LINUX_SYSROOT=$sdk"
+            echo "CANOPY_LINUX_LIBCXX_INCLUDE=$sdk/include/c++/v1"
+            echo "CANOPY_LINUX_LIBCXX_LIBDIR=$sdk/lib64"
+          } >> "$GITHUB_ENV"
+      - name: Initialize approved Windows compiler and SDK
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          CANOPY_UE_SOURCE_ARCHIVE_URL: ${{ secrets.CANOPY_UE_SOURCE_ARCHIVE_URL }}
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          if (-not (Test-Path $vswhere)) { throw 'Visual Studio installer vswhere.exe is missing' }
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if ($LASTEXITCODE -ne 0 -or -not $vs) { throw 'MSVC developer environment unavailable' }
+          if (-not (Get-ChildItem -LiteralPath (Join-Path $vs 'VC\Tools\MSVC') -Directory -Filter '14.50.*')) {
+            $installer = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\setup.exe'
+            $channel = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property channelId
+            if ($LASTEXITCODE -ne 0 -or -not $channel) { throw 'Visual Studio channel unavailable' }
+            $arguments = 'modify --installPath "' + $vs + '" --channelId "' + $channel + '" --add Microsoft.VisualStudio.Component.VC.14.50.18.0.x86.x64 --quiet --norestart --noUpdateInstaller'
+            $install = Start-Process -FilePath $installer -ArgumentList $arguments -Wait -PassThru
+            if ($install.ExitCode -ne 0) { throw "MSVC 14.50 installation failed: $($install.ExitCode)" }
+          }
+          $vsdev = Join-Path $vs 'Common7\Tools\VsDevCmd.bat'
+          if (-not (Test-Path $vsdev)) { throw 'VsDevCmd.bat missing' }
+          $commands = @(
+            ('call "' + $vsdev + '" -arch=amd64 -host_arch=amd64 -vcvars_ver=14.50 -winsdk=10.0.26100.0'),
+            'uv sync --frozen --all-packages --all-extras',
+            'uv run --frozen python scripts/bootstrap_native.py',
+            'uv run --frozen python scripts/build_core.py --config Release',
+            'uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root "%RUNNER_TEMP%\ue581"',
+            'uv run --frozen python scripts/build_game.py --platform "${{ inputs.platform }}" --configuration "${{ inputs.configuration }}" --engine-root "%RUNNER_TEMP%\ue581"'
+          )
+          & cmd.exe /d /c ($commands -join ' && ')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        timeout-minutes: 330
+      - name: Build qualified native core and provision complete original Editor dependencies
+        if: runner.os != 'Windows'
+        shell: bash
+        env:
+          CANOPY_UE_SOURCE_ARCHIVE_URL: ${{ secrets.CANOPY_UE_SOURCE_ARCHIVE_URL }}
+        run: |
+          uv sync --frozen --all-packages --all-extras
+          uv run --frozen python scripts/bootstrap_native.py
+          uv run --frozen python scripts/build_core.py --config Release
+          uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root "$RUNNER_TEMP/ue581"
+          uv run --frozen python scripts/build_game.py --platform '${{ inputs.platform }}' --configuration '${{ inputs.configuration }}' --engine-root "$RUNNER_TEMP/ue581"
+        timeout-minutes: 330
+      - name: Retain private manifests only (never upload Epic source or packages)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: native-game-evidence-${{ inputs.platform }}-${{ inputs.configuration }}
+          path: |
+            .build/engine-bootstrap.json
+            .build/core/release/canopy-core-manifest.json
+            .build/game/*/*/uat-*/canopy-game-manifest.json
+            .build/game/*/*/uat-*/f03-native-room.json
+            .build/game/*/*/uat-*/b02-cooked-fiducial.json
+            .build/game/*/*/uat-*/automation/index.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7

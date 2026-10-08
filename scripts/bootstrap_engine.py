@@ -1,7 +1,8 @@
-"""Install the pinned Unreal source and only the host's build-tool dependencies.
+"""Install pinned Unreal source and original GitDependencies payloads.
 
-This is not Setup, an editor installation, or a game qualification. The private
-archive URL is read only from the process environment and never recorded.
+Default installs only host build tools. --full-editor installs the original
+unfiltered Epic dependency manifest for Editor, runtime and cooker builds.
+Never run Setup: it changes git hooks in the enclosing worktree.
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ import tarfile
 import tempfile
 from urllib.error import URLError
 from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
 from urllib.request import HTTPRedirectHandler, build_opener
 
 try:
@@ -187,7 +189,44 @@ def _publish_source(installed: Path, destination: Path, record: dict) -> None:
         raise
 
 
-def bootstrap(destination: Path, archive: Path | None = None) -> dict:
+def _dependency_manifest(installed: Path) -> dict:
+    manifest = installed / "Engine/Build/Commit.gitdeps.xml"
+    if not manifest.is_file() or manifest.is_symlink():
+        raise BuildFailure("Pinned source lacks the original Epic dependency manifest")
+    # GitDependencies writes the selected files to this working manifest. Hash
+    # the recorded output too; a successful exit alone is not proof of payload.
+    working = installed / ".uedependencies"
+    if not working.is_file() or working.is_symlink():
+        raise BuildFailure("GitDependencies did not publish its working manifest")
+    count = 0
+    payloads = hashlib.sha256()
+    for _, node in ET.iterparse(working, events=("end",)):
+        if node.tag == "File":
+            name = node.attrib.get("Name", "")
+            path = (installed / name).resolve()
+            if (not name or not re.fullmatch(r"[0-9a-f]{40}", node.attrib.get("ExpectedHash", ""))
+                    or node.attrib.get("Hash") != node.attrib["ExpectedHash"]
+                    or not path.is_relative_to(installed.resolve()) or not path.is_file()):
+                raise BuildFailure("GitDependencies reported an incomplete selected dependency")
+            actual = hashlib.sha1()
+            content = hashlib.sha256()
+            with path.open("rb") as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b""):
+                    actual.update(block)
+                    content.update(block)
+            if actual.hexdigest() != node.attrib["ExpectedHash"]:
+                raise BuildFailure(f"GitDependencies selected payload changed: {name}")
+            payloads.update(name.encode("utf-8") + b"\0" + content.digest())
+            count += 1
+        node.clear()
+    if count == 0:
+        raise BuildFailure("GitDependencies published an empty dependency manifest")
+    return {"original_manifests_sha256": {"Engine/Build/Commit.gitdeps.xml": sha256(manifest)},
+            "working_manifest_sha256": sha256(working), "selected_file_count": count,
+            "payloads_sha256": payloads.hexdigest()}
+
+
+def bootstrap(destination: Path, archive: Path | None = None, *, full_editor: bool = False) -> dict:
     requirements = load_json(CONFIG)["unreal"]
     source, version = _source_requirements(requirements)
     if (version["major"], version["minor"], version["patch"]) != (5, 8, 1):
@@ -195,6 +234,13 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
     if source.get("tag") != "5.8.1-release" or source.get("dotnet_directory") != "10.0":
         raise BuildFailure("Unreal tag or bundled .NET directory differs from the approved source")
     host, rid = _host()
+    if full_editor:
+        try:
+            from scripts import build_game
+        except ImportError:
+            import build_game
+        compiler = build_game.qualified_compiler(ROOT, "win64" if host == "win-x64" else host,
+                                                 requirements["win64" if host == "win-x64" else host])
     if not destination.is_absolute() or destination.exists() or destination.is_symlink():
         raise BuildFailure("--engine-root must be an absolute, new, non-symlinked directory")
     if archive is not None and not archive.is_absolute():
@@ -203,6 +249,11 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
         raise BuildFailure("Refusing to overwrite existing engine bootstrap evidence")
     destination = destination.resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
+    if full_editor:
+        free_bytes = shutil.disk_usage(destination.parent).free
+        minimum_bytes = 100 * 1024 ** 3
+        if free_bytes < minimum_bytes:
+            raise BuildFailure(f"Full Editor source build requires at least 100 GiB free on {destination.parent}; found {free_bytes / 1024 ** 3:.1f} GiB. Use a trusted build volume/runner with sufficient capacity.")
     downloaded = None
     staged = Path(tempfile.mkdtemp(prefix=".unreal-bootstrap-", dir=destination.parent))
     installed = staged / "source"
@@ -228,7 +279,6 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
             "Engine/Source/Programs/Shared/UnrealEngine.CSharp.targets",
             "Engine/Source/Programs/Shared/UnrealEngine.csproj.props",
         )
-        # UE 5.8 always uses UBA's native executor, even with -NoUBA.
         uba_directory, uba_names = {
             "mac-arm64": ("Mac", ("libUbaHost.dylib", "libUbaDetours.dylib")),
             "linux-x64": ("Linux", ("libUbaHost.so", "libUbaDetours.so", "UbaStaticStub.bin")),
@@ -240,17 +290,15 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
         if host == "win-x64":
             build_inputs += ("Engine/Build/Windows/Resources/Default.ico",)
         elif host == "linux-x64":
-            build_inputs += (
-                "Engine/Binaries/Linux/dump_syms",
-                "Engine/Binaries/Linux/BreakpadSymbolEncoder",
+            build_inputs += ("Engine/Binaries/Linux/dump_syms", "Engine/Binaries/Linux/BreakpadSymbolEncoder")
+        if not full_editor:
+            ignore.write_text(
+                "# Host .NET, native UBA and official UBT inputs; not an editor installation.\n"
+                "**\n"
+                f"!/Engine/Binaries/ThirdParty/DotNet/10.0/{host}/**\n"
+                + "".join(f"!/{name}\n" for name in build_inputs),
+                encoding="utf-8",
             )
-        ignore.write_text(
-            "# Host .NET, native UBA and official UBT inputs; not an editor installation.\n"
-            "**\n"
-            f"!/Engine/Binaries/ThirdParty/DotNet/10.0/{host}/**\n"
-            + "".join(f"!/{name}\n" for name in build_inputs),
-            encoding="utf-8",
-        )
         environment = os.environ.copy()
         environment.pop("CANOPY_UE_SOURCE_ARCHIVE_URL", None)
         # Prevent ambient GitDependencies options or caches from changing the selection.
@@ -258,9 +306,11 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
             environment.pop(key, None)
         environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1"
         environment["DOTNET_GENERATE_ASPNET_CERTIFICATE"] = "false"
-        run([str(gitdeps), f"--root={installed}", "--force", "--no-cache"], cwd=installed, env=environment)
+        arguments = [f"--root={installed}", "--force", "--no-cache"]
+        run([str(gitdeps), *arguments], cwd=installed, env=environment)
         if any(not (installed / name).is_file() for name in build_inputs):
             raise BuildFailure("GitDependencies did not install the official UBT/UBA build inputs")
+        dependencies = _dependency_manifest(installed) if full_editor else {}
         dotnet = installed / "Engine/Binaries/ThirdParty/DotNet/10.0" / host / ("dotnet.exe" if os.name == "nt" else "dotnet")
         if not dotnet.is_file() or dotnet.is_symlink():
             raise BuildFailure("GitDependencies did not install the host's bundled .NET executable")
@@ -270,19 +320,22 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
             raise BuildFailure("Bundled .NET SDK is missing or not version 10.0")
         version_file = installed / "Engine/Build/Build.version"
         record = {
-            "schema": 1, "status": "success", "scope": "unreal-build-tools",
+            "schema": 1, "status": "success",
+            "scope": "unreal-full-editor" if full_editor else "unreal-build-tools",
             "engine_root": str(destination), "platform": host,
             "source": {"tag": source["tag"], "commit": source["commit"],
                        "archive_root": source["archive_root"], "archive_sha256": source["archive_sha256"],
                        "build_version": load_json(version_file), "build_version_sha256": sha256(version_file)},
             "gitdependencies": {"path": str(gitdeps.relative_to(installed)), "sha256": gitdeps_hash,
-                                "filter_sha256": sha256(ignore), "host_rid": rid,
-                                "arguments": [f"--root={installed}", "--force", "--no-cache"], "returncode": 0},
+                                "filter_sha256": sha256(ignore) if not full_editor else None,
+                                "host_rid": rid, "arguments": arguments, "returncode": 0,
+                                **dependencies},
             "build_inputs": {name: sha256(installed / name) for name in build_inputs},
             "dotnet": {"path": str(dotnet.relative_to(installed)), "sha256": sha256(dotnet),
                        "version": dotnet_version, "info_sha256": hashlib.sha256(dotnet_info.encode("utf-8")).hexdigest(),
                        "version_returncode": 0, "info_returncode": 0},
             "inputs": {"config_sha256": sha256(CONFIG), "bootstrap_sha256": sha256(Path(__file__).resolve())},
+            **({"native_toolchain": compiler} if full_editor else {}),
         }
         _publish_source(installed, destination, record)
         return record
@@ -293,12 +346,13 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Install pinned UE 5.8.1 source and host build-tool .NET")
+    parser = argparse.ArgumentParser(description="Install pinned UE 5.8.1 source and official dependencies")
     parser.add_argument("--engine-root", type=Path, required=True, help="absolute new installation destination")
     parser.add_argument("--archive", type=Path, help="absolute local source tar.gz; otherwise use CANOPY_UE_SOURCE_ARCHIVE_URL")
+    parser.add_argument("--full-editor", action="store_true", help="install original complete Epic dependencies (requires qualified native compiler)")
     args = parser.parse_args()
     try:
-        result = bootstrap(args.engine_root, args.archive)
+        result = bootstrap(args.engine_root, args.archive, full_editor=args.full_editor)
     except (BuildFailure, OSError, KeyError, ValueError, TypeError) as error:
         print(f"engine bootstrap: {error}", file=sys.stderr)
         return 1

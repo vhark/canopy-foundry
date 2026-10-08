@@ -1,0 +1,12 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "Canopy Runtime",
+  "Description": "Single-owner native simulation bridge",
+  "Category": "Runtime",
+  "CanContainContent": false,
+  "Modules": [
+    { "Name": "CanopyRuntime", "Type": "Runtime", "LoadingPhase": "Default" }
+  ]
+}

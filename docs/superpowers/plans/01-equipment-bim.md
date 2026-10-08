@@ -55,6 +55,9 @@ F01 pins native UE 5.8.1 toolchains: Windows VS 2026 18.0/MSVC 14.50/SDK 10.0.26
 
 **B02 execution record (not complete):** the actual CLI compiled both the original accepted fixture and B01's reconciled accepted service archive; native `flatc` 25.12.19 independently decoded both. Original revision `fea6549b1b3ba0104740e3c3e621e73fdfe76a87cadfe7939faea541d8856567` produced semantic SHA-256 `972eca7760c4e90f7098c93945fc2afbe5027b8524c80eafafdaaca5e9bc6402`, identical on repeat. The decoded definition retained 216 m² gross floor, eight 3 m-high rooms, six full connector frames, physical equipment dimensions/0.6 m front clearances and separate 33.6 m² canopy area. The source profile does not declare a validity interval; `validity_known=false` preserves that absence without inventing dates. Cooked GLB/render/collider/port alignment remains an unpassed native-engine gate.
 
+**Cooked-coordinate gate source (not a native pass):** the original asymmetric GLB generator emits right-handed Y-up metres with nested reflected/rotated geometry, separate UCX collision and two port sockets. Its bytes passed an independent decoder smoke. The Editor commandlet uses UE5.8.1 Interchange, verifies source hashes with PlatformCrypto, enables CPU access, preserves authored collision and saves the imported asset into the qualification map. The packaged mode measures actual render positions/normals, four unique collision corners (not the importer’s duplicated raw vertex count), a Chaos ray hit and both transformed port frames. This mode requires a real rendering RHI; NullRHI cannot prove cooked render-buffer content. The build driver rejects missing/malformed results and incomplete port frames. All 86 Python build/authoring checks pass, but importing, cooking and executing these native measurements still require the approved full Editor/SDK and a capable host.
+
+
 
 ### B03: Detailed original generic masters and reproducible render cook
 
