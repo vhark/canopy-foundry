@@ -128,6 +128,8 @@ The three-host source workflow now invokes the real crash helper in both configu
 
 The [first portability rerun](https://github.com/vhark/canopy-foundry/actions/runs/37773159698) passed macOS but exposed two native configuration defects after the portable `zstd::libzstd` target repair. Linux's pthread probe invoked missing `clang-scan-deps`; the header-based core now explicitly disables C++ module scanning. MSVC's `<chrono>` required `_HAS_EXCEPTIONS=0` alongside disabled unwinding, exactly as UE5.8.1's `VCToolChain.AddExceptionArguments` configures its platform headers. The updated policy again passed 41 local cases and all 15 real process-kill scenarios; Windows/Linux still require their next native rerun before F04 closes.
 
+The [next rerun](https://github.com/vhark/canopy-foundry/actions/runs/37775271163) confirmed Linux pthread detection and MSVC standard-library compilation. It then exposed host-tool selection incorrectly retaining Linux's `-ue-v26` target suffix, and MSVC rejecting the fault hook's `getenv` calls. Host `flatc` selection now strips either approved target-only suffix; Windows fault injection reads its stage through the bounded native API and its sentinel path through the Unicode API. Local rebuilding again passed 41 cases and 15 kill/recovery paths; the new Windows/Linux paths remain subject to native execution.
+
 
 ## F05 — Headless runner, diagnostics and qualification protocol
 

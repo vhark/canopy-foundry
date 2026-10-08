@@ -88,11 +88,11 @@ find_package(flatbuffers 25.12.19 EXACT CONFIG REQUIRED PATHS "${flatbuffers_DIR
 find_package(zstd 1.5.7 EXACT CONFIG REQUIRED PATHS "${zstd_DIR}" NO_DEFAULT_PATH)
 set(CANOPY_FLATC_TRIPLET "${VCPKG_HOST_TRIPLET}")
 if(CANOPY_FLATC_TRIPLET STREQUAL "")
-    string(REGEX REPLACE "-ue58$" "" CANOPY_FLATC_TRIPLET "${VCPKG_TARGET_TRIPLET}")
+    string(REGEX REPLACE "-(ue58|ue-v26)$" "" CANOPY_FLATC_TRIPLET "${VCPKG_TARGET_TRIPLET}")
 endif()
 set(CANOPY_FLATC "${VCPKG_INSTALLED_DIR}/${CANOPY_FLATC_TRIPLET}/tools/flatbuffers/flatc${CMAKE_EXECUTABLE_SUFFIX}")
 if(NOT EXISTS "${CANOPY_FLATC}")
-    message(FATAL_ERROR "Pinned host flatc 25.12.19 is missing from isolated vcpkg install")
+    message(FATAL_ERROR "Pinned host flatc 25.12.19 is missing: ${CANOPY_FLATC}")
 endif()
 set(CANOPY_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 add_custom_command(OUTPUT "${CANOPY_GENERATED_DIR}/save_generated.h" "${CANOPY_GENERATED_DIR}/command-log_generated.h"

@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <iterator>
+#include <string>
 #include <thread>
 #ifdef _WIN32
 #define NOMINMAX
@@ -86,10 +87,23 @@ SaveError replace(const std::filesystem::path& from, const std::filesystem::path
 void durability_stage(const char* name) {
     // Only the qualification helper explicitly arms this hook. A real external process
     // kills this process after observing the ready sentinel; it is not an I/O mock.
+#ifdef _WIN32
+    char stage[32]{};
+    const DWORD stage_size = GetEnvironmentVariableA("CANOPY_SAVE_KILL_STAGE", stage, sizeof(stage));
+    if (!stage_size || stage_size >= sizeof(stage) || std::strcmp(stage, name)) return;
+    const DWORD required = GetEnvironmentVariableW(L"CANOPY_SAVE_STAGE_FILE", nullptr, 0);
+    if (!required) return;
+    std::wstring signal(required, L'\0');
+    const DWORD copied = GetEnvironmentVariableW(L"CANOPY_SAVE_STAGE_FILE", signal.data(), required);
+    if (!copied || copied >= required) return;
+    signal.resize(copied);
+#else
     const char* stage = std::getenv("CANOPY_SAVE_KILL_STAGE");
+    if (!stage || std::strcmp(stage, name)) return;
     const char* signal = std::getenv("CANOPY_SAVE_STAGE_FILE");
-    if (!stage || !signal || std::strcmp(stage, name)) return;
-    std::ofstream out(signal, std::ios::binary | std::ios::trunc);
+    if (!signal) return;
+#endif
+    std::ofstream out(std::filesystem::path(signal), std::ios::binary | std::ios::trunc);
     out << name << '\n'; out.flush(); out.close();
     for (;;) std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
