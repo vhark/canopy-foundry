@@ -228,11 +228,20 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
             "Engine/Source/Programs/Shared/UnrealEngine.CSharp.targets",
             "Engine/Source/Programs/Shared/UnrealEngine.csproj.props",
         )
+        # UE 5.8 always uses UBA's native executor, even with -NoUBA.
+        uba_directory, uba_names = {
+            "mac-arm64": ("Mac", ("libUbaHost.dylib", "libUbaDetours.dylib")),
+            "linux-x64": ("Linux", ("libUbaHost.so", "libUbaDetours.so", "UbaStaticStub.bin")),
+            "win-x64": ("Win64", ("x64/UbaHost.dll", "x64/UbaDetours.dll")),
+        }[host]
+        build_inputs = managed_inputs + tuple(
+            f"Engine/Binaries/{uba_directory}/UnrealBuildAccelerator/{name}" for name in uba_names
+        )
         ignore.write_text(
-            "# Host .NET and official UBT managed build inputs; not an editor installation.\n"
+            "# Host .NET, native UBA and official UBT inputs; not an editor installation.\n"
             "**\n"
             f"!/Engine/Binaries/ThirdParty/DotNet/10.0/{host}/**\n"
-            + "".join(f"!/{name}\n" for name in managed_inputs),
+            + "".join(f"!/{name}\n" for name in build_inputs),
             encoding="utf-8",
         )
         environment = os.environ.copy()
@@ -243,8 +252,8 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
         environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1"
         environment["DOTNET_GENERATE_ASPNET_CERTIFICATE"] = "false"
         run([str(gitdeps), f"--root={installed}", "--force", "--no-cache"], cwd=installed, env=environment)
-        if any(not (installed / name).is_file() for name in managed_inputs):
-            raise BuildFailure("GitDependencies did not install the official UBT managed build inputs")
+        if any(not (installed / name).is_file() for name in build_inputs):
+            raise BuildFailure("GitDependencies did not install the official UBT/UBA build inputs")
         dotnet = installed / "Engine/Binaries/ThirdParty/DotNet/10.0" / host / ("dotnet.exe" if os.name == "nt" else "dotnet")
         if not dotnet.is_file() or dotnet.is_symlink():
             raise BuildFailure("GitDependencies did not install the host's bundled .NET executable")
@@ -262,6 +271,7 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
             "gitdependencies": {"path": str(gitdeps.relative_to(installed)), "sha256": gitdeps_hash,
                                 "filter_sha256": sha256(ignore), "host_rid": rid,
                                 "arguments": [f"--root={installed}", "--force", "--no-cache"], "returncode": 0},
+            "build_inputs": {name: sha256(installed / name) for name in build_inputs},
             "dotnet": {"path": str(dotnet.relative_to(installed)), "sha256": sha256(dotnet),
                        "version": dotnet_version, "info_sha256": hashlib.sha256(dotnet_info.encode("utf-8")).hexdigest(),
                        "version_returncode": 0, "info_returncode": 0},

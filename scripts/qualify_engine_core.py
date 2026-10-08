@@ -164,6 +164,10 @@ def qualify(engine_root: Path) -> list[Path]:
             or common.sha256(engine_root / ".gitdepsignore") != dependencies["filter_sha256"]
             or dependencies.get("returncode") != 0):
         raise common.BuildFailure("Official engine dependency client or selected filter changed")
+    for relative, digest in boot["build_inputs"].items():
+        path = (engine_root / relative).resolve()
+        if not path.is_relative_to(engine_root) or common.sha256(path) != digest:
+            raise common.BuildFailure("Official UBT/UBA build input changed")
     version_path = engine_root / "Engine/Build/Build.version"
     version = common.load_json(version_path)
     if (boot["source"].get("build_version") != version
@@ -247,6 +251,7 @@ def qualify(engine_root: Path) -> list[Path]:
                 or common.sha256(Path(core["compiler"]["path"])) != core["compiler"]["binary_sha256"]
                 or common.sha256(ubt) != ubt_hash or common.sha256(ubt_project) != ubt_project_hash
                 or common.sha256(dotnet) != boot["dotnet"]["sha256"]
+                or any(common.sha256(engine_root / relative) != digest for relative, digest in boot["build_inputs"].items())
                 or common.sha256(boot_path) != bootstrap_hash
                 or common.sha256(Path(__file__)) != qualifier_hash
                 or common.sha256(version_path) != boot["source"]["build_version_sha256"]
