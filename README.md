@@ -2,7 +2,7 @@
 
 Build your growing operation, master its environment, and scale from your first crop to an industrial growing business.
 
-**Status: F01, F02 and upstream B01 are complete; F03, F04 and B02 remain under qualification. No packaged game is included.** F01 passed native source checks and real UE5.8.1 Development/Shipping boundary-consumer execution on Linux, Windows and Apple Silicon macOS. F02 provides deterministic bounded command/clock authority. B01's accepted IFC4 facility/MEP profile is pinned as GrowBIM 0.2.0. Persistence and the accepted-source compiler now have local executable evidence; native game rendering/input and cooked coordinate alignment remain unproved. This is a new repository, not a rename or fork of Grownetics Sim. The title remains subject to trademark/domain clearance.
+**Status: F01, F02, F04 and upstream B01 are complete; F03 and B02 remain under qualification. No packaged game is included.** F01 passed native source checks and real UE5.8.1 Development/Shipping boundary-consumer execution on Linux, Windows and Apple Silicon macOS. F02 provides deterministic bounded command/clock authority. F04 qualifies persistence and crash recovery of that implemented authority on all three native platforms. B01's accepted IFC4 facility/MEP profile is pinned as GrowBIM 0.2.0. The accepted-source compiler has local executable evidence; native game rendering/input and cooked coordinate alignment remain unproved. This is a new repository, not a rename or fork of Grownetics Sim. The title remains subject to trademark/domain clearance.
 
 ## License
 
@@ -87,7 +87,7 @@ In a private build repository, `native-game.yml` requires an explicitly selected
 
 Observed source evidence: **86 Python checks passed**, including payload-tamper rejection, authentic BOM/camel-case automation parsing and packaged-report rejection. The original generated GLB's binary positions/winding/normals, four collision corners and two asymmetric port frames passed an independent decoder smoke; its SHA-256 is `8d23b10703d75297d12c5c6bde159eecb95b47525268c5cbc7a69b38614682b2`. These are **not native import/cook, interactive input or visual results**. F03 and B02 remain open.
 
-The latest F04 core rebuild passes 41 local tests and all 15 real process-kill recovery scenarios. Windows/Linux portability fixes are pushed, but [run 37777558997](https://github.com/vhark/canopy-foundry/actions/runs/37777558997) could not start any job: GitHub reports failed account payments or a spending limit. Restore Actions capacity or supply authorized native hosts; F04's three-platform crash-safety gate remains open.
+Public [source CI, attempt 2](https://github.com/vhark/canopy-foundry/actions/runs/37804761665/attempts/2) passed on Windows, Apple Silicon macOS and Linux: 41 core tests and 15 real process-kill/recovery scenarios per Debug/Release configuration on each host. This closes F04's three-platform persistence gate for the implemented F02 authority and clears the earlier hosted-runner billing blocker. It does not qualify new gameplay state, engine builds or rendering. See the [F04 execution record](docs/superpowers/plans/00-engine-core.md#f04--crash-safe-saves-and-replay-authority).
 
 ## Accepted-source semantic compiler
 
