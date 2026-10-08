@@ -126,6 +126,8 @@ missing optional logo   -> neutral visual, identical domain hash
 
 The three-host source workflow now invokes the real crash helper in both configurations; those new hosted results are not yet recorded. Local Xcode27 is standalone evidence only. The persisted authority currently consists of F02 controls, commands/receipts, clocks, deadlines, seed and events; inventory, cash, crops and construction must extend this same schema and recovery proof when their domain tasks introduce those fields. No crop/economic recovery result is claimed here.
 
+The [first portability rerun](https://github.com/vhark/canopy-foundry/actions/runs/37773159698) passed macOS but exposed two native configuration defects after the portable `zstd::libzstd` target repair. Linux's pthread probe invoked missing `clang-scan-deps`; the header-based core now explicitly disables C++ module scanning. MSVC's `<chrono>` required `_HAS_EXCEPTIONS=0` alongside disabled unwinding, exactly as UE5.8.1's `VCToolChain.AddExceptionArguments` configures its platform headers. The updated policy again passed 41 local cases and all 15 real process-kill scenarios; Windows/Linux still require their next native rerun before F04 closes.
+
 
 ## F05 — Headless runner, diagnostics and qualification protocol
 
