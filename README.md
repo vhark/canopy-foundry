@@ -43,11 +43,11 @@ uv run --frozen python -m pytest tests/build -q
 
 Local macOS arm64 verification passed: four native conversion cases in each of Debug, Release and ASan/UBSan builds, plus 30 build-orchestration tests. The separately linked API smoke produced `60000 square feet = 5574.1824 square metres`. A stale Intel CMake target was corrected to arm64; the emitted manifest is checked against the actual archive architecture and selected SDK. These results do not qualify an Unreal ABI or another platform.
 
-The [F01 execution report](docs/research/f01-build-evidence.md) records the tested source commit, failure/recovery evidence, private native-CI run and remaining qualification gate.
+The approved-SDK hosted matrix also passed Debug and Release on all three native platforms: four native cases per configuration; 30 Python checks on Linux/Mac and 26 passed plus four POSIX-only skips on Windows. The [F01 execution report](docs/research/f01-build-evidence.md) records both source checkpoints, compiler/SDK and artifact hashes, failure/recovery evidence, preserved manifests and the remaining engine-access gate.
 
-The approved game baseline remains Unreal **5.8.1**, Mac Xcode **26.1.1**, Windows VS2026/MSVC14.50/SDK10.0.26100 and Linux v26 Clang20.1.8 with its fixed sysroot. The inspected host instead has Unreal **5.8.0**, Xcode **27.0** and SDK **27.0**. Game packaging must reject an incompatible host or missing game project; do not edit engine metadata or relabel a standalone manifest to pass the gate.
+The approved game baseline remains Unreal **5.8.1**, Mac Xcode **26.1.1**, Windows VS2026/MSVC14.50/SDK10.0.26100 and Linux v26 Clang20.1.8 with its fixed sysroot. Those compiler/SDK selections are exercised in source CI; they are not Unreal qualification. The latest inspected local engine is Unreal **5.8.3**, with Xcode **27.0** and SDK **27.0**. Game packaging must reject an incompatible host or missing game project; do not edit engine metadata or relabel a standalone manifest to pass the gate.
 
-Execution decision: retain this approved baseline. Engine-dependent implementation remains gated until the approved installations and native engine runners are available; the installed versions are not an experimental substitute.
+Execution decision: retain this approved baseline. Engine-dependent implementation remains gated on authorized UE5.8.1 access and native engine qualification. Complete [Epic's account-link and invitation procedure](https://www.unrealengine.com/en-US/ue-on-github), or provide authorized UE5.8.1 artifacts on engine-capable native build hosts. The installed versions are not an experimental substitute; account/legal acceptance is an owner action.
 
 ## Repository policy
 

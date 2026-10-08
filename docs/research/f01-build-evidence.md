@@ -1,8 +1,8 @@
 # F01 source-build evidence
 
-**Case:** `F01-source-build`. **Status:** local checks and the three-platform native source matrix passed; F01 is not complete. This report does not qualify Unreal, a game package, BIM exchange, simulation accuracy or performance.
+**Case:** `F01-source-build`. **Status:** local checks and the three-platform native source matrix with approved SDK selections passed; F01 is not complete. This report does not qualify Unreal, a game package, BIM exchange, simulation accuracy or performance.
 
-**Code checkpoint:** [`78ed18f2034c2c4a4769d1c244fb4694c29be302`](https://github.com/vhark/canopy-foundry/commit/78ed18f2034c2c4a4769d1c244fb4694c29be302). The native manifests also bind the actual input files, compiler binary, dependency bootstrap and output library by SHA-256. No simulation model, recipe, random seed or rendering settings apply to this source-build case; gameplay and performance measurements are **not measured**.
+**Initial source checkpoint:** [`78ed18f2034c2c4a4769d1c244fb4694c29be302`](https://github.com/vhark/canopy-foundry/commit/78ed18f2034c2c4a4769d1c244fb4694c29be302). The approved-SDK checkpoint is recorded separately below. Native manifests bind the actual input files, compiler binary, dependency bootstrap and output library by SHA-256. No simulation model, recipe, random seed or rendering settings apply to this source-build case; gameplay and performance measurements are **not measured**.
 
 ## Local native execution
 
@@ -31,7 +31,7 @@ The area cases use the public core API, including finite conversion, signed/zero
 
 Independent native/bootstrap and build-orchestration spec reviews, followed by quality reviews and targeted correction rechecks, returned no outstanding findings. Review is not a substitute for execution or qualification.
 
-## Hosted native source checks
+## Initial hosted native source checks
 
 The private [source matrix run](https://github.com/vhark/canopy-foundry/actions/runs/37705605555) passed on 2026-10-08 UTC at the code checkpoint above. All three jobs performed frozen environment resolution, pinned bootstrap, native Debug compilation and test execution:
 
@@ -45,8 +45,26 @@ The four Windows skips are POSIX executable-permission cases, exercised on both 
 
 The workflow requires no engine or vendor credentials and retains only explicitly selected bootstrap/core manifests and native test logs for 30 days. Its first run reported Node20 action-runtime deprecation. Checkout and artifact upload were moved to verified immutable [checkout v7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1) and [upload-artifact v7.0.2](https://github.com/actions/upload-artifact/releases/tag/v7.0.2), both using Node24. The [follow-up native matrix](https://github.com/vhark/canopy-foundry/actions/runs/37706605327), at workflow-only commit `d6e029fdd6fc982d817885eae79bf7d602b67b54`, passed on all three runners, including evidence upload. The core/build-script source is unchanged from the first checkpoint.
 
+## Approved SDK source checks
+
+The [approved-SDK source matrix](https://github.com/vhark/canopy-foundry/actions/runs/37714748308) passed on 2026-10-08 UTC at [`96800c19f8f1618925a28c0e51be2c374acd0f90`](https://github.com/vhark/canopy-foundry/commit/96800c19f8f1618925a28c0e51be2c374acd0f90). Each native job resolved the frozen environment, bootstrapped pinned dependencies, checked the selected compiler against the approved SDK profile, built Debug and Release, ran both native test binaries and ran the Python build checks.
+
+| Native runner | Observed approved compiler / SDK selection | Debug / Release CTest | Python build checks | Preserved manifests |
+|---|---|---|---|---|
+| `ubuntu-24.04`, x64 | Epic v26 Clang20.1.8, fixed `x86_64-unknown-linux-gnu` sysroot, bundled libc++/libc++abi | 4/4 passed in each | 30 passed | [Debug](f01-source-manifests/approved-sdk/linux-x64-debug.json), [Release](f01-source-manifests/approved-sdk/linux-x64-release.json), [bootstrap](f01-source-manifests/approved-sdk/linux-x64-bootstrap.json) |
+| `windows-2025`, x64 | VS18.0, MSVC toolset14.50.35717/compiler19.50.35739, SDK10.0.26100.0; MDd / MD | 4/4 passed in each | 26 passed, 4 POSIX-only skips | [Debug](f01-source-manifests/approved-sdk/win64-debug.json), [Release](f01-source-manifests/approved-sdk/win64-release.json), [bootstrap](f01-source-manifests/approved-sdk/win64-bootstrap.json) |
+| `macos-15`, arm64 | Xcode26.1.1 build17B100, Apple Clang17.0.0 (`clang-1700.4.4.1`), SDK26.1, libc++ | 4/4 passed in each | 30 passed | [Debug](f01-source-manifests/approved-sdk/mac-arm64-debug.json), [Release](f01-source-manifests/approved-sdk/mac-arm64-release.json), [bootstrap](f01-source-manifests/approved-sdk/mac-arm64-bootstrap.json) |
+
+Mac selects the installed approved Xcode rather than the image default. Windows provisions the side-by-side `Microsoft.VisualStudio.Component.VC.14.50.18.0.x86.x64` component when needed and pins both vcpkg triplets to the selected developer environment; dependencies no longer silently select the newer14.51 compiler. Linux downloads the official archive pinned in `config/toolchains.json`, verifies SHA-256 `6eef42679b744cdcb50276f2d7cff0a51f7ddd632960e06bfbc3f6b9508ef615`, and uses the v26 triplet for target libraries. Linux host-only tools retain their native host triplet; they are not linked into the core.
+
+The [preceding run](https://github.com/vhark/canopy-foundry/actions/runs/37712962046) exposed Linux's static-runtime link-order failure and a Windows-sensitive test fixture. libc++/libc++abi now occupy CMake's trailing standard-library slot rather than preceding their consumers in linker flags. The stale-success-manifest regression now exercises a real failed preflight instead of relying on a malformed mocked SDK configuration. Its focused local run passed, followed by the successful native matrix above.
+
+All six core manifests retain `scope: standalone-core` and `unreal_qualified: false`. The nine downloaded JSON files are preserved byte-for-byte; `.gitattributes` disables line-ending conversion for this evidence directory. Each Debug/Release manifest's bootstrap hash was checked against its downloaded bootstrap file before preservation. Compiler, standard-library and output-library hashes are observed artifacts, not invented qualification values.
+
 ## Remaining hard gate
 
-The user retained the approved Unreal 5.8.1 / Xcode 26.1.1 / VS2026-MSVC14.50-SDK10.0.26100 / Linux v26 Clang20.1.8 fixed-sysroot baseline. The inspected installation is UE5.8.0 with Xcode27; authorized UE5.8.1 artifacts and approved native engine runners are unavailable. Hosted source CI cannot certify those engine/compiler ABIs or GPU/runtime acceptance.
+The user retained the approved Unreal 5.8.1 / Xcode26.1.1 / VS2026-MSVC14.50-SDK10.0.26100 / Linux v26 Clang20.1.8 fixed-sysroot baseline. Standalone builds with those compiler/SDK selections now pass on all three native hosted runners. The latest inspected local engine reports UE5.8.3, with local Xcode27; neither is an approved substitute. No authorized UE5.8.1 artifact or engine-qualified native runner is available through the current access.
+
+The GitHub CLI received HTTP404 for `EpicGames/UnrealEngine`; Epic's account page required sign-in. No new license terms were accepted and no engine metadata was altered. The account owner must complete [Epic's GitHub access procedure](https://www.unrealengine.com/en-US/ue-on-github): sign in, connect GitHub, personally review/accept any required EULA, authorize the connection and accept the organization email invitation within seven days. The resulting access must be usable by the build account. Alternatively, provide authorized UE5.8.1 source/build artifacts on engine-capable native Windows, Mac and Linux hosts. Engine build IDs/artifact hashes stay private; engine integration and GPU/runtime qualification still have to run.
 
 F01 remains open. F02 and the later implementation packages retain their hard completion prerequisites. The first-/third-person and overhead camera requirements are documented in architecture A13 and the F03/X04/native acceptance tasks; no camera runtime has been implemented or exercised.

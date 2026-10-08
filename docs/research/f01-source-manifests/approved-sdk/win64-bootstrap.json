@@ -1,0 +1,189 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "--version"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "72dc60e11b0dfa68bc7b055fc909e74ec8634b2caebfe31538631cefc442c46c"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "init",
+        "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\.vcpkg-stage-z2rr5rdc"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "5dacb2e7e0fda81c9320d9c35148942757503f3476eabde6110d5f51cd1fa7e2"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/microsoft/vcpkg.git"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\.vcpkg-stage-z2rr5rdc",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "fetch",
+        "--depth",
+        "1",
+        "origin",
+        "2750401336fb7c95f6619657a46a7e798661341c"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\.vcpkg-stage-z2rr5rdc",
+      "returncode": 0,
+      "stderr_sha256": "a939350c9645d887b0ea7f98e4ac17354985a5e2aa5531c315410e5732247e2a",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "checkout",
+        "--detach",
+        "FETCH_HEAD"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\.vcpkg-stage-z2rr5rdc",
+      "returncode": 0,
+      "stderr_sha256": "135d7903c18a449d1ca9455a62c1ec62f57fcae7abba4b5a6dccd5bdbd25c8e1",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\.vcpkg-stage-z2rr5rdc",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "848333a0f677b69de60ed72d2e8c037f9b43d0a2d0a34a51eeafedcc8fb05fa2"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "remote",
+        "get-url",
+        "origin"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "535cbd06e792db251b645dc313b4e0e451ec826948fc5954c9217f52bf728723"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "848333a0f677b69de60ed72d2e8c037f9b43d0a2d0a34a51eeafedcc8fb05fa2"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "--",
+        "triplets"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\Git\\bin\\git.EXE",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d3343c7ad49f8a1173ab360d7103c501f90d9413fb152696241cf8a3780e45ae"
+    },
+    {
+      "argv": [
+        "cmd",
+        "/d",
+        "/c",
+        "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg\\bootstrap-vcpkg.bat",
+        "-disableMetrics"
+      ],
+      "cwd": "D:\\a\\canopy-foundry\\canopy-foundry\\.work\\tools\\vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "84fe63ca75b0e9c92fa85866108d1bfdb8c9aac3ca1428bf550113fb35932a69"
+    }
+  ],
+  "git": {
+    "executable": "C:\\Program Files\\Git\\bin\\git.EXE",
+    "sha256": "78211c7ed73988da93a6d8a33d47ec6187f464d7ea2a9a00c182bbd7a1ecf30f",
+    "version": "git version 2.55.0.windows.5"
+  },
+  "inputs": {
+    "dependencies\\native-lock.json": "a2b54ad2fc26ac9454e543822678be45215eac28d3f3af8107d681acf325eb0f",
+    "dependencies\\vcpkg-configuration.json": "999609a3cf1d6d33129e754912ea6f0b0f820f7ee1fe78a0bf0d139f160b46a1",
+    "dependencies\\vcpkg.json": "2f7363cbf0af4fff0da51758cd1c7be657f4216c1abd7ab482e21cae2de79dd6",
+    "scripts\\bootstrap_native.py": "36d326a557dcad130e9082fe611de43d1aceac77f711b22cf502e4bd053adb31"
+  },
+  "output": {
+    "path": ".work\\tools\\vcpkg\\vcpkg.exe",
+    "sha256": "2a4ae1467b9e797964c60c919d057b9e5dc1ec03f4b9632c1150026db25201f2"
+  },
+  "ports": {
+    "catch2": {
+      "metadata_sha256": "b697f7fb82726ce2eaa81495f53ae30b4a0e2b1b81e1a82538afa84ae0336b32",
+      "portfile_sha256": "0fa6ce5090f983a3319c987f9d3016e389fc9adbaa2b03319cbc8bfa76eb3106",
+      "source_sha512": "b17a1d03bd206ec2a006bfd2cb6a40cb641dd6c3ee192f4e4830ecc2c7fe60ffb2d98397adbb7c039b065c891ebc5dcd0e02331dff472ced7411f8263e1d7b29"
+    },
+    "flatbuffers": {
+      "metadata_sha256": "9455217c6441b81e4be7c0fdb5725d26c4468c6d06d79122c4a04489cabab636",
+      "portfile_sha256": "e876f066c887850d3db219c86730779f3eac9c08e27027861050d1fa8ca31453",
+      "source_sha512": "808c77536fbfb1c8a1145506873a2b4e5cb508e48bf35f8502a2d1349b64e7581bfe7ff2f587b3edb2642cc885c60c0170a8875fad245240a1288057f4c07a42"
+    },
+    "zstd": {
+      "metadata_sha256": "1d6262377eaee174cc4934c4cc9cf13d0f679b26d129fb4b5707f49bf876d20a",
+      "portfile_sha256": "b348bd1c831dcda55e55f2b251178c0e9414161a2474dab58e76be639e870575",
+      "source_sha512": "26e441267305f6e58080460f96ab98645219a90d290a533410b1b0b1d2f870721c95f8384e342ee647c5e968385a5b7e30c2d04340c37f59b3e6d86762c3260c"
+    }
+  },
+  "schema": 1,
+  "source": {
+    "bootstrap_script_sha256": "8e8ec8a66db4f9fa69e51ca725a2aeec3c2a99e4ee0040f50358ffd8776f82b5",
+    "commit": "2750401336fb7c95f6619657a46a7e798661341c",
+    "repository": "https://github.com/microsoft/vcpkg.git",
+    "tree": "50903852a5e11f7551cdc02f1f521fb1998e9347"
+  },
+  "status": "success"
+}
