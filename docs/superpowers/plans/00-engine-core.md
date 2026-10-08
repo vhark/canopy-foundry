@@ -10,7 +10,7 @@
 
 ---
 
-F01 is complete; later tasks still define future work, not an existing game executable. The [master plan](2026-10-07-canopy-foundry.md) owns sequencing. Follow the architecture's authority/units rules. Each task ends with a focused commit, runtime smoke and its recorded evidence; do not substitute unit tests for a packaged-game check.
+F01 and F02 are complete; later tasks still define future work, not an existing game executable. The [master plan](2026-10-07-canopy-foundry.md) owns sequencing. Follow the architecture's authority/units rules. Each task ends with a focused commit, runtime smoke and its recorded evidence; do not substitute unit tests for a packaged-game check.
 
 ## F01 — Reproducible native build and dependency lock
 
@@ -50,12 +50,12 @@ B02 adds the distinct facility invariant: three 20,000 ft² storeys total 60,000
 
 **Create:** `core/include/canopy/{id,command,world,clock,view}.hpp`, `core/src/{world,clock,receipts}.cpp`, `core/tests/{clock,commands,replay}_test.cpp`, `core/tests/fixtures/clock_world.hpp`. Extend F01's `units.hpp`.
 
-- [ ] Define architecture A04's ID/time/budget types, typed quantities, `World::submit`, `World::advance`, read views and explicit result/error enums. Stable IDs never use raw pointers or Actor names. Define compact test fixture helpers in `clock_world.hpp`, not an unrelated mock engine.
-- [ ] Add consumer-facing cases before implementation: a repeated control command returns the original receipt without advancing the authoritative revision twice; changed payload under the same ID conflicts; a stale revision fails; stepping 0→60 as one target versus 60 one-second targets emits the same events; a decision at 60 stops requested advancement to 120 at exactly 60. Purchase/ledger semantics are implemented and tested in S06, not a second temporary economy inside F02.
-- [ ] Implement stable timestamp/type/entity tie-breaking, per-entity deterministic random streams, bounded command/receipt buffers and transactional mutation. Reject queue/full-state capacity violations with a typed error; never partially apply a command.
-- [ ] Implement 1-second controls and event deadlines with the later climate/crop interval hooks. `AdvanceBudget::max_substeps` yields progress without changing the integrator's time step. No wall time is consulted by the core.
-- [ ] Instrument allocations after load and run the steady-state clock case: accepted operations within reserved capacity allocate zero bytes on the stepping path. Scenario growth occurs only through an explicit capacity admission/reservation step.
-- [ ] Run the actual core test executable under normal and sanitizer builds; F05 later exposes these operations through the headless CLI. Commit the observed transcript.
+- [x] Define architecture A04's ID/time/budget types, typed quantities, `World::submit`, `World::advance`, read views and explicit result/error enums. Stable IDs never use raw pointers or Actor names. Define compact test fixture helpers in `clock_world.hpp`, not an unrelated mock engine.
+- [x] Add consumer-facing cases before implementation: a repeated control command returns the original receipt without advancing the authoritative revision twice; changed payload under the same ID conflicts; a stale revision fails; stepping 0→60 as one target versus 60 one-second targets emits the same events; a decision at 60 stops requested advancement to 120 at exactly 60. Purchase/ledger semantics are implemented and tested in S06, not a second temporary economy inside F02.
+- [x] Implement stable timestamp/type/entity tie-breaking, per-entity deterministic random streams, bounded command/receipt buffers and transactional mutation. Reject queue/full-state capacity violations with a typed error; never partially apply a command.
+- [x] Implement 1-second controls and event deadlines with the later climate/crop interval hooks. `AdvanceBudget::max_substeps` yields progress without changing the integrator's time step. No wall time is consulted by the core.
+- [x] Instrument allocations after load and run the steady-state clock case: accepted operations within reserved capacity allocate zero bytes on the stepping path. Scenario growth occurs only through an explicit capacity admission/reservation step.
+- [x] Run the actual core test executable under normal and sanitizer builds; F05 later exposes these operations through the headless CLI. Commit the observed transcript.
 
 Fixture specification, implemented as actual state transitions rather than expected-value echoes:
 
@@ -66,7 +66,18 @@ Fixture specification, implemented as actual state transitions rather than expec
  "decision_second":60,"requested_second":120,"expected_stop_second":60}
 ```
 
-**Check:** `ctest --test-dir .build/core -R 'Clock|Command|Replay' --output-on-failure`. Expected: receipt/ordering/stop cases pass; original failing-before traces retained in the implementation review.
+**Check:** `uv run --frozen ctest --test-dir .build/core --output-on-failure`. The native executable contains 23 cases, including the clock, command, replay and allocation scenarios; no case-name filter may silently select zero tests.
+
+**Implemented boundary semantics:** `World::load(controls, deadlines, seed)` validates positive authored deadlines and storage capacity before admission. No deadlines means no decision stops. Decisions sort by second, entity ID and decision ID; all same-time required events are emitted once, with resolution required in that order. Requested controls apply at the next second; 5-second climate and 60-second crop boundary events precede that second's required decisions. These events are integration hooks, not fictitious physics updates. Accepted actor/action identities use a preallocated receipt index and never evict; retry envelope time/revision may differ. Seed/entity/stream/counter mixing is ordered and stateless, with no unsolicited per-tick random draws. Views borrow const storage until mutation. Explicit moves transfer all state and reset the source to an unloaded world.
+
+**Observed failures and corrections:** the initial Debug build rejected a shadowed `action` declaration in the resolution branch. An independent RNG probe exposed identical samples for swapped stream/counter values `(2,7)` and `(7,2)`; domain-separated ordered mixing removes that structural collision. Review found default moves copied `loaded_` after moving its storage; a new regression failed in both move sections (`DecisionRequired` instead of `InvalidModel`) before the explicit transfer/reset implementation. Its construction/assignment, receipt continuity, deadline and source-reload checks now pass 47 assertions.
+
+**Executed verification:** native Apple Silicon macOS, AppleClang21/Xcode27/SDK27, macOS14 deployment floor: Debug 23/23, Release 23/23 and ASan/UBSan 23/23; build-orchestration pytest 52/52. These source results are not new approved-SDK game or GPU qualification. The separately compiled and linked public-API smoke used the specified command UUID, two deliveries, one authored decision at 60 and target 120; it also compared the event stream against sixty single-second advances. Its actual output was:
+
+```text
+receipt_revision=1 duplicate_deliveries=2 control=0.75 stop_second=60 resumed_second=120 climate=24 crop=2 partition_events=equal rng_domains=distinct
+```
+
 
 ## F03 — Native first-/third-person game and state bridge
 

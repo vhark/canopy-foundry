@@ -80,7 +80,12 @@ function(canopy_instrument target)
     endif()
 endfunction()
 
-add_library(canopy_core STATIC core/src/units.cpp)
+add_library(canopy_core STATIC
+    core/src/units.cpp
+    core/src/clock.cpp
+    core/src/world.cpp
+    core/src/receipts.cpp
+)
 target_include_directories(canopy_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/core/include")
 target_compile_features(canopy_core PUBLIC cxx_std_20)
 canopy_strict_warnings(canopy_core)
@@ -107,7 +112,12 @@ if(BUILD_TESTING)
         message(FATAL_ERROR "Pinned Catch2 package is missing from the isolated vcpkg install")
     endif()
     find_package(Catch2 3.16.0 EXACT CONFIG REQUIRED PATHS "${Catch2_DIR}" NO_DEFAULT_PATH)
-    add_executable(canopy_core_tests core/tests/units_test.cpp)
+    add_executable(canopy_core_tests
+        core/tests/units_test.cpp
+        core/tests/clock_test.cpp
+        core/tests/commands_test.cpp
+        core/tests/replay_test.cpp
+    )
     target_link_libraries(canopy_core_tests PRIVATE canopy_core Catch2::Catch2WithMain)
     if(MSVC)
         set_property(TARGET canopy_core_tests PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
