@@ -122,6 +122,7 @@ jobs:
         run: uv run --frozen python -m pytest tests/build -q
       - name: Qualify Development and Shipping engine core consumers
         if: runner.os != 'Windows' && env.CANOPY_QUALIFY_ENGINE == 'true'
+        timeout-minutes: 15
         shell: bash
         run: uv run --frozen python scripts/qualify_engine_core.py --engine-root "$CANOPY_UE_ROOT"
       - name: Retain scoped native build evidence

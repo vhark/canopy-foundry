@@ -237,6 +237,8 @@ def bootstrap(destination: Path, archive: Path | None = None) -> dict:
         build_inputs = managed_inputs + tuple(
             f"Engine/Binaries/{uba_directory}/UnrealBuildAccelerator/{name}" for name in uba_names
         )
+        if host == "win-x64":
+            build_inputs += ("Engine/Build/Windows/Resources/Default.ico",)
         ignore.write_text(
             "# Host .NET, native UBA and official UBT inputs; not an editor installation.\n"
             "**\n"

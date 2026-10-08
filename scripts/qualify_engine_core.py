@@ -209,10 +209,10 @@ def qualify(engine_root: Path) -> list[Path]:
             raise common.BuildFailure("Qualified Linux toolchain is not the expected multiarch target")
         environment["LINUX_MULTIARCH_ROOT"] = str(architecture.parent)
     ubt_command = [str(dotnet), "build", str(ubt_project), "-c", "Development", "-v", "quiet"]
-    common.run(ubt_command, cwd=engine_root, env=environment)
+    common.run(ubt_command, cwd=engine_root, env=environment, capture=False)
     publish_command = [str(dotnet), "publish", str(ubt_project), "-c", "Development",
                        "--output", str(ubt.parent), "--no-build", "-v", "quiet"]
-    common.run(publish_command, cwd=engine_root, env=environment)
+    common.run(publish_command, cwd=engine_root, env=environment, capture=False)
     if not ubt.is_file():
         raise common.BuildFailure("Official UBT build/publish did not produce UnrealBuildTool.dll")
     ubt_hash = common.sha256(ubt)
@@ -233,7 +233,7 @@ def qualify(engine_root: Path) -> list[Path]:
         args = [str(dotnet), str(ubt), NAME, {"mac-arm64": "Mac", "win64": "Win64", "linux-x64": "Linux"}[host], config,
                 f"-Project={working_descriptor}", f"-Architecture={'arm64' if host == 'mac-arm64' else 'x64'}",
                 "-NoUBA", "-NoHotReload", "-NoUBTMakefiles"]
-        common.run(args, cwd=engine_root, env=environment)
+        common.run(args, cwd=engine_root, env=environment, capture=False)
         receipt, executable = receipt_executable(project, config, host)
         native_output = common.run([str(executable)], cwd=project, env=environment)
         measured = validate_consumer_output(native_output, core)
