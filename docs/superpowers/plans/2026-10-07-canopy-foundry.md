@@ -8,7 +8,7 @@
 
 **Tech stack:** UE/UBT; C++20/CMake/Ninja; FlatBuffers and zstd; Catch2/CTest; Python3.12/uv/pytest; pinned GrowBIM/OpenCEA/IfcOpenShell; separately installed Blender/Bonsai; Git/Git LFS; private S3-compatible object storage; GitHub Actions with isolated native Windows/Linux/Mac build workers. Dependencies are selected here; exact installed artifacts and hashes are verified and locked in F01 rather than invented in a plan.
 
-**Status:** implementation started from the 2026-10-07 planning deliverable. F01's standalone native core/build tooling is under implementation and review; approved engine/toolchain and native-platform qualification remain open. No game executable, qualified runtime benchmark, signed vendor deal or commercial title clearance exists. Unchecked work packages remain pending; this repository is separate from the existing Grownetics Sim study.
+**Status:** implementation started from the 2026-10-07 planning deliverable. F01's standalone native core/build tooling is implemented and locally exercised; approved engine/toolchain and native-platform qualification remain open. The [source-build evidence](../../research/f01-build-evidence.md) records the reviewed checkpoint and executed checks. No game executable, qualified runtime benchmark, signed vendor deal or commercial title clearance exists. Unchecked work packages remain pending; this repository is separate from the existing Grownetics Sim study.
 
 ## 1. Decisions already made
 

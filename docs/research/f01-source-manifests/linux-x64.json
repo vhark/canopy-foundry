@@ -1,0 +1,79 @@
+{
+  "abi": {
+    "crt": "libstdc++",
+    "exceptions": false,
+    "rtti": false
+  },
+  "bootstrap_sha256": "287fb00c3ebcb47fb0aaf2344ccc68878bed1de0f7ac5c81e9be79775288355b",
+  "child_return_codes": {
+    "build": 0,
+    "configure": 0
+  },
+  "compiler": {
+    "binary_sha256": "1353e9bdd29a7295c7226bf6c63abccce056d8cac31f112e5cdbecc3f28c2769",
+    "id": "GNU",
+    "path": "/usr/bin/c++",
+    "version": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "config": "Debug",
+  "host_sdk": {
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "sysroot": ""
+  },
+  "inputs_sha256": {
+    "CMakeLists.txt": "947fc1100eed2b99bc5cc7a1738e8397364f444f478544fbce18d2dff54102ac",
+    "CMakePresets.json": "a3e13290a6524dedbf277c9506f76d9728688f7fb0cc30f8d5cf4daf4754aeca",
+    "config/toolchains.json": "23bc7a24455af5095e0c4c6f32debecf08520ca4c5a41a9892c990a3a8dc27a3",
+    "core/include/canopy/units.hpp": "5061f5c8fd144ef7517e8ac412cfcd3f3b402d2395a60e156d2afd7928bdfdc6",
+    "core/src/units.cpp": "5e51f3b39760f2fb74689ae35e3fc564a6ce24f8903edf5b6fe74c2390c15165",
+    "core/tests/units_test.cpp": "814bd480b42082ece30a7e4f82bf636bd5b6e7287ea5765f6dc630c28bf9a9db",
+    "dependencies/native-lock.json": "a2b54ad2fc26ac9454e543822678be45215eac28d3f3af8107d681acf325eb0f",
+    "dependencies/triplets/v26-chainload.cmake": "b643745864443edb29d1e9e85521f86af496df706644b11c285f4709e97e35a2",
+    "dependencies/triplets/x64-linux-ue-v26.cmake": "4310426fbe9c9404a42b1410371e80d93fe39d76d72d5db4c10c2615abcebf7b",
+    "dependencies/upstream/growbim-0.1.0-py3-none-any.whl": "1e4999bef0cfecc86a95e58d0915fac29b0d6f1c6f80621a59e86cc8126428f2",
+    "dependencies/upstream/opencea-0.1.0-py3-none-any.whl": "6bc833fcf21644c260aeeb21ce6912443a36a8926ccf48a6fdd173550dcfbbb9",
+    "dependencies/vcpkg-configuration.json": "999609a3cf1d6d33129e754912ea6f0b0f820f7ee1fe78a0bf0d139f160b46a1",
+    "dependencies/vcpkg.json": "2f7363cbf0af4fff0da51758cd1c7be657f4216c1abd7ab482e21cae2de79dd6",
+    "pyproject.toml": "78b11bcb21f53e650e7f942b71b8a3098a487811086b27eb6a49d7e2b85c2932",
+    "scripts/bootstrap_native.py": "36d326a557dcad130e9082fe611de43d1aceac77f711b22cf502e4bd053adb31",
+    "scripts/build_common.py": "8e481a3260276e4aa4edd5ffd30bc1eed549655acdca2b4f0ac9a77e3a3b912a",
+    "scripts/build_core.py": "e9b6463fb7cc7270501d6e5876229fd828874bf31a924515b37c114223987f82",
+    "scripts/build_game.py": "47b878f76ff972b4f6ee3cef9b36a02f52e3effb9a6453b4012fa4087960c0b2",
+    "uv.lock": "ed9389427c16691ced778b4d67a41c567564b34a2b8e5e1d0ede4dfeb5163689"
+  },
+  "library": {
+    "path": "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/libcanopy_core.a",
+    "sha256": "a8d1fadf5e495604c84c0a777dba0c1fbe0c45572ce3a3d50e2d4bc9e8f266dd"
+  },
+  "platform": "linux-x64",
+  "schema": 1,
+  "scope": "standalone-core",
+  "tools": {
+    "cmake": {
+      "path": "/home/runner/work/canopy-foundry/canopy-foundry/.venv/bin/cmake",
+      "sha256": "0667b07477add5023fc871781b86bedae813853ae50a6832a192075f003504c4",
+      "version": "cmake version 4.4.4"
+    },
+    "ninja": {
+      "path": "/home/runner/work/canopy-foundry/canopy-foundry/.venv/bin/ninja",
+      "sha256": "08639e194fffa7f08b259fc4abfa4803aff66b64de52549cee42ec527d55cea6",
+      "version": "1.13.2.git.kitware.jobserver-pipe-1"
+    },
+    "python": {
+      "path": "/home/runner/work/canopy-foundry/canopy-foundry/.venv/bin/python3",
+      "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "version": "3.12.13"
+    },
+    "uv": {
+      "path": "/opt/hostedtoolcache/uv/0.12.3/x86_64/uv",
+      "sha256": "729d27dbea534ee540a2d3ef43a62fa1a10af7fcbb6d57a70d5859509f624578",
+      "version": "uv 0.12.3 (x86_64-unknown-linux-gnu)"
+    }
+  },
+  "unreal_qualified": false,
+  "vcpkg_commit": "2750401336fb7c95f6619657a46a7e798661341c",
+  "vcpkg_triplet": "x64-linux"
+}
