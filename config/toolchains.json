@@ -10,7 +10,20 @@
   "unreal": {
     "engine": {"major": 5, "minor": 8, "patch": 1},
     "win64": {"visual_studio": "18.0", "msvc": "14.50", "windows_sdk": "10.0.26100", "crt_debug": "MDd", "crt_release": "MD", "rtti": false, "exceptions": false},
-    "linux-x64": {"clang": "20.1.8", "toolchain": "v26", "qualified_triplet": "x64-linux-ue-v26", "fixed_sysroot_required": true, "crt": "libc++", "rtti": false, "exceptions": false},
+    "linux-x64": {
+      "clang": "20.1.8",
+      "toolchain": "v26",
+      "qualified_triplet": "x64-linux-ue-v26",
+      "fixed_sysroot_required": true,
+      "crt": "libc++",
+      "rtti": false,
+      "exceptions": false,
+      "archive": {
+        "url": "https://cdn.unrealengine.com/Toolchain_Linux/native-linux-v26_clang-20.1.8-rockylinux8.tar.gz",
+        "sha256": "6eef42679b744cdcb50276f2d7cff0a51f7ddd632960e06bfbc3f6b9508ef615",
+        "root": "v26_clang-20.1.8-rockylinux8"
+      }
+    },
     "mac-arm64": {"xcode": "26.1.1", "crt": "libc++", "rtti": false, "exceptions": false}
   }
 }
