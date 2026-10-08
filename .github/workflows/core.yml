@@ -149,6 +149,7 @@ jobs:
             .build/native-bootstrap-attempt.json
             .build/core/*/canopy-core-manifest.json
             .build/core/Testing/Temporary/LastTest.log
+            .build/core/CMakeFiles/CMakeConfigureLog.yaml
             .build/engine-bootstrap.json
             .build/engine-qualification/*/*/manifest.json
           include-hidden-files: true
