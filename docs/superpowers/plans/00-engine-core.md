@@ -6,11 +6,11 @@
 
 **Architecture:** C++20 domain library plus a thin Unreal runtime bridge; authoring is external. The headless executable, replay tools and game use the same library and model packs.
 
-**Tech Stack:** Unreal 5.8.1, CMake, C++20, CTest/Catch2, FlatBuffers, zstd, Python 3.12 build/qualification orchestration, Git LFS.
+**Tech Stack:** Unreal 5.8.3, Xcode 27.0 on Apple Silicon macOS, CMake, C++20, CTest/Catch2, FlatBuffers, zstd, Python 3.12 build/qualification orchestration, Git LFS.
 
 ---
 
-F01 and F02 are complete; later tasks still define future work, not an existing game executable. The [master plan](2026-10-07-canopy-foundry.md) owns sequencing. Follow the architecture's authority/units rules. Each task ends with a focused commit, runtime smoke and its recorded evidence; do not substitute unit tests for a packaged-game check.
+F01, F02 and F04 are complete; F03 has a locally built and exercised UE5.8.3/Xcode27 Mac Development package, with full input/platform acceptance still open. The [master plan](2026-10-07-canopy-foundry.md) owns sequencing. Follow the architecture's authority/units rules. Each task ends with a focused commit, runtime smoke and its recorded evidence; do not substitute unit tests for a packaged-game check.
 
 ## F01 — Reproducible native build and dependency lock
 
@@ -27,6 +27,8 @@ F01 and F02 are complete; later tasks still define future work, not an existing 
 - [x] Build a library and test binary on each OS; record compiler and ABI metadata. Commit the lock, build rules and successful reports.
 
 Completion evidence: the [native qualification matrix](https://github.com/vhark/canopy-foundry/actions/runs/37746886997) at `ef149389528508fb74521aa65fa3ba31dd5fcca4` passed source builds and actual UE5.8.1 UBT Development/Shipping core consumers on all three approved hosts. Each executable called the same Release core API and passed strict compiler/runtime ABI validation. The [F01 execution report](../../research/f01-build-evidence.md) preserves 18 linked provenance/consumer records and the failure/recovery history. Local Debug, Release and ASan/UBSan each passed four native cases; the build-orchestration suite passed 52 checks. `build_game.py` remains fail-closed without F03's game project; no UAT game, editor or GPU/runtime result is claimed. F02 and B01 may proceed.
+
+**Baseline migration:** the current lock is UE5.8.3 with stable Xcode27.0/SDK27.0 on Mac. The F01 report above and its original manifests deliberately retain UE5.8.1/Xcode26.1.1: historical three-platform core-consumer proof does not certify the new engine patch. Current local Editor/package evidence and commands belong in the [native build instructions](../../../README.md#full-editor-room-and-cooked-coordinate-gate); Windows/Linux engine requalification remains separate.
 
 Initial concrete boundary test in `core/tests/units_test.cpp`; the function under test must be implemented in the core, not supplied as a fixture echo:
 
@@ -96,7 +98,9 @@ receipt_revision=1 duplicate_deliveries=2 control=0.75 stop_second=60 resumed_se
 
 **Check:** `uv run --frozen python scripts/build_game.py --platform win64 --configuration Development --engine-root "$CANOPY_UE_ROOT"` and the corresponding Mac/Linux commands, with `CANOPY_UE_ROOT` naming the authorized approved engine installation on that host. Expected: three native packages start and input works. Editor play-in-editor alone does not pass.
 
-**F03 source qualification work (native acceptance still open):** the build driver now requires a full approved Editor dependency inventory, authors the room, runs the required Editor automation suite, packages and requires a fresh structured result from the executable. Worker updates mark the final event packet explicitly: an intermediate packet no longer clears target admission or movement restrictions. The target-batch regression and modifier-free key selectors are covered by native automation source, not by an observed Editor run. Local full-Editor preflight rejects Xcode27 instead of relaxing the pinned26.1.1 requirement; no approved high-capacity runner is registered. Packaged controller/keyboard/visual acceptance remains unexecuted.
+**F03 native Mac execution (full acceptance still open):** the approved baseline is now UE5.8.3 CL58210709 with Xcode27.0/SDK27.0. Epic's installed Editor compiled the project modules, authored/imported the qualification room and passed all six Editor automation cases, including the final-event packet and modifier-free key-selection regressions. The Xcode game scheme compiled, linked and signed; UAT cooked, staged and archived the actual Development app. Its native F03 scenario reached second60/revision3/control0.75 while checking queued commands, management-time movement restrictions and view-only state invariance. The actual Metal window rendered the room and first-/third-person views. Sandbox-contained JSON reporting is collected by the parent driver without disabling sandboxing. The room uses movable lights so the generated map does not require an omitted static-light bake.
+
+This does **not** close the combined checklist: controller input, complete keyboard/mouse reach/collision/rebinding, saved camera preference across relaunch, Shipping and the corresponding Windows/Linux UE5.8.3 packages remain unqualified. Full source-Editor rebuilding is separate from compiling project modules against Epic's installed Editor. Commands, scoped evidence and the stock-engine Xcode27 executor workaround are in the [native build instructions](../../../README.md#full-editor-room-and-cooked-coordinate-gate).
 
 ## F04 — Crash-safe saves and replay authority
 

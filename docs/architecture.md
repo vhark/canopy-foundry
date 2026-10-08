@@ -4,7 +4,7 @@ Baseline 2026-10-07. Decisions below are binding for the implementation plans; c
 
 ## A01 — Unreal presentation, independent domain core
 
-Choose **Unreal Engine 5.8.1**, **C++20**, CMake for headless tools/tests and Unreal Build Tool for the game. Unreal supplies rendering, spatial interaction, audio, input, UI, navigation presentation, packaging and later network transport. It does not own crop, climate, inventory, scheduling or business truth.
+Choose **Unreal Engine 5.8.3**, **C++20**, CMake for headless tools/tests and Unreal Build Tool for the game. The Mac toolchain is pinned to stable **Xcode 27.0** with macOS SDK 27.0; exact engine distribution and compiler evidence are checked before packaging. Unreal supplies rendering, spatial interaction, audio, input, UI, navigation presentation, packaging and later network transport. It does not own crop, climate, inventory, scheduling or business truth.
 
 Alternatives considered: a custom Three.js/browser client lowers web deployment friction but puts high-end first-person rendering, authoring and native interaction infrastructure on the project; Godot offers an open engine but requires more project-owned high-end asset/render pipeline work; Unity is viable, but adds managed/native integration choices without an existing project advantage. Unreal best matches the high-fidelity industrial-world requirement. Its licensing, large build footprint and uneven rendering-feature support are accepted costs, with explicit fallback profiles and platform builds.
 

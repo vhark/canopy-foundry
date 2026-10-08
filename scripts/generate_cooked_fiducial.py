@@ -110,10 +110,12 @@ def generate(destination: Path):
                 "semantic_normal": semantic_normal,
                 "export_glb_normal": coordinates.semantic_to_glb((semantic_normal,))[0]}
 
+    engine = json.loads((Path(__file__).resolve().parents[1] / "config/toolchains.json").read_text(encoding="utf-8"))["unreal"]["engine"]
+    engine_version = ".".join(str(engine[key]) for key in ("major", "minor", "patch"))
     provenance = {"format": "canopy-cooked-fiducial-1", "glb_sha256": hashlib.sha256(glb).hexdigest(),
                   "source_basis": "RH Z-up metres; parent T(1.7,.9,.4) Rz(+90deg), child T(.25,.1,.15) mirror-X",
                   "export_basis": "RH Y-up metres; semantic (x,y,z) -> GLB (x,z,-y), no scale or reflection",
-                  "import_basis": "UE 5.8.1 Interchange GLTF ConvertVec3 (x,z,y), mesh metre->cm x100 exactly once",
+                  "import_basis": f"UE {engine_version} Interchange GLTF ConvertVec3 (x,z,y), mesh metre->cm x100 exactly once",
                   "semantic_frame": FRAME, "ports": [port_data(port) for port in PORTS]}
     (destination / "CookedFiducial.basis.json").write_text(json.dumps(provenance, indent=2)+"\n", encoding="utf-8")
 

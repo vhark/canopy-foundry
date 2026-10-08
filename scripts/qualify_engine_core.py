@@ -1,4 +1,4 @@
-"""Qualify the Release standalone core archive with a real UE 5.8.1 UBT Program."""
+"""Qualify the Release standalone core archive with a source UE 5.8.3 UBT Program."""
 
 from __future__ import annotations
 
@@ -143,12 +143,16 @@ def qualify(engine_root: Path) -> list[Path]:
     for configuration in ("Development", "Shipping"):
         (output_root / configuration / "manifest.json").unlink(missing_ok=True)
     if not engine_root.is_absolute() or not engine_root.is_dir():
-        raise common.BuildFailure("--engine-root must be an installed absolute source path")
+        raise common.BuildFailure("--engine-root must be an absolute source engine path")
+    if (engine_root / "Engine/Build/InstalledBuild.txt").is_file():
+        raise common.BuildFailure("Program core qualification is source-only; installed engines cannot use a unique build environment")
     engine_root = engine_root.resolve()
     requirements = common.load_json(ROOT / "config/toolchains.json")["unreal"]
     approved = requirements["source"]
     boot_path = ROOT / ".build/engine-bootstrap.json"
     boot = common.load_json(boot_path)
+    if boot.get("scope") == "unreal-installed-editor" or boot.get("installed") is True:
+        raise common.BuildFailure("Program core qualification is source-only; installed engines cannot use a unique build environment")
     if (boot.get("schema") != 1 or boot.get("status") != "success" or boot.get("scope") != "unreal-build-tools"
             or boot.get("engine_root") != str(engine_root)
             or boot.get("platform") != ("win-x64" if build_core.host_platform() == "win64" else build_core.host_platform())

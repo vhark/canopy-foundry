@@ -4,9 +4,9 @@
 
 **Goal:** Prove the first playable facility, representative industrial scale and safe native distribution on Windows, Linux and Apple Silicon Mac before claiming release readiness.
 
-**Architecture:** Generated immutable benchmark workloads exercise the authoritative C++20 core and a real cooked Unreal Engine 5.8.1 client, while one qualification interface dispatches case handlers and retains raw platform-specific evidence. Production/render budgets are measured before expensive flagship art; rights, save compatibility, accessibility and release sign-off are independent blocking gates, not inferred from green unit tests.
+**Architecture:** Generated immutable benchmark workloads exercise the authoritative C++20 core and a real cooked Unreal Engine 5.8.3 client, while one qualification interface dispatches case handlers and retains raw platform-specific evidence. Production/render budgets are measured before expensive flagship art; rights, save compatibility, accessibility and release sign-off are independent blocking gates, not inferred from green unit tests.
 
-**Tech Stack:** UE 5.8.1 native packaged client/Unreal Insights, C++20/CMake core, Python 3.12 qualification and fixture tools, `scripts/qualify.py`, platform-native cook/sign tools, private artifact storage; Windows VS 2026 18.0/MSVC 14.50/SDK 10.0.26100, Apple Silicon Xcode 26.1.1, Linux v26 clang 20.1.8 fixed sysroot as F01 pins.
+**Tech Stack:** UE 5.8.3 native packaged client/Unreal Insights, C++20/CMake core, Python 3.12 qualification and fixture tools, `scripts/qualify.py`, platform-native cook/sign tools, private artifact storage; Windows VS 2026 18.0/MSVC 14.50/SDK 10.0.26100, Apple Silicon Xcode 27.0, Linux v26 clang 20.1.8 fixed sysroot as the current lock pins.
 
 ---
 
@@ -97,7 +97,7 @@ Each P/R identifier is a tracked acceptance case or a family of named case phase
 **Files:** Extend F01's `.github/workflows/core.yml`; create `.github/workflows/trusted-native.yml`, `scripts/build_native.py`, `tests/qualification/release.py` (R01), `tests/release/test_artifact_manifest.py`. The orchestrator calls F01's `build_core.py`/`build_game.py`, propagates failures and collects their manifests; do not duplicate toolchain/cook rules.
 
 - [ ] Test a fork/untrusted PR attempting to select trusted runner/cook/signing or download vendor artifact: no trusted label, secret, object-store token or licensed-engine runner is reachable. Trusted CI runs only protected approved refs/environment; runner is ephemeral/isolated, clears workspace/cache/credentials after run; protect artifact links and verify manifest digest/access controls.
-- [ ] Make signed provenance manifest bind commit, UE 5.8.1 patch, Windows VS2026 18.0/MSVC14.50/SDK10.0.26100, Xcode26.1.1 on ARM64 macOS, Linux v26 clang20.1.8 sysroot, input/content/license digests, cooked platform, symbol/debug path, qualification results and SBOM digest. Do not quietly substitute Xcode26.4 or cross-compile Mac on Windows. Source-only untrusted lane may run sanitized tests without licensed/private inputs.
+- [ ] Make signed provenance manifest bind commit, UE 5.8.3 patch, Windows VS2026 18.0/MSVC14.50/SDK10.0.26100, Xcode27.0 on ARM64 macOS, Linux v26 clang20.1.8 sysroot, input/content/license digests, cooked platform, symbol/debug path, qualification results and SBOM digest. Do not quietly substitute another SDK or cross-compile Mac on Windows. Source-only untrusted lane may run sanitized tests without licensed/private inputs.
 - [ ] Cook and package each platform on its trusted native host; stage binaries, symbols and raw performance traces in access-controlled object storage with retention policy, encrypted transport, hash verification and vendor-access segregation. Publish only approved redacted reports; no public raw CAD, source IFC, vendor art or license payload.
 - [ ] Run **future** `python3 scripts/qualify.py --case R01 --platform win64 --output .work/qualification/R01`; expected PASS only for trusted immutable artifact/manifest provenance and explicit denied-untrusted scenario. Require the same case on linux-x64 and mac-arm64 native hosts.
 

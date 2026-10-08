@@ -5,6 +5,18 @@ import pytest
 
 from scripts import build_common
 
+def test_program_qualification_rejects_installed_editor(tmp_path, monkeypatch):
+    qualifier = importlib.import_module("scripts.qualify_engine_core")
+    engine = tmp_path / "UE_5.8"
+    marker = engine / "Engine/Build/InstalledBuild.txt"
+    marker.parent.mkdir(parents=True)
+    marker.touch()
+    monkeypatch.setattr(qualifier, "ROOT", tmp_path)
+    monkeypatch.setattr(qualifier.build_core, "host_platform", lambda: "mac-arm64")
+
+    with pytest.raises(build_common.BuildFailure, match="source-only.*installed"):
+        qualifier.qualify(engine)
+
 
 def consumer_record():
     return {

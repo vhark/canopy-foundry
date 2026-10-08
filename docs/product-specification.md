@@ -14,7 +14,7 @@ The world is primary. Players walk through rooms, inspect plants, operate rollin
 
 | Topic | Decision |
 |---|---|
-| Engine | Unreal Engine 5.8.1 baseline; C++ for domain/integration, Blueprints for presentation and authored interactions |
+| Engine | Unreal Engine 5.8.3 baseline; C++ for domain/integration, Blueprints for presentation and authored interactions |
 | Simulation | Engine-independent C++20 library, single authoritative process, fixed domain clock, headless executable |
 | Authoring | GrowBIM/OpenCEA semantic authority; external Blender/Bonsai/IfcOpenShell; game-specific derived packs |
 | Platforms | Windows 11 x64, macOS 15+ Apple Silicon with M2 Pro reference tier, Linux x64 Ubuntu 24.04; Ubuntu 22.04 is additional qualification, not an untested launch promise |

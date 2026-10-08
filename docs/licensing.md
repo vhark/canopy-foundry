@@ -18,7 +18,7 @@ Unreal is a proprietary commercial dependency. The current [Epic licensing summa
 
 The non-game seat-based licensing category is distinct. A future separately licensed business training/design application may need a different analysis; calling a B2B product a game does not establish its category. Engine source access is not an open-source license. Do not publish engine code/binaries or distribute editor tools except through channels the accepted terms permit.
 
-The older publicly accessible Epic PDF EULA reviewed during research is historical evidence, **not** the contractual authority for the chosen 5.8.1 account/license. Current terms and account acceptance must be archived by the publisher before implementation distribution.
+The older publicly accessible Epic PDF EULA reviewed during research is historical evidence, **not** the contractual authority for the chosen 5.8.3 account/license. Current terms and account acceptance must be archived by the publisher before implementation distribution.
 
 ## Authoring tools and generated output
 

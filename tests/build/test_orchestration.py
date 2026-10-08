@@ -1,10 +1,11 @@
 import hashlib
 import json
+import plistlib
 import sys
 
 import pytest
 
-from scripts import build_common, build_core, build_game
+from scripts import bootstrap_engine, build_common, build_core, build_game
 
 MACOS_PROFILE = {"deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58"}
 
@@ -33,20 +34,17 @@ def test_native_platform_and_project_preflight_reject_before_uat(tmp_path, monke
         build_game.preflight(tmp_path, "mac-arm64", "Development", tmp_path / "UE")
 
 
-def test_engine_patch_mismatch_is_rejected(tmp_path, monkeypatch):
-    monkeypatch.setattr(build_game, "native_platform", lambda: "mac-arm64")
-    project = tmp_path / "game" / "CanopyFoundry.uproject"
-    project.parent.mkdir()
-    project.write_text("{}")
-    config = tmp_path / "config" / "toolchains.json"
-    config.parent.mkdir()
-    config.write_text(json.dumps({"unreal": {"engine": {"major": 5, "minor": 8, "patch": 1}}}))
+def test_engine_patch_mismatch_is_rejected(tmp_path):
+    requirements = {"engine": {"major": 5, "minor": 8, "patch": 3}}
+    approved = {"MajorVersion": 5, "MinorVersion": 8, "PatchVersion": 3}
     engine = tmp_path / "Unreal Engine 5.8"
     version = engine / "Engine" / "Build" / "Build.version"
     version.parent.mkdir(parents=True)
-    version.write_text(json.dumps({"MajorVersion": 5, "MinorVersion": 8, "PatchVersion": 0}))
-    with pytest.raises(build_common.BuildFailure, match="5.8.1"):
-        build_game.preflight(tmp_path, "mac-arm64", "Development", engine)
+    version.write_text(json.dumps(approved))
+    assert bootstrap_engine._engine_version(engine, requirements) == approved
+    version.write_text(json.dumps({**approved, "PatchVersion": 1}))
+    with pytest.raises(build_common.BuildFailure):
+        bootstrap_engine._engine_version(engine, requirements)
 
 
 def test_core_manifest_rejects_wrong_configuration_host_or_compiler(tmp_path):
@@ -167,6 +165,7 @@ def test_game_input_snapshot_ignores_cook_outputs_but_detects_authored_changes(t
         tmp_path / "game/CanopyFoundry.uproject",
         tmp_path / "game/Config/DefaultEngine.ini",
         tmp_path / "game/Content/Maps/Facility.umap",
+        tmp_path / "game/Build/Mac/FileOpenOrder/GameOpenOrder.log",
         tmp_path / "game/Plugins/CanopyRuntime/Source/Runtime.cpp",
     ]
     for path in authored:
@@ -179,6 +178,11 @@ def test_game_input_snapshot_ignores_cook_outputs_but_detects_authored_changes(t
         "game/Saved/Cooked/Facility.uasset",
         "game/Plugins/CanopyRuntime/Binaries/Mac/Runtime.dylib",
         "game/Plugins/CanopyRuntime/Intermediate/generated.cpp",
+        "game/CanopyFoundry (Mac).xcworkspace/contents.xcworkspacedata",
+        "game/CanopyFoundry.xcodeproj/project.pbxproj",
+        "game/Build/Mac/game.PackageVersionCounter",
+        "game/Build/Mac/FileOpenOrder/EditorOpenOrder.log",
+        "game/Build/Mac/FileOpenOrder/CookerOpenOrder.log",
     ):
         generated = tmp_path / relative
         generated.parent.mkdir(parents=True, exist_ok=True)
@@ -190,11 +194,50 @@ def test_game_input_snapshot_ignores_cook_outputs_but_detects_authored_changes(t
     assert after[key] != before[key]
 
 
-@pytest.mark.parametrize("version", ["Xcode 27.0\nBuild version 27A266a", "Xcode 26.4", "Xcode 26.1", ""])
-def test_unapproved_xcode_fails_preflight(version):
-    with pytest.raises(build_common.BuildFailure, match="26.1.1"):
-        build_game.validate_xcode_version(version)
-    build_game.validate_xcode_version("Xcode 26.1.1\nBuild version 17B100")
+def test_mac_native_report_stays_in_bundle_container_and_rejects_stale_evidence(tmp_path, monkeypatch):
+    executable = tmp_path / "CanopyFoundry.app/Contents/MacOS/CanopyFoundry"
+    executable.parent.mkdir(parents=True)
+    (executable.parents[1] / "Info.plist").write_bytes(
+        plistlib.dumps({"CFBundleIdentifier": "com.example.CanopyFoundry"}))
+    home = tmp_path / "home"
+    monkeypatch.setattr(build_game.Path, "home", lambda: home)
+    archive = tmp_path / "uat-first"
+    report = build_game.native_report_path(executable, "mac-arm64", archive, "f03-native-room")
+    container = home / "Library/Containers/com.example.CanopyFoundry/Data"
+    assert report.is_relative_to(container)
+    assert build_game.native_report_path(
+        executable, "mac-arm64", tmp_path / "uat-second", "f03-native-room") != report
+    report.parent.mkdir(parents=True)
+    report.write_text('{"status":"pass"}')
+    with pytest.raises(build_common.BuildFailure, match="already exists"):
+        build_game.native_report_path(executable, "mac-arm64", archive, "f03-native-room")
+
+
+@pytest.mark.parametrize("identifier", (None, "../other", "/tmp/other", "com.example/other"))
+def test_mac_native_report_rejects_missing_or_escaping_bundle_identity(tmp_path, identifier):
+    executable = tmp_path / "App.app/Contents/MacOS/App"
+    executable.parent.mkdir(parents=True)
+    identity = {} if identifier is None else {"CFBundleIdentifier": identifier}
+    (executable.parents[1] / "Info.plist").write_bytes(plistlib.dumps(identity))
+    with pytest.raises(build_common.BuildFailure, match="bundle identifier"):
+        build_game.native_report_path(executable, "mac-arm64", tmp_path / "uat-run", "f03-native-room")
+
+
+@pytest.mark.parametrize(
+    ("required", "version"),
+    [
+        ("27.0", "Xcode 26.1.1\nBuild version 17B100"),
+        ("26.6", "Xcode 27.0\nBuild version 27A266a"),
+        ("27.0", "Xcode 27.0.1"),
+        ("27.0", "Xcode 27.0 beta"),
+        ("27.0", "unrelated output\nXcode 27.0"),
+        ("27.0", ""),
+    ],
+)
+def test_xcode_admission_uses_the_exact_configured_release(required, version):
+    with pytest.raises(build_common.BuildFailure):
+        build_game.validate_xcode_version(version, required)
+    build_game.validate_xcode_version(f"Xcode {required}\nBuild version test", required)
 
 
 @pytest.mark.parametrize(

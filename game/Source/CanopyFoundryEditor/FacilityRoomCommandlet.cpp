@@ -65,12 +65,15 @@ int32 UFacilityRoomCommandlet::Main(const FString& Params)
     if (!Target) return 5;
     Target->SetActorLabel(TEXT("Inspectable vent control"));
     ADirectionalLight* Sun = World->SpawnActor<ADirectionalLight>(FVector(0, 0, 250), FRotator(-60, 15, 0));
+    Sun->GetLightComponent()->SetMobility(EComponentMobility::Movable);
     Sun->GetLightComponent()->SetIntensity(4.f);
     ASkyLight* Sky = World->SpawnActor<ASkyLight>(FVector(0, 0, 250), FRotator::ZeroRotator);
+    Sky->GetLightComponent()->SetMobility(EComponentMobility::Movable);
     Sky->GetLightComponent()->SetIntensity(1.f);
     for (const float X : {-450.f, 450.f})
     {
         APointLight* Fixture = World->SpawnActor<APointLight>(FVector(X, 0, 315), FRotator::ZeroRotator);
+        Fixture->PointLightComponent->SetMobility(EComponentMobility::Movable);
         Fixture->PointLightComponent->SetIntensity(8500.f);
         Fixture->PointLightComponent->SetAttenuationRadius(1200.f);
     }

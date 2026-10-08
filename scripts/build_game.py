@@ -1,4 +1,4 @@
-"""Preflight and package an existing game on a qualified native UE 5.8.1 host."""
+"""Build, package and exercise Canopy with the pinned native Unreal toolchain."""
 
 import argparse
 import hashlib
@@ -6,6 +6,7 @@ import json
 import math
 import os
 import platform
+import plistlib
 import re
 import shutil
 import sys
@@ -32,12 +33,25 @@ def editor_command(engine: Path, host: str) -> Path:
                      "win64": "Engine/Binaries/Win64/UnrealEditor-Cmd.exe"}[host]
 
 
-def editor_build_command(engine: Path, project: Path, host: str) -> list[str]:
+def editor_build_command(engine: Path, project: Path, host: str, *, installed: bool) -> list[str]:
+    if host == "mac-arm64" and not installed:
+        return xcode_build_command(project, "CanopyFoundryEditor", "Development")
     relative = {"win64": "Build.bat", "mac-arm64": "Mac/Build.sh", "linux-x64": "Linux/Build.sh"}[host]
     script = engine / "Engine/Build/BatchFiles" / relative
-    bootstrap = [] if host == "win64" else ["-buildubt", "-buildscw"]
+    bootstrap = ["-NoEngineChanges"] if installed else ([] if host == "win64" else ["-buildubt", "-buildscw"])
     return [str(script), "CanopyFoundryEditor", PLATFORMS[host], "Development",
             f"-Project={project}", "-NoHotReload", "-NoUBTMakefiles", *bootstrap]
+
+
+def xcode_build_command(project: Path, target: str, configuration: str) -> list[str]:
+    # UE-396802: UBT's executor closes stdin, breaking Xcode 27 scheme scripts.
+    # The standard Xcode scheme drives both compilation and app finalization.
+    return ["/usr/bin/xcodebuild", "build", "-workspace",
+            str(project.with_name(f"{project.stem} (Mac).xcworkspace")),
+            "-scheme", target, "-configuration", configuration,
+            "-destination", "generic/platform=macOS", "ARCHS=arm64",
+            "CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION=YES",
+            "-allowProvisioningUpdates", "-hideShellScriptEnvironment"]
 
 
 def read_engine_report(path: Path) -> dict:
@@ -64,10 +78,10 @@ def validate_automation_report(report: dict) -> None:
         raise common.BuildFailure("F03 automation cases did not all succeed")
 
 
-def validate_packaged_report(report: dict, case: str) -> None:
+def validate_packaged_report(report: dict, case: str, engine_version: str) -> None:
     if (type(report.get("schema")) is not int or report["schema"] != 1
             or report.get("case") != case or report.get("status") != "pass"
-            or not isinstance(report.get("engine"), str) or not report["engine"].startswith("5.8.1-")
+            or not isinstance(report.get("engine"), str) or not report["engine"].startswith(engine_version + "-")
             or not isinstance(report.get("measurements"), dict)):
         raise common.BuildFailure(f"Invalid packaged qualification report for {case}")
     measurements = report["measurements"]
@@ -195,9 +209,10 @@ def validate_core_manifest(manifest: dict, expected: dict) -> None:
         raise common.BuildFailure("core manifest library checksum mismatch")
 
 
-def validate_xcode_version(version: str) -> None:
-    if not re.search(r"^Xcode 26\.1\.1$", version, re.MULTILINE):
-        raise common.BuildFailure(f"Xcode mismatch: required 26.1.1, found {version.strip()}")
+def validate_xcode_version(version: str, required: str) -> None:
+    lines = version.splitlines()
+    if not lines or lines[0] != f"Xcode {required}":
+        raise common.BuildFailure(f"Xcode mismatch: required {required}, found {version.strip()}")
 
 
 def validate_windows_sdk(visual_studio: str, tools: str, sdk: str, requirements: dict) -> None:
@@ -208,7 +223,7 @@ def validate_windows_sdk(visual_studio: str, tools: str, sdk: str, requirements:
 def qualified_compiler(root: Path, host: str, requirements: dict) -> dict:
     if host == "mac-arm64":
         xcode = common.run(["xcodebuild", "-version"], cwd=root)
-        validate_xcode_version(xcode)
+        validate_xcode_version(xcode, requirements["xcode"])
         sdk_path = str(Path(common.run(["xcrun", "--sdk", "macosx", "--show-sdk-path"], cwd=root).strip()).resolve())
         sdk = common.run(["xcrun", "--sdk", sdk_path, "--show-sdk-version"], cwd=root).strip()
         compiler_path = Path(common.run(["xcrun", "--sdk", sdk_path, "--find", "clang++"], cwd=root).strip()).resolve()
@@ -252,7 +267,11 @@ def qualified_compiler(root: Path, host: str, requirements: dict) -> dict:
 
 def uat_command(engine: Path, project: Path, platform_name: str, configuration: str, archive: Path) -> list[str]:
     script = engine / "Engine/Build/BatchFiles" / ("RunUAT.bat" if platform_name == "win64" else "RunUAT.sh")
-    return [str(script), "BuildCookRun", f"-project={project}", "-noP4", "-unattended", "-utf8output", "-build", "-cook", "-stage", "-pak", "-package", "-archive", f"-archivedirectory={archive}", f"-platform={PLATFORMS[platform_name]}", f"-clientconfig={configuration}"]
+    build = ["-skipbuildeditor"] if platform_name == "mac-arm64" else ["-build"]
+    return [str(script), "BuildCookRun", f"-project={project}", "-noP4", "-unattended",
+            "-utf8output", *build, "-cook", "-stage", "-pak", "-package", "-archive",
+            f"-archivedirectory={archive}", f"-platform={PLATFORMS[platform_name]}",
+            f"-clientconfig={configuration}"]
 
 
 def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
@@ -266,49 +285,18 @@ def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
     common.load_json(project)
     expected_engine = common.load_json(root / "config/toolchains.json")["unreal"]
     version_path = engine / "Engine/Build/Build.version"
-    version = common.load_json(version_path)
-    if any(version.get(k) != expected_engine["engine"][key] for k, key in (("MajorVersion", "major"), ("MinorVersion", "minor"), ("PatchVersion", "patch"))):
-        raise common.BuildFailure(f"Unreal engine must be 5.8.1; found {version}")
+    bootstrap_engine._engine_version(engine, expected_engine)
+    engine_version = ".".join(str(expected_engine["engine"][key]) for key in ("major", "minor", "patch"))
     uat = Path(uat_command(engine, project, host, configuration, root / ".build/game")[0])
     if not uat.is_file():
         raise common.BuildFailure(f"Missing official Unreal Automation Tool {uat}")
     profile = expected_engine[host]
-    bootstrap_path = root / ".build/engine-bootstrap.json"
-    boot = common.load_json(bootstrap_path)
-    source = expected_engine["source"]
-    if (boot.get("scope") != "unreal-full-editor" or boot.get("status") != "success"
-            or boot.get("engine_root") != str(engine.resolve())
-            or boot.get("platform") != ("win-x64" if host == "win64" else host)
-            or any(boot.get("source", {}).get(k) != source[k] for k in
-                   ("tag", "commit", "archive_root", "archive_sha256"))
-            or boot.get("source", {}).get("build_version_sha256") != common.sha256(version_path)
-            or boot.get("inputs", {}).get("config_sha256") != common.sha256(root / "config/toolchains.json")
-            or boot.get("inputs", {}).get("bootstrap_sha256") != common.sha256(root / "scripts/bootstrap_engine.py")):
-        raise common.BuildFailure("Game requires this checkout's pinned full-editor bootstrap evidence")
-    deps = boot.get("gitdependencies", {})
-    manifest = engine / "Engine/Build/Commit.gitdeps.xml"
-    working = engine / ".uedependencies"
-    gitdeps = engine / deps.get("path", "")
-    if (deps.get("original_manifests_sha256", {}).get("Engine/Build/Commit.gitdeps.xml") != common.sha256(manifest)
-            or deps.get("working_manifest_sha256") != common.sha256(working)
-            or not isinstance(deps.get("selected_file_count"), int) or deps["selected_file_count"] < 1
-            or deps.get("filter_sha256") is not None or (engine / ".gitdepsignore").exists()
-            or deps.get("returncode") != 0 or deps.get("sha256") != common.sha256(gitdeps)):
-        raise common.BuildFailure("Official full-editor dependency manifest/client changed")
-    dependency_manifest = bootstrap_engine._dependency_manifest(engine)
-    if any(deps.get(key) != value for key, value in dependency_manifest.items()):
-        raise common.BuildFailure("Full-editor selected dependency payloads changed")
+    tool = qualified_compiler(root, host, profile)
+    provenance = bootstrap_engine.validate_editor(root, engine, host, tool)
     editor = editor_command(engine, host)
-    build_script = Path(editor_build_command(engine, project, host)[0])
+    build_script = Path(editor_build_command(engine, project, host, installed=provenance["installed"])[0])
     if not build_script.is_file():
         raise common.BuildFailure("Official Editor build script missing")
-    bundled = engine / boot.get("dotnet", {}).get("path", "")
-    if (boot.get("dotnet", {}).get("sha256") != common.sha256(bundled)
-            or boot.get("dotnet", {}).get("version_returncode") != 0):
-        raise common.BuildFailure("Provisioned Editor .NET SDK changed")
-    tool = qualified_compiler(root, host, profile)
-    if boot.get("native_toolchain") != tool:
-        raise common.BuildFailure("Native compiler differs from full-editor provision")
     config = "Release"
     manifest_path = root / ".build/core" / config.lower() / "canopy-core-manifest.json"
     core = common.load_json(manifest_path)
@@ -339,8 +327,24 @@ def preflight(root: Path, host: str, configuration: str, engine: Path) -> dict:
     if core.get("inputs_sha256") != common.input_checksums(root):
         raise common.BuildFailure("core manifest stale or incomplete source input checksums")
     return {"project": project, "version_path": version_path, "core_path": manifest_path,
-            "core": core, "boot_path": bootstrap_path, "editor": editor,
-            "dependency_manifest": dependency_manifest, **tool}
+            "core": core, "editor": editor, "engine_version": engine_version, **provenance, **tool}
+
+
+def native_report_path(executable: Path, host: str, archive: Path, case: str) -> Path:
+    path = archive / f"{case}.json"
+    if host == "mac-arm64":
+        with (executable.parents[1] / "Info.plist").open("rb") as stream:
+            identity = plistlib.load(stream)
+        bundle = identity.get("CFBundleIdentifier") if isinstance(identity, dict) else None
+        if not isinstance(bundle, str) or not re.fullmatch(r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", bundle):
+            raise common.BuildFailure("Packaged Mac bundle identifier is invalid")
+        # Keep Apple's sandbox enabled. Only the parent build process exports
+        # the child's fresh report from its writable container to the archive.
+        path = (Path.home() / "Library/Containers" / bundle / "Data/CanopyQualification"
+                / f"{archive.name}-{case}.json")
+    if path.exists() or path.is_symlink():
+        raise common.BuildFailure(f"Native qualification report already exists: {path}")
+    return path
 
 
 def game_input_checksums(root: Path, *, include_authored_outputs: bool = True) -> dict[str, str]:
@@ -352,6 +356,12 @@ def game_input_checksums(root: Path, *, include_authored_outputs: bool = True) -
         for name in filenames:
             path = Path(directory) / name
             relative = path.relative_to(root / "game")
+            generated_order_log = (
+                len(relative.parts) == 4 and relative.parts[0] == "Build"
+                and relative.parts[2] == "FileOpenOrder"
+                and name in {"EditorOpenOrder.log", "CookerOpenOrder.log"})
+            if relative == Path("Build/Mac/game.PackageVersionCounter") or generated_order_log:
+                continue
             if not include_authored_outputs and (
                     relative == Path("Content/Maps/FacilityQualification.umap")
                     or relative.is_relative_to(Path("Content/B02"))):
@@ -370,7 +380,6 @@ def build(root: Path, host: str, configuration: str, engine: Path) -> Path:
     archive_base.mkdir(parents=True, exist_ok=True)
     archive = Path(tempfile.mkdtemp(prefix="uat-", dir=archive_base))
     manifest_path = archive / "canopy-game-manifest.json"
-    game_sources = game_input_checksums(root, include_authored_outputs=False)
     core_inputs = common.input_checksums(root)
     core_hash = common.sha256(evidence["core_path"])
     boot_hash = common.sha256(evidence["boot_path"])
@@ -389,7 +398,13 @@ def build(root: Path, host: str, configuration: str, engine: Path) -> Path:
     if host == "win64":
         environment["CANOPY_UBT_MSVC_VERSION"] = evidence["qualification"]["msvc"].rstrip("\\/")
         environment["CANOPY_UBT_WINDOWS_SDK"] = evidence["qualification"]["windows_sdk"].rstrip("\\/")
-    build_command = editor_build_command(engine, evidence["project"], host)
+    project_command = []
+    if host == "mac-arm64":
+        project_command = [str(engine / "Engine/Build/BatchFiles/Mac/GenerateProjectFiles.sh"),
+                           f"-project={evidence['project']}", "-game", "-NoIntelliSense"]
+        common.run(project_command, cwd=root, env=environment, capture=False)
+    game_sources = game_input_checksums(root, include_authored_outputs=False)
+    build_command = editor_build_command(engine, evidence["project"], host, installed=evidence["installed"])
     common.run(build_command, cwd=root, env=environment, capture=False)
     editor = evidence["editor"]
     if not editor.is_file():
@@ -421,6 +436,10 @@ def build(root: Path, host: str, configuration: str, engine: Path) -> Path:
     common.run(automation, cwd=root, env=environment, capture=False)
     report = report_dir / "index.json"
     validate_automation_report(read_engine_report(report))
+    game_build_commands = ([xcode_build_command(evidence["project"], "CanopyFoundry", configuration)]
+                           if host == "mac-arm64" else [])
+    for game_build_command in game_build_commands:
+        common.run(game_build_command, cwd=root, env=environment, capture=False)
     command = uat_command(engine, evidence["project"], host, configuration, archive)
     common.run(command, cwd=root, env=environment, capture=False)
     packaged = [p for p in archive.rglob("*") if p.is_file()
@@ -432,29 +451,37 @@ def build(root: Path, host: str, configuration: str, engine: Path) -> Path:
     for case, mode in (("f03-native-room", "-FacilityQualify"),
                        ("b02-cooked-fiducial", "-CookedFiducialQualify")):
         result_path = archive / f"{case}.json"
+        native_result_path = native_report_path(executables[0], host, archive, case)
         native = [str(executables[0]), "/Game/Maps/FacilityQualification", mode,
-                  f"-QualificationReport={result_path}", "-unattended",
+                  f"-QualificationReport={native_result_path}", "-unattended",
                   "-nullrhi" if case == "f03-native-room" else "-RenderOffscreen",
                   "-stdout", "-FullStdOutLogOutput"]
         native_output = common.run(native, cwd=executables[0].parent, env=environment)
-        validate_packaged_report(read_engine_report(result_path), case)
+        validate_packaged_report(read_engine_report(native_result_path), case, evidence["engine_version"])
+        if native_result_path != result_path:
+            shutil.move(native_result_path, result_path)
         native_runs[case] = {"argv": native, "returncode": 0, "report_sha256": common.sha256(result_path),
                              "stdout_sha256": hashlib.sha256(native_output.encode("utf-8")).hexdigest()}
+    current_tool = qualified_compiler(root, host, common.load_json(root / "config/toolchains.json")["unreal"][host])
+    current_engine = bootstrap_engine.validate_editor(root, engine, host, current_tool)
     if (game_inputs != game_input_checksums(root) or core_inputs != common.input_checksums(root)
             or core_hash != common.sha256(evidence["core_path"]) or boot_hash != common.sha256(evidence["boot_path"])
             or editor_hash != common.sha256(editor) or map_hash != common.sha256(map_path)
             or fixture_source_hashes != {str(path.relative_to(root)): common.sha256(path) for path in fixture_sources}
             or fixture_hashes != {str(path.relative_to(fixture_dir)): common.sha256(path)
                                  for path in sorted(fixture_dir.iterdir()) if path.is_file()}
-            or bootstrap_engine._dependency_manifest(engine) != evidence["dependency_manifest"]):
+            or current_engine["dependency_manifest"] != evidence["dependency_manifest"]):
         raise common.BuildFailure("Game, engine, or native core inputs changed during package")
     data = {"schema": 1, "scope": "native-game-package", "platform": host, "configuration": configuration,
+            "engine_distribution": "installed" if evidence["installed"] else "source",
             "engine_version_sha256": common.sha256(evidence["version_path"]),
             "engine_bootstrap_sha256": boot_hash, "editor_sha256": editor_hash,
             "uat_sha256": common.sha256(Path(command[0])), "project_sha256": common.sha256(evidence["project"]),
             "game_inputs_sha256": game_inputs, "core_manifest_sha256": core_hash,
             "config_sha256": common.sha256(root / "config/toolchains.json"), "compiler": evidence["compiler"],
             "qualification": evidence["qualification"], "editor_build_argv": build_command,
+            "game_build_commands": [{"argv": argv, "returncode": 0} for argv in game_build_commands],
+            "project_generation_argv": project_command,
             "room_commandlet_argv": commandlet, "map_sha256": map_hash, "automation_argv": automation,
             "automation_report_sha256": common.sha256(report), "uat_argv": command,
             "fiducial_generator_argv": generate, "fiducial_import_argv": imported,

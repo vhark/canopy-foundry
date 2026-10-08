@@ -8,12 +8,12 @@
     "vcpkg_commit": "2750401336fb7c95f6619657a46a7e798661341c"
   },
   "unreal": {
-    "engine": {"major": 5, "minor": 8, "patch": 1},
+    "engine": {"major": 5, "minor": 8, "patch": 3},
     "source": {
-      "tag": "5.8.1-release",
-      "commit": "71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
-      "archive_root": "EpicGames-UnrealEngine-71fe36aac5a8df5ccd66c763ffc902b29b6a9c43",
-      "archive_sha256": "712ae95d999d5e3e88f2e132b059ff360d089ef0a13df00418abedbc56841d89",
+      "tag": "5.8.3-release",
+      "commit": "396c9f059903aed5fec78ecd3d437a40c6415368",
+      "archive_root": "EpicGames-UnrealEngine-396c9f059903aed5fec78ecd3d437a40c6415368",
+      "archive_sha256": "b93c1296aeb5143d878b9ebe407edc29ead51b0ab3f5f8088f7e3b1ffe3805e3",
       "dotnet_directory": "10.0"
     },
     "win64": {"visual_studio": "18.0", "msvc": "14.50", "windows_sdk": "10.0.26100", "qualified_triplet": "x64-windows-msvc", "crt_debug": "MDd", "crt_release": "MD", "rtti": false, "exceptions": false},
@@ -31,6 +31,15 @@
         "root": "v26_clang-20.1.8-rockylinux8"
       }
     },
-    "mac-arm64": {"xcode": "26.1.1", "deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58", "crt": "libc++", "rtti": false, "exceptions": true}
+    "mac-arm64": {"xcode": "27.0", "deployment_target": "14.0", "qualified_triplet": "arm64-osx-ue58", "crt": "libc++", "rtti": false, "exceptions": true},
+    "installed": {
+      "mac-arm64": {
+        "app_name": "UE_5.8",
+        "app_version": "5.8.3-58210709+++UE5+Release-5.8-Mac",
+        "build_version_sha256": "eab58750e84719489f3ee0d42d05a533ceb357eb3ee511777e9408d27a85f43c",
+        "editor_sha256": "92a29c07430a88ee50ca6d343a81d83e92ec433619dff99ac12995dac26c2612",
+        "ubt_sha256": "5ff07b9022c405e4c923da42b9a6efb29c88c8ab57623c2296dbd728feea1287"
+      }
+    }
   }
 }

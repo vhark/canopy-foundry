@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import plistlib
 import os
 from pathlib import Path, PurePosixPath
 import platform
@@ -31,6 +32,22 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config/toolchains.json"
 EVIDENCE = ROOT / ".build/engine-bootstrap.json"
+LAUNCHER_REGISTRY = Path.home() / "Library/Application Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"
+LAUNCHER_MANIFESTS = Path.home() / "Library/Application Support/Epic/EpicGamesLauncher/Data/Manifests"
+EDITOR_BINARY = "Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor"
+UBT_BINARY = "Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll"
+GENERATED_DIRECTORIES = frozenset({"Saved", "DerivedDataCache", ".vs"})
+GENERATED_INSTALLED_FILES = frozenset({
+    "Engine/Intermediate/ProjectFiles/PrimaryProjectName.txt",
+    "Engine/Intermediate/ProjectFiles/PrimaryProjectPath.txt",
+    "Engine/Intermediate/Build/Mac/Resources/Info-Editor.Template.plist",
+    "Engine/Intermediate/Build/Mac/Resources/Info.Template.plist",
+    "Engine/Intermediate/Build/BuildCookRun/StagedBuild_CanopyFoundry.ini",
+    "Engine/Intermediate/TargetInfo.json",
+    "Engine/Intermediate/Build/BuildRulesProjects/UE5Rules/UE5Rules.csproj",
+    "Engine/Intermediate/Build/BuildRulesProjects/UE5ProgramRules/UE5ProgramRules.csproj",
+    "Engine/Plugins/ScriptPlugin/Source/ScriptGeneratorUbtPlugin/ScriptGeneratorUbtPlugin.ubtplugin.csproj.props",
+})
 HOSTS = {
     ("Darwin", "arm64"): ("mac-arm64", "osx-arm64"),
     ("Windows", "AMD64"): ("win-x64", "win-x64"),
@@ -226,12 +243,221 @@ def _dependency_manifest(installed: Path) -> dict:
             "payloads_sha256": payloads.hexdigest()}
 
 
+def _engine_version(engine: Path, requirements: dict) -> dict:
+    version = load_json(engine / "Engine/Build/Build.version")
+    expected = requirements["engine"]
+    if any(type(version.get(field)) is not int or version[field] != expected[key]
+           for field, key in (("MajorVersion", "major"), ("MinorVersion", "minor"), ("PatchVersion", "patch"))):
+        raise BuildFailure(f"Unreal engine release differs from configured {expected}: {version}")
+    return version
+
+
+def _launcher_identity(engine: Path, expected: dict) -> dict:
+    if not engine.is_absolute() or engine.is_symlink() or not engine.is_dir():
+        raise BuildFailure("Installed Editor root must be an existing absolute non-symlinked directory")
+    registry = load_json(LAUNCHER_REGISTRY)
+    candidates = [entry for entry in registry.get("InstallationList", [])
+                  if isinstance(entry, dict) and entry.get("InstallLocation") == str(engine.resolve())
+                  and entry.get("AppName") == expected["app_name"] and entry.get("NamespaceId") == "ue"]
+    if len(candidates) != 1 or candidates[0].get("AppVersion") != expected["app_version"]:
+        raise BuildFailure("Epic Launcher installation registry does not match the pinned Editor release and root")
+    matching = []
+    for path in sorted(LAUNCHER_MANIFESTS.glob("*.item")):
+        receipt = load_json(path)
+        if receipt.get("InstallLocation") == str(engine.resolve()) and receipt.get("AppName") == expected["app_name"]:
+            matching.append((path, receipt))
+    if len(matching) != 1:
+        raise BuildFailure("Epic Launcher Editor installation receipt is missing or ambiguous")
+    item_path, receipt = matching[0]
+    guid = receipt.get("InstallationGuid")
+    if (receipt.get("AppVersionString") != expected["app_version"]
+            or receipt.get("bIsIncompleteInstall") is not False
+            or receipt.get("CatalogNamespace") not in (None, "ue")
+            or receipt.get("ManifestLocation") != str(engine / ".egstore")
+            or not isinstance(guid, str) or not re.fullmatch(r"[A-Za-z0-9]+", guid)
+            or not (engine / ".egstore" / f"{guid}.manifest").is_file()):
+        raise BuildFailure("Epic Launcher Editor receipt or installed manifest differs from the pinned release")
+    return {"registry_entry": candidates[0], "receipt_path": str(item_path),
+            "receipt_sha256": sha256(item_path)}
+
+
+def _installed_inventory(engine: Path) -> dict:
+    """Hash installation inputs, excluding runtime caches and generated project-selection metadata."""
+    digest = hashlib.sha256()
+    count = 0
+    for directory, dirs, files in os.walk(engine, followlinks=False):
+        base = Path(directory)
+        # Do not omit Intermediate: it also contains shipped rules and generated headers.
+        dirs[:] = sorted(name for name in dirs if name not in GENERATED_DIRECTORIES
+                         and not (base == engine / ".egstore" and name == "Pending")
+                         and not (base == engine / "Engine/Intermediate" and name == "UbtRuns"))
+        for name in (*dirs, *files):
+            path = base / name
+            if path.is_symlink():
+                raise BuildFailure(f"Installed engine inventory contains a symlink: {path}")
+        for name in sorted(files):
+            path = base / name
+            if not path.is_file():
+                raise BuildFailure(f"Installed engine inventory contains a non-file: {path}")
+            relative_path = path.relative_to(engine)
+            relative = relative_path.as_posix()
+            # Xcode metadata export writes shared-PCH wrappers and response files.
+            # Keep actual .gch binaries, module definitions and shipped UHT headers.
+            generated_pch = (
+                relative_path.parts[:5] == ("Engine", "Intermediate", "Build", "Mac", "arm64")
+                and name.startswith(("SharedPCH.", "SharedDefinitions."))
+                and (name.endswith(".h") or name.endswith(".h.gch.rsp")))
+            if relative in GENERATED_INSTALLED_FILES or generated_pch:
+                continue
+            digest.update(relative.encode("utf-8") + b"\0" + bytes.fromhex(sha256(path)))
+            count += 1
+    if count == 0:
+        raise BuildFailure("Installed engine inventory is empty")
+    return {"selected_file_count": count, "payloads_sha256": digest.hexdigest()}
+
+
+def _installed_payload(engine: Path, requirements: dict, host: str) -> tuple[dict, dict]:
+    if host != "mac-arm64":
+        raise BuildFailure(f"No approved installed Editor distribution for {host}")
+    expected = requirements["installed"][host]
+    version = _engine_version(engine, requirements)
+    if (sha256(engine / "Engine/Build/Build.version") != expected["build_version_sha256"]
+            or sha256(engine / EDITOR_BINARY) != expected["editor_sha256"]
+            or sha256(engine / UBT_BINARY) != expected["ubt_sha256"]):
+        raise BuildFailure("Installed UnrealEditor/UnrealBuildTool/Build.version differs from pinned release")
+    with (engine / "Engine/Binaries/Mac/UnrealEditor.app/Contents/Info.plist").open("rb") as stream:
+        plist = plistlib.load(stream)
+    dotted = ".".join(str(requirements["engine"][key]) for key in ("major", "minor", "patch"))
+    if (plist.get("CFBundleShortVersionString") != dotted
+            or plist.get("CFBundleExecutable") != "UnrealEditor"
+            or expected["app_version"] != f"{dotted}-{version.get('Changelist')}+{version.get('BranchName')}-Mac"):
+        raise BuildFailure("Installed Editor bundle/release identity does not match pinned Epic build")
+    return _launcher_identity(engine, expected), _installed_inventory(engine)
+
+
+def register_installed_editor(root: Path, engine: Path, host: str, tool: dict) -> dict:
+    """Admit an existing Epic Launcher Editor without modifying its installed SDK."""
+    root, engine = Path(root).resolve(), Path(engine)
+    if not engine.is_absolute() or engine.is_symlink():
+        raise BuildFailure("--engine-root must be an absolute non-symlinked installed Editor path")
+    engine = engine.resolve()
+    requirements = load_json(root / "config/toolchains.json")["unreal"]
+    launcher, inventory = _installed_payload(engine, requirements, host)
+    dotnet_path = f"Engine/Binaries/ThirdParty/DotNet/{requirements['source']['dotnet_directory']}/{host}/dotnet"
+    dotnet = engine / dotnet_path
+    if not dotnet.is_file() or dotnet.is_symlink():
+        raise BuildFailure("Installed Editor bundled .NET SDK is missing")
+    version = run([str(dotnet), "--version"], cwd=engine).strip()
+    info = run([str(dotnet), "--info"], cwd=engine)
+    if not re.fullmatch(r"10\.0\.\d+", version) or not info.strip():
+        raise BuildFailure("Installed Editor bundled .NET SDK is not the approved 10.0 SDK")
+    record = {"schema": 1, "status": "success", "scope": "unreal-installed-editor",
+              "engine_root": str(engine), "platform": host,
+              "installed": {"distribution": "epic-launcher", "launcher": launcher, "inventory": inventory},
+              "dotnet": {"path": dotnet_path, "sha256": sha256(dotnet), "version": version,
+                         "info_sha256": hashlib.sha256(info.encode()).hexdigest(),
+                         "version_returncode": 0, "info_returncode": 0},
+              "inputs": {"config_sha256": sha256(root / "config/toolchains.json"),
+                         "bootstrap_sha256": sha256(root / "scripts/bootstrap_engine.py")},
+              "native_toolchain": tool}
+    # Re-evaluate admitted files and checkout hashes before atomically replacing evidence.
+    if (_installed_payload(engine, requirements, host) != (launcher, inventory)
+            or record["dotnet"]["sha256"] != sha256(dotnet)
+            or record["inputs"] != {"config_sha256": sha256(root / "config/toolchains.json"),
+                                    "bootstrap_sha256": sha256(root / "scripts/bootstrap_engine.py")}):
+        raise BuildFailure("Installed Editor or checkout inputs changed during admission")
+    write_manifest(root / ".build/engine-bootstrap.json", record)
+    return record
+
+
+def validate_editor(root: Path, engine: Path, host: str, tool: dict) -> dict:
+    """Validate source or installed Editor admission against this checkout and the live engine."""
+    root, engine = Path(root).resolve(), Path(engine).resolve()
+    boot_path = root / ".build/engine-bootstrap.json"
+    boot = load_json(boot_path)
+    requirements = load_json(root / "config/toolchains.json")["unreal"]
+    if (boot.get("schema") != 1 or boot.get("status") != "success"
+            or boot.get("engine_root") != str(engine)
+            or boot.get("platform") != ("win-x64" if host == "win64" else host)
+            or boot.get("inputs") != {"config_sha256": sha256(root / "config/toolchains.json"),
+                                      "bootstrap_sha256": sha256(root / "scripts/bootstrap_engine.py")}):
+        raise BuildFailure("Editor admission differs from this checkout's pinned bootstrap evidence")
+    if boot.get("native_toolchain") != tool:
+        raise BuildFailure("Native compiler differs from Editor admission")
+    _engine_version(engine, requirements)
+    dotnet = boot.get("dotnet")
+    if not isinstance(dotnet, dict) or not isinstance(dotnet.get("path"), str):
+        raise BuildFailure("Provisioned Editor .NET SDK evidence is missing")
+    relative = dotnet["path"]
+    expected_dotnet = (f"Engine/Binaries/ThirdParty/DotNet/"
+                       f"{requirements['source']['dotnet_directory']}/"
+                       f"{'win-x64' if host == 'win64' else host}/"
+                       f"{'dotnet.exe' if host == 'win64' else 'dotnet'}")
+    path = (engine / relative).resolve()
+    if (relative != expected_dotnet or not path.is_relative_to(engine)
+            or (engine / relative).is_symlink() or dotnet.get("sha256") != sha256(path)
+            or dotnet.get("version_returncode") != 0):
+        raise BuildFailure("Provisioned Editor .NET SDK changed")
+    build_script = {"mac-arm64": "Mac/Build.sh", "linux-x64": "Linux/Build.sh",
+                    "win64": "Build.bat"}.get(host)
+    uat_script = "RunUAT.bat" if host == "win64" else "RunUAT.sh"
+    if (build_script is None
+            or not (engine / "Engine/Build/BatchFiles" / build_script).is_file()
+            or not (engine / "Engine/Build/BatchFiles" / uat_script).is_file()):
+        raise BuildFailure("Official Editor build or Automation Tool script missing")
+    if boot.get("scope") == "unreal-installed-editor":
+        launcher, inventory = _installed_payload(engine, requirements, host)
+        installed = boot.get("installed")
+        if (not isinstance(installed, dict) or installed.get("distribution") != "epic-launcher"
+                or installed.get("launcher") != launcher
+                or installed.get("inventory") != inventory
+                or boot.get("source") is not None or boot.get("gitdependencies") is not None):
+            raise BuildFailure("Installed Editor inventory or Epic Launcher provenance changed")
+        return {"boot_path": boot_path, "installed": True, "dependency_manifest": inventory}
+    if boot.get("scope") != "unreal-full-editor":
+        raise BuildFailure("Game requires a pinned full-editor bootstrap admission")
+    source = requirements["source"]
+    version_path = engine / "Engine/Build/Build.version"
+    admission_source = boot.get("source")
+    if (not isinstance(admission_source, dict)
+            or any(admission_source.get(key) != source[key]
+                   for key in ("tag", "commit", "archive_root", "archive_sha256"))
+            or admission_source.get("build_version_sha256") != sha256(version_path)
+            or admission_source.get("build_version") != load_json(version_path)):
+        raise BuildFailure("Pinned full-editor source archive identity changed")
+    deps = boot.get("gitdependencies")
+    if not isinstance(deps, dict) or not isinstance(deps.get("path"), str):
+        raise BuildFailure("Official full-editor dependency client evidence is missing")
+    manifest = engine / "Engine/Build/Commit.gitdeps.xml"
+    working = engine / ".uedependencies"
+    gitdeps = (engine / deps["path"]).resolve()
+    if (deps.get("original_manifests_sha256", {}).get("Engine/Build/Commit.gitdeps.xml") != sha256(manifest)
+            or deps.get("working_manifest_sha256") != sha256(working)
+            or not isinstance(deps.get("selected_file_count"), int) or deps["selected_file_count"] < 1
+            or deps.get("filter_sha256") is not None or (engine / ".gitdepsignore").exists()
+            or deps.get("returncode") != 0 or not gitdeps.is_relative_to(engine)
+            or deps.get("sha256") != sha256(gitdeps)):
+        raise BuildFailure("Official full-editor dependency manifest/client changed")
+    dependency_manifest = _dependency_manifest(engine)
+    if any(deps.get(key) != value for key, value in dependency_manifest.items()):
+        raise BuildFailure("Full-editor selected dependency payloads changed")
+    if not isinstance(boot.get("build_inputs"), dict) or not boot["build_inputs"]:
+        raise BuildFailure("Pinned full-editor source build inputs are missing")
+    for name, expected_hash in boot["build_inputs"].items():
+        if not isinstance(name, str):
+            raise BuildFailure("Pinned full-editor source build input path is invalid")
+        path = (engine / name).resolve()
+        if not path.is_relative_to(engine) or sha256(path) != expected_hash:
+            raise BuildFailure(f"Full-editor source build input changed: {name}")
+    return {"boot_path": boot_path, "installed": False, "dependency_manifest": dependency_manifest}
+
+
 def bootstrap(destination: Path, archive: Path | None = None, *, full_editor: bool = False) -> dict:
     requirements = load_json(CONFIG)["unreal"]
     source, version = _source_requirements(requirements)
-    if (version["major"], version["minor"], version["patch"]) != (5, 8, 1):
+    if (version["major"], version["minor"], version["patch"]) != (5, 8, 3):
         raise BuildFailure("Unsupported Unreal source version")
-    if source.get("tag") != "5.8.1-release" or source.get("dotnet_directory") != "10.0":
+    if source.get("tag") != "5.8.3-release" or source.get("dotnet_directory") != "10.0":
         raise BuildFailure("Unreal tag or bundled .NET directory differs from the approved source")
     host, rid = _host()
     if full_editor:
@@ -331,7 +557,7 @@ def bootstrap(destination: Path, archive: Path | None = None, *, full_editor: bo
                                 "host_rid": rid, "arguments": arguments, "returncode": 0,
                                 **dependencies},
             "build_inputs": {name: sha256(installed / name) for name in build_inputs},
-            "dotnet": {"path": str(dotnet.relative_to(installed)), "sha256": sha256(dotnet),
+            "dotnet": {"path": dotnet.relative_to(installed).as_posix(), "sha256": sha256(dotnet),
                        "version": dotnet_version, "info_sha256": hashlib.sha256(dotnet_info.encode("utf-8")).hexdigest(),
                        "version_returncode": 0, "info_returncode": 0},
             "inputs": {"config_sha256": sha256(CONFIG), "bootstrap_sha256": sha256(Path(__file__).resolve())},
@@ -346,13 +572,28 @@ def bootstrap(destination: Path, archive: Path | None = None, *, full_editor: bo
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Install pinned UE 5.8.1 source and official dependencies")
-    parser.add_argument("--engine-root", type=Path, required=True, help="absolute new installation destination")
+    parser = argparse.ArgumentParser(description="Install pinned UE 5.8.3 source or register an existing Epic Editor")
+    parser.add_argument("--engine-root", type=Path, required=True, help="absolute new source destination or existing installed Editor")
     parser.add_argument("--archive", type=Path, help="absolute local source tar.gz; otherwise use CANOPY_UE_SOURCE_ARCHIVE_URL")
     parser.add_argument("--full-editor", action="store_true", help="install original complete Epic dependencies (requires qualified native compiler)")
+    parser.add_argument("--installed-editor", action="store_true", help="register an existing Epic Launcher Editor without changing its SDK")
     args = parser.parse_args()
     try:
-        result = bootstrap(args.engine_root, args.archive, full_editor=args.full_editor)
+        if args.installed_editor:
+            if args.archive is not None or args.full_editor:
+                raise BuildFailure("--installed-editor cannot be combined with source --archive or --full-editor")
+            host, _ = _host()
+            if host != "mac-arm64":
+                raise BuildFailure(f"No approved installed Editor distribution for {host}")
+            try:
+                from scripts import build_game
+            except ImportError:
+                import build_game
+            requirements = load_json(CONFIG)["unreal"]
+            compiler = build_game.qualified_compiler(ROOT, host, requirements[host])
+            result = register_installed_editor(ROOT, args.engine_root, host, compiler)
+        else:
+            result = bootstrap(args.engine_root, args.archive, full_editor=args.full_editor)
     except (BuildFailure, OSError, KeyError, ValueError, TypeError) as error:
         print(f"engine bootstrap: {error}", file=sys.stderr)
         return 1

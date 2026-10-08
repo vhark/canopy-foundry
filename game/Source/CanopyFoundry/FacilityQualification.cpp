@@ -60,7 +60,7 @@ void AFacilityGameMode::Tick(float DeltaTime)
         const bool WallBlocks = GetWorld()->LineTraceSingleByChannel(Hit, {-130, 220, 110}, {130, 220, 110}, ECC_Visibility, Query);
         const bool BenchBlocks = GetWorld()->LineTraceSingleByChannel(Hit, {350, 180, 210}, {350, 180, 45}, ECC_Visibility, Query);
         AFacilityTarget* Target = nullptr;
-        for (TActorIterator<AFacilityTarget> It(GetWorld()); It; ++It) { Target = *It; break; }
+        if (TActorIterator<AFacilityTarget> It(GetWorld()); It) Target = *It;
         UInteractionComponent* Reach = Worker->FindComponentByClass<UInteractionComponent>();
         if (!Target || !Reach) { FailQualification(TEXT("Inspectable target or reach policy missing")); return; }
         const FVector StartPosition = Worker->GetActorLocation();

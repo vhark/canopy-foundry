@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-2025, macos-15]
+        os: [ubuntu-24.04, windows-2025, xcode-27]
     runs-on: ${{ matrix.os }}
     env:
       CANOPY_QUALIFY_ENGINE: ${{ github.event.repository.private && github.event_name == 'push' && github.actor == github.repository_owner && contains(github.event.head_commit.message, '[qualify-engine]') }}
@@ -31,14 +31,14 @@ jobs:
           CANOPY_UE_SOURCE_ARCHIVE_URL: ${{ secrets.CANOPY_UE_SOURCE_ARCHIVE_URL }}
         shell: bash
         run: |
-          uv run --frozen python scripts/bootstrap_engine.py --engine-root "$RUNNER_TEMP/ue581"
-          echo "CANOPY_UE_ROOT=$RUNNER_TEMP/ue581" >> "$GITHUB_ENV"
+          uv run --frozen python scripts/bootstrap_engine.py --engine-root "$RUNNER_TEMP/ue583"
+          echo "CANOPY_UE_ROOT=$RUNNER_TEMP/ue583" >> "$GITHUB_ENV"
       - name: Select approved Apple toolchain
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          test -d /Applications/Xcode_26.1.1.app/Contents/Developer
-          echo 'DEVELOPER_DIR=/Applications/Xcode_26.1.1.app/Contents/Developer' >> "$GITHUB_ENV"
+          test -d /Applications/Xcode_27.0.app/Contents/Developer
+          echo 'DEVELOPER_DIR=/Applications/Xcode_27.0.app/Contents/Developer' >> "$GITHUB_ENV"
       - name: Provision pinned Linux v26 SDK
         if: runner.os == 'Linux'
         shell: bash

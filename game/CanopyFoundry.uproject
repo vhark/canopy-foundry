@@ -7,5 +7,5 @@
     { "Name": "CanopyFoundry", "Type": "Runtime", "LoadingPhase": "Default" },
     { "Name": "CanopyFoundryEditor", "Type": "Editor", "LoadingPhase": "Default" }
   ],
-  "Plugins": [ { "Name": "CanopyRuntime", "Enabled": true }, { "Name": "EnhancedInput", "Enabled": true }, { "Name": "Interchange", "Enabled": true }, { "Name": "PlatformCrypto", "Enabled": true } ]
+  "Plugins": [ { "Name": "CanopyRuntime", "Enabled": true }, { "Name": "EnhancedInput", "Enabled": true }, { "Name": "Interchange", "Enabled": true }, { "Name": "PlatformCrypto", "Enabled": true }, { "Name": "AndroidFileServer", "Enabled": false } ]
 }

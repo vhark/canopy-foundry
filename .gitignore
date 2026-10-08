@@ -8,6 +8,16 @@
 *.xcodeproj/
 *.xcworkspace/
 Engine/
+game/Build/Mac/game.PackageVersionCounter
+game/Build/*/FileOpenOrder/EditorOpenOrder.log
+game/Build/*/FileOpenOrder/CookerOpenOrder.log
+# Stock resources copied by Unreal's Xcode generator; not project-authored assets.
+game/Build/Mac/Resources/Info.Template.plist
+game/Build/Mac/Resources/Sandbox.NoNet.entitlements
+game/Build/Mac/Resources/Sandbox.Server.entitlements
+# Regenerated from original source by the qualification commandlets.
+game/Content/Maps/FacilityQualification.umap
+game/Content/B02/Fiducial.uasset
 
 # Local tools, generated packages, profiling and build evidence.
 .build/

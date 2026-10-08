@@ -155,15 +155,17 @@ public class CanopySimExternal : ModuleRules
         ExternalDependencies.Add(manifestPath);
         string configPath = Path.Combine(root, "config/toolchains.json");
         ExternalDependencies.Add(configPath);
-        using JsonDocument configDocument = JsonDocument.Parse(File.ReadAllText(configPath));
-        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        // Select the string overload: UBT's rules compiler does not reference System.Memory.
+        using JsonDocument configDocument = JsonDocument.Parse(json: File.ReadAllText(configPath));
+        using JsonDocument document = JsonDocument.Parse(json: File.ReadAllText(manifestPath));
         JsonElement manifest = document.RootElement;
         Require(manifest.GetProperty("schema").GetInt32() == 1 &&
             manifest.GetProperty("scope").GetString() == "standalone-core" &&
             manifest.GetProperty("config").GetString() == "Release", "core manifest schema/config mismatch");
         JsonElement engine = configDocument.RootElement.GetProperty("unreal").GetProperty("engine");
-        Require(engine.GetProperty("major").GetInt32() == 5 && engine.GetProperty("minor").GetInt32() == 8 &&
-            engine.GetProperty("patch").GetInt32() == 1, "approved engine version mismatch");
+        Require(Target.Version.MajorVersion == engine.GetProperty("major").GetInt32() &&
+            Target.Version.MinorVersion == engine.GetProperty("minor").GetInt32() &&
+            Target.Version.PatchVersion == engine.GetProperty("patch").GetInt32(), "approved engine version mismatch");
         string platform = Target.Platform == UnrealTargetPlatform.Win64 ? "win64" :
             Target.Platform == UnrealTargetPlatform.Mac ? "mac-arm64" :
             Target.Platform == UnrealTargetPlatform.Linux ? "linux-x64" : "unsupported";

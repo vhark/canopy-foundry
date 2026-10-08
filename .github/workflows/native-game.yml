@@ -40,8 +40,8 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          test -d /Applications/Xcode_26.1.1.app/Contents/Developer
-          echo 'DEVELOPER_DIR=/Applications/Xcode_26.1.1.app/Contents/Developer' >> "$GITHUB_ENV"
+          test -d /Applications/Xcode_27.0.app/Contents/Developer
+          echo 'DEVELOPER_DIR=/Applications/Xcode_27.0.app/Contents/Developer' >> "$GITHUB_ENV"
       - name: Provision pinned Linux v26 SDK
         if: runner.os == 'Linux'
         shell: bash
@@ -85,8 +85,8 @@ jobs:
             'uv sync --frozen --all-packages --all-extras',
             'uv run --frozen python scripts/bootstrap_native.py',
             'uv run --frozen python scripts/build_core.py --config Release',
-            'uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root "%RUNNER_TEMP%\ue581"',
-            'uv run --frozen python scripts/build_game.py --platform "${{ inputs.platform }}" --configuration "${{ inputs.configuration }}" --engine-root "%RUNNER_TEMP%\ue581"'
+            'uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root "%RUNNER_TEMP%\ue583"',
+            'uv run --frozen python scripts/build_game.py --platform "${{ inputs.platform }}" --configuration "${{ inputs.configuration }}" --engine-root "%RUNNER_TEMP%\ue583"'
           )
           & cmd.exe /d /c ($commands -join ' && ')
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -100,8 +100,8 @@ jobs:
           uv sync --frozen --all-packages --all-extras
           uv run --frozen python scripts/bootstrap_native.py
           uv run --frozen python scripts/build_core.py --config Release
-          uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root "$RUNNER_TEMP/ue581"
-          uv run --frozen python scripts/build_game.py --platform '${{ inputs.platform }}' --configuration '${{ inputs.configuration }}' --engine-root "$RUNNER_TEMP/ue581"
+          uv run --frozen python scripts/bootstrap_engine.py --full-editor --engine-root "$RUNNER_TEMP/ue583"
+          uv run --frozen python scripts/build_game.py --platform '${{ inputs.platform }}' --configuration '${{ inputs.configuration }}' --engine-root "$RUNNER_TEMP/ue583"
         timeout-minutes: 330
       - name: Retain private manifests only (never upload Epic source or packages)
         if: always()
