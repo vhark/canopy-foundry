@@ -1,0 +1,186 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "--version"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e928567de6f903039a669b7647bf037309d50e4f7916bb5c06f7b05d3bf966fe"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "init",
+        "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/.vcpkg-stage-gijip7w2"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry",
+      "returncode": 0,
+      "stderr_sha256": "3e70934f1909b0f5a846d62237fcc1509d733b9fb0321187024723dfc67176d3",
+      "stdout_sha256": "aff01d69047a79e2bde9cb37267a70d6bf218f5f44675c84d622bd1733f3a258"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/microsoft/vcpkg.git"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/.vcpkg-stage-gijip7w2",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "fetch",
+        "--depth",
+        "1",
+        "origin",
+        "2750401336fb7c95f6619657a46a7e798661341c"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/.vcpkg-stage-gijip7w2",
+      "returncode": 0,
+      "stderr_sha256": "a939350c9645d887b0ea7f98e4ac17354985a5e2aa5531c315410e5732247e2a",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "checkout",
+        "--detach",
+        "FETCH_HEAD"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/.vcpkg-stage-gijip7w2",
+      "returncode": 0,
+      "stderr_sha256": "135d7903c18a449d1ca9455a62c1ec62f57fcae7abba4b5a6dccd5bdbd25c8e1",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/.vcpkg-stage-gijip7w2",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "848333a0f677b69de60ed72d2e8c037f9b43d0a2d0a34a51eeafedcc8fb05fa2"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "remote",
+        "get-url",
+        "origin"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "535cbd06e792db251b645dc313b4e0e451ec826948fc5954c9217f52bf728723"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "848333a0f677b69de60ed72d2e8c037f9b43d0a2d0a34a51eeafedcc8fb05fa2"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "--",
+        "triplets"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/bin/git",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d3343c7ad49f8a1173ab360d7103c501f90d9413fb152696241cf8a3780e45ae"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg/bootstrap-vcpkg.sh",
+        "-disableMetrics"
+      ],
+      "cwd": "/Users/runner/work/canopy-foundry/canopy-foundry/.work/tools/vcpkg",
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "fb1f4dda3af1b550140dcee979a6bad31984bd91ca0e708c512b7a7bb28960c7"
+    }
+  ],
+  "git": {
+    "executable": "/opt/homebrew/bin/git",
+    "sha256": "80045299a1ae4309b716fd02f076c677d74c5dac2d5f065ca6d6364afab198ad",
+    "version": "git version 2.55.0"
+  },
+  "inputs": {
+    "dependencies/native-lock.json": "a2b54ad2fc26ac9454e543822678be45215eac28d3f3af8107d681acf325eb0f",
+    "dependencies/vcpkg-configuration.json": "999609a3cf1d6d33129e754912ea6f0b0f820f7ee1fe78a0bf0d139f160b46a1",
+    "dependencies/vcpkg.json": "2f7363cbf0af4fff0da51758cd1c7be657f4216c1abd7ab482e21cae2de79dd6",
+    "scripts/bootstrap_native.py": "36d326a557dcad130e9082fe611de43d1aceac77f711b22cf502e4bd053adb31"
+  },
+  "output": {
+    "path": ".work/tools/vcpkg/vcpkg",
+    "sha256": "f6adb17ce4df42bcb36d143664689de7ecce951739cd3e555e0c2e4ba04fa263"
+  },
+  "ports": {
+    "catch2": {
+      "metadata_sha256": "b697f7fb82726ce2eaa81495f53ae30b4a0e2b1b81e1a82538afa84ae0336b32",
+      "portfile_sha256": "0fa6ce5090f983a3319c987f9d3016e389fc9adbaa2b03319cbc8bfa76eb3106",
+      "source_sha512": "b17a1d03bd206ec2a006bfd2cb6a40cb641dd6c3ee192f4e4830ecc2c7fe60ffb2d98397adbb7c039b065c891ebc5dcd0e02331dff472ced7411f8263e1d7b29"
+    },
+    "flatbuffers": {
+      "metadata_sha256": "9455217c6441b81e4be7c0fdb5725d26c4468c6d06d79122c4a04489cabab636",
+      "portfile_sha256": "e876f066c887850d3db219c86730779f3eac9c08e27027861050d1fa8ca31453",
+      "source_sha512": "808c77536fbfb1c8a1145506873a2b4e5cb508e48bf35f8502a2d1349b64e7581bfe7ff2f587b3edb2642cc885c60c0170a8875fad245240a1288057f4c07a42"
+    },
+    "zstd": {
+      "metadata_sha256": "1d6262377eaee174cc4934c4cc9cf13d0f679b26d129fb4b5707f49bf876d20a",
+      "portfile_sha256": "b348bd1c831dcda55e55f2b251178c0e9414161a2474dab58e76be639e870575",
+      "source_sha512": "26e441267305f6e58080460f96ab98645219a90d290a533410b1b0b1d2f870721c95f8384e342ee647c5e968385a5b7e30c2d04340c37f59b3e6d86762c3260c"
+    }
+  },
+  "schema": 1,
+  "source": {
+    "bootstrap_script_sha256": "87edce330ffadb27c86f10b7f3a5fc08d8c4241b9040c3759dfbb04cc85fb26a",
+    "commit": "2750401336fb7c95f6619657a46a7e798661341c",
+    "repository": "https://github.com/microsoft/vcpkg.git",
+    "tree": "50903852a5e11f7551cdc02f1f521fb1998e9347"
+  },
+  "status": "success"
+}

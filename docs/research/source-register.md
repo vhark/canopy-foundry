@@ -4,25 +4,26 @@ Initial research date: 2026-10-07. This register separates inspected capability 
 
 ## Local authoritative evidence
 
-The following table records inspected interfaces in the existing sibling repositories. F01 now retains immutable OpenCEA/GrowBIM wheels built from source commit `91b3b6b855cea542667fcd9794fd3aaccb208e1f`; [artifact provenance and hashes](../../dependencies/upstream/README.md) distinguish those approved bytes from a sibling editable checkout. These artifacts preserve the existing narrow functionality, not B01's future general-facility/MEP profile.
+The table records existing sibling interfaces and their qualified extensions. The frozen authoring environment retains unchanged OpenCEA 0.1.0 bytes from `91b3b6b855cea542667fcd9794fd3aaccb208e1f` and GrowBIM 0.2.0 from B01 commit `093e09656f04ecbf48677c43ceb92ce549d09ff5`; [artifact provenance and hashes](../../dependencies/upstream/README.md) distinguish these immutable wheels from sibling editable checkouts.
 
 | ID | Existing repository/path | Observed scope |
 |---|---|---|
 | L01 | `opencea/docs/contracts.md` | OpenCEA 0.1 program, optional 0.2 design envelopes, provenance, immutable revisions/CAS/retries; not qualified engineering design |
 | L02 | `opencea/packages/opencea/src/opencea/schemas/0.1/` and `schemas/0.2/` | Packaged authoritative JSON schemas; no game-owned duplicate schema authority |
 | L03 | `opencea/packages/opencea/src/opencea/identity.py` | Separate source/product/element/installed-asset/role/channel identities and lifecycle/temporal validation |
-| L04 | `opencea/packages/growbim/src/growbim/ifc/__init__.py` | Existing lazy API: fixtures, candidate validation, reference-room/rack operations and placement reconciliation |
-| L05 | `opencea/packages/growbim/src/growbim/ifc/_native.py` | IFC4 fixture generation/validation, units and nominal systems; not a duct/utility solver or general equipment asset library |
+| L04 | `opencea/packages/growbim/src/growbim/ifc/__init__.py` | Lazy fixture, reference-room/rack and lifecycle APIs; 0.2.0 adds `build_facility` and separate `reconcile_facility_edit` |
+| L05 | `opencea/packages/growbim/src/growbim/ifc/_native.py` | IFC4 fixture generation/validation and new facility-profile dispatch; not a duct/utility solver or detailed asset library |
 | L06 | `opencea/packages/growbim/src/growbim/ifc/reference_room.py` and `exchange.py` | Real narrow one-room authoring and strict selected-rack rigid-placement reconciliation; arbitrary imported edits are rejected |
 | L07 | `opencea/packages/growbim/src/growbim/resources/catalog/reference-rack.json` | Source-backed Metro MQ-2448G-80-M4 envelope, not detailed licensed manufacturer CAD; internal members/caster sweep/cultivation suitability unknown |
 | L08 | `opencea/packages/growbim/src/growbim/project/store.py` and `jobs/store.py` | POSIX `fcntl` local locking, so not a Windows runtime dependency |
 | L09 | `opencea/docs/compatibility.md` and `Grownetics Sim/docs/one-room-qualification.md` | Historical Blender 5.2.2 LTS / Bonsai 0.8.5 / IfcOpenShell 0.8.5 and independent web-ifc 0.0.78 qualification for the bounded rack placement case |
 | L10 | `Grownetics Sim/src/grownetics_sim/design.py`, `bridge.py` and `pyproject.toml` | Existing JSON bridge/projected view/candidate acceptance flow, Python3.12 and sibling-editable dependencies; no general game engine or calibrated crop model |
 | L11 | `Grownetics Sim/README.md` | Explicit synthetic-study boundaries, source-backed rack, no real controls, commercial asset permissions not established |
+| L12 | B01 `growbim/ifc/facility.py`, `exchange.py` and service `core/projects.py` | Original 216 m² rectangular facility, actual MEP ports, native access/geometry checks and reviewed selected-MEP CAS/replay. Upstream 136 native/project/contract and 88 service tests plus live HTTP rejection/acceptance/export passed; frozen downstream wheel imported all four accepted revisions with exact artifact digests. |
 
-Existing Python entrypoints include `growbim.ifc.build_reference_room`, `move_reference_rack`, `resize_reference_room`, `validate_candidate`, `reconcile_placement_edit`, `reference_access` and element lifecycle operations. GrowBIM CLI has `design accept`, project/import/export and jobs commands; there is no existing general facility/rack/duct game-export CLI. The new creator tool and generalized upstream profile in B01–B06 are new work.
+Python entrypoints include the legacy reference-room/lifecycle operations and B01's new facility construction and selected-MEP reconciliation. GrowBIM CLI provides design acceptance and project/import/export commands; the new creator compiler and game-export tooling in B02–B06 remain separate work.
 
-Existing `IfcSystem`/group/service relations do not establish MEP ports, flow directions, capacity maps or working climate control. Game purchase/installation must not fabricate a reported real-world asset. Schema/version migration must preserve historical accepted bytes and old qualification cases.
+IFC grouping alone does not establish connectivity or performance. B01 now supplies explicit IFC4 ports/connections and typed system admission, not capacity maps or working climate control. Game purchase/installation must never fabricate reported real-world assets; new profile/schema versions must preserve historical accepted bytes and qualification cases.
 
 ## Primary engine/platform evidence
 
@@ -67,4 +68,4 @@ These are official product/data leads, not verified partnerships, granted rights
 
 ## Explicit unresolved external prerequisites
 
-F01 source entitlement and native core/toolchain qualification are cleared. Remaining gates include full engine/editor and reference-hardware provisioning for packaged-game/runtime work; upstream general-facility/MEP implementation and immutable release; signed SKU-specific content/data/mark permissions; qualified operating/crop datasets and reviewers for stronger validity claims; publisher/store/signing accounts; and real playtest participants. These are assigned gates in the plan, not fields to fill with invented values. Generic original equipment and honestly illustrative models keep the core game independent of vendor participation and calibration sponsorship.
+F01 source entitlement/native core qualification and B01's first facility-profile release are cleared. Remaining gates include full engine/editor and reference-hardware provisioning for packaged runtime work; broader construction/application round trips; signed SKU-specific content/data/mark permissions; qualified operating/crop datasets and reviewers for stronger validity claims; publisher/store/signing accounts; and real playtest participants. These are assigned gates, not fields to fill with invented values. Generic original equipment and honestly illustrative models keep the core game independent of vendor participation and calibration sponsorship.

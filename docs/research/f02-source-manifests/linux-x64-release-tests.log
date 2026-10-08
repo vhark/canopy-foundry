@@ -1,0 +1,463 @@
+Start testing: Oct 08 09:38 UTC
+----------------------------------------------------------
+1/23 Testing: admitted command delivery and clock stepping allocate nothing after load
+1/23 Test: admitted command delivery and clock stepping allocate nothing after load
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "admitted command delivery and clock stepping allocate nothing after load"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"admitted command delivery and clock stepping allocate nothing after load" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "admitted command delivery and clock stepping allocate nothing after load"
+Randomness seeded to: 3451476911
+===============================================================================
+All tests passed (7 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"admitted command delivery and clock stepping allocate nothing after load" end time: Oct 08 09:38 UTC
+"admitted command delivery and clock stepping allocate nothing after load" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/23 Testing: authored decisions at 7 and 83 stop exactly and leave interval hooks intact
+2/23 Test: authored decisions at 7 and 83 stop exactly and leave interval hooks intact
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "authored decisions at 7 and 83 stop exactly and leave interval hooks intact"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"authored decisions at 7 and 83 stop exactly and leave interval hooks intact" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "authored decisions at 7 and 83 stop exactly and leave interval hooks intact"
+Randomness seeded to: 2016941765
+===============================================================================
+All tests passed (10 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"authored decisions at 7 and 83 stop exactly and leave interval hooks intact" end time: Oct 08 09:38 UTC
+"authored decisions at 7 and 83 stop exactly and leave interval hooks intact" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/23 Testing: budgets yield without skipping a one second boundary
+3/23 Test: budgets yield without skipping a one second boundary
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "budgets yield without skipping a one second boundary"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"budgets yield without skipping a one second boundary" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "budgets yield without skipping a one second boundary"
+Randomness seeded to: 312801065
+===============================================================================
+All tests passed (6 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"budgets yield without skipping a one second boundary" end time: Oct 08 09:38 UTC
+"budgets yield without skipping a one second boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/23 Testing: colliding receipt IDs remain independent and rejected IDs remain available
+4/23 Test: colliding receipt IDs remain independent and rejected IDs remain available
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "colliding receipt IDs remain independent and rejected IDs remain available"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"colliding receipt IDs remain independent and rejected IDs remain available" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "colliding receipt IDs remain independent and rejected IDs remain available"
+Randomness seeded to: 2710569412
+===============================================================================
+All tests passed (8 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"colliding receipt IDs remain independent and rejected IDs remain available" end time: Oct 08 09:38 UTC
+"colliding receipt IDs remain independent and rejected IDs remain available" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/23 Testing: converted areas preserve ordering and additivity within rounding
+5/23 Test: converted areas preserve ordering and additivity within rounding
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "converted areas preserve ordering and additivity within rounding"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"converted areas preserve ordering and additivity within rounding" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "converted areas preserve ordering and additivity within rounding"
+Randomness seeded to: 1114541896
+===============================================================================
+All tests passed (15 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"converted areas preserve ordering and additivity within rounding" end time: Oct 08 09:38 UTC
+"converted areas preserve ordering and additivity within rounding" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/23 Testing: deadline load rejects invalid time, duplicate ID, unknown entity and capacity without admission
+6/23 Test: deadline load rejects invalid time, duplicate ID, unknown entity and capacity without admission
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "deadline load rejects invalid time\, duplicate ID\, unknown entity and capacity without admission"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"deadline load rejects invalid time, duplicate ID, unknown entity and capacity without admission" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "deadline load rejects invalid time\, duplicate ID\, unknown entity and capacity without admission"
+Randomness seeded to: 3261420761
+===============================================================================
+All tests passed (6 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"deadline load rejects invalid time, duplicate ID, unknown entity and capacity without admission" end time: Oct 08 09:38 UTC
+"deadline load rejects invalid time, duplicate ID, unknown entity and capacity without admission" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/23 Testing: decision resolution is typed, idempotent and rejects stale or wrong boundary
+7/23 Test: decision resolution is typed, idempotent and rejects stale or wrong boundary
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "decision resolution is typed\, idempotent and rejects stale or wrong boundary"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"decision resolution is typed, idempotent and rejects stale or wrong boundary" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "decision resolution is typed\, idempotent and rejects stale or wrong boundary"
+Randomness seeded to: 2151105210
+===============================================================================
+All tests passed (9 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"decision resolution is typed, idempotent and rejects stale or wrong boundary" end time: Oct 08 09:38 UTC
+"decision resolution is typed, idempotent and rejects stale or wrong boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/23 Testing: event capacity rejects a whole step before changing time or control
+8/23 Test: event capacity rejects a whole step before changing time or control
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "event capacity rejects a whole step before changing time or control"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"event capacity rejects a whole step before changing time or control" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "event capacity rejects a whole step before changing time or control"
+Randomness seeded to: 4131878421
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"event capacity rejects a whole step before changing time or control" end time: Oct 08 09:38 UTC
+"event capacity rejects a whole step before changing time or control" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/23 Testing: floor area converts square feet to square metres
+9/23 Test: floor area converts square feet to square metres
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "floor area converts square feet to square metres"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"floor area converts square feet to square metres" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "floor area converts square feet to square metres"
+Randomness seeded to: 2249284979
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"floor area converts square feet to square metres" end time: Oct 08 09:38 UTC
+"floor area converts square feet to square metres" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/23 Testing: invalid targets cannot change the clock, even near integer limits
+10/23 Test: invalid targets cannot change the clock, even near integer limits
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "invalid targets cannot change the clock\, even near integer limits"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"invalid targets cannot change the clock, even near integer limits" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "invalid targets cannot change the clock\, even near integer limits"
+Randomness seeded to: 4074446434
+===============================================================================
+All tests passed (6 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"invalid targets cannot change the clock, even near integer limits" end time: Oct 08 09:38 UTC
+"invalid targets cannot change the clock, even near integer limits" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/23 Testing: load rejects duplicate entities, invalid fractions and insufficient capacity
+11/23 Test: load rejects duplicate entities, invalid fractions and insufficient capacity
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "load rejects duplicate entities\, invalid fractions and insufficient capacity"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"load rejects duplicate entities, invalid fractions and insufficient capacity" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "load rejects duplicate entities\, invalid fractions and insufficient capacity"
+Randomness seeded to: 2031862919
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"load rejects duplicate entities, invalid fractions and insufficient capacity" end time: Oct 08 09:38 UTC
+"load rejects duplicate entities, invalid fractions and insufficient capacity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/23 Testing: moving authority preserves receipts and leaves a reusable unloaded source
+12/23 Test: moving authority preserves receipts and leaves a reusable unloaded source
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "moving authority preserves receipts and leaves a reusable unloaded source"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"moving authority preserves receipts and leaves a reusable unloaded source" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "moving authority preserves receipts and leaves a reusable unloaded source"
+Randomness seeded to: 3787532019
+===============================================================================
+All tests passed (47 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"moving authority preserves receipts and leaves a reusable unloaded source" end time: Oct 08 09:38 UTC
+"moving authority preserves receipts and leaves a reusable unloaded source" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/23 Testing: no authored deadlines means uninterrupted clock with real interval events
+13/23 Test: no authored deadlines means uninterrupted clock with real interval events
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "no authored deadlines means uninterrupted clock with real interval events"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"no authored deadlines means uninterrupted clock with real interval events" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "no authored deadlines means uninterrupted clock with real interval events"
+Randomness seeded to: 2635201951
+===============================================================================
+All tests passed (10 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"no authored deadlines means uninterrupted clock with real interval events" end time: Oct 08 09:38 UTC
+"no authored deadlines means uninterrupted clock with real interval events" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/23 Testing: non-finite IEEE inputs remain non-finite
+14/23 Test: non-finite IEEE inputs remain non-finite
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "non-finite IEEE inputs remain non-finite"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"non-finite IEEE inputs remain non-finite" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "non-finite IEEE inputs remain non-finite"
+Randomness seeded to: 3000490509
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"non-finite IEEE inputs remain non-finite" end time: Oct 08 09:38 UTC
+"non-finite IEEE inputs remain non-finite" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/23 Testing: one request to 120 stops at the exact 60 second decision and resumes
+15/23 Test: one request to 120 stops at the exact 60 second decision and resumes
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "one request to 120 stops at the exact 60 second decision and resumes"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"one request to 120 stops at the exact 60 second decision and resumes" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "one request to 120 stops at the exact 60 second decision and resumes"
+Randomness seeded to: 1571945581
+===============================================================================
+All tests passed (14 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"one request to 120 stops at the exact 60 second decision and resumes" end time: Oct 08 09:38 UTC
+"one request to 120 stops at the exact 60 second decision and resumes" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/23 Testing: random streams separate entity, stream and counter domains without unsolicited draws
+16/23 Test: random streams separate entity, stream and counter domains without unsolicited draws
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "random streams separate entity\, stream and counter domains without unsolicited draws"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"random streams separate entity, stream and counter domains without unsolicited draws" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "random streams separate entity\, stream and counter domains without unsolicited draws"
+Randomness seeded to: 3826067000
+===============================================================================
+All tests passed (7 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"random streams separate entity, stream and counter domains without unsolicited draws" end time: Oct 08 09:38 UTC
+"random streams separate entity, stream and counter domains without unsolicited draws" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/23 Testing: receipt and event admission rejects atomically without losing recorded IDs
+17/23 Test: receipt and event admission rejects atomically without losing recorded IDs
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "receipt and event admission rejects atomically without losing recorded IDs"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"receipt and event admission rejects atomically without losing recorded IDs" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "receipt and event admission rejects atomically without losing recorded IDs"
+Randomness seeded to: 3696334719
+===============================================================================
+All tests passed (10 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"receipt and event admission rejects atomically without losing recorded IDs" end time: Oct 08 09:38 UTC
+"receipt and event admission rejects atomically without losing recorded IDs" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/23 Testing: repeated control delivery returns original receipt and conflicts on changed payload
+18/23 Test: repeated control delivery returns original receipt and conflicts on changed payload
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "repeated control delivery returns original receipt and conflicts on changed payload"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"repeated control delivery returns original receipt and conflicts on changed payload" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "repeated control delivery returns original receipt and conflicts on changed payload"
+Randomness seeded to: 1201404663
+===============================================================================
+All tests passed (14 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"repeated control delivery returns original receipt and conflicts on changed payload" end time: Oct 08 09:38 UTC
+"repeated control delivery returns original receipt and conflicts on changed payload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/23 Testing: same-time decisions resolve in stable entity and decision ID order
+19/23 Test: same-time decisions resolve in stable entity and decision ID order
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "same-time decisions resolve in stable entity and decision ID order"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"same-time decisions resolve in stable entity and decision ID order" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "same-time decisions resolve in stable entity and decision ID order"
+Randomness seeded to: 3375772548
+===============================================================================
+All tests passed (12 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"same-time decisions resolve in stable entity and decision ID order" end time: Oct 08 09:38 UTC
+"same-time decisions resolve in stable entity and decision ID order" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/23 Testing: same-time events order by phase and stable entity ID, not delivery order
+20/23 Test: same-time events order by phase and stable entity ID, not delivery order
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "same-time events order by phase and stable entity ID\, not delivery order"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"same-time events order by phase and stable entity ID, not delivery order" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "same-time events order by phase and stable entity ID\, not delivery order"
+Randomness seeded to: 827817564
+===============================================================================
+All tests passed (9 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"same-time events order by phase and stable entity ID, not delivery order" end time: Oct 08 09:38 UTC
+"same-time events order by phase and stable entity ID, not delivery order" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/23 Testing: sixty single-second advances replay the same authoritative state and events
+21/23 Test: sixty single-second advances replay the same authoritative state and events
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "sixty single-second advances replay the same authoritative state and events"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"sixty single-second advances replay the same authoritative state and events" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "sixty single-second advances replay the same authoritative state and events"
+Randomness seeded to: 2807600683
+===============================================================================
+All tests passed (143 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sixty single-second advances replay the same authoritative state and events" end time: Oct 08 09:38 UTC
+"sixty single-second advances replay the same authoritative state and events" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/23 Testing: stale revisions, invalid times, IDs and fractions do not mutate authority
+22/23 Test: stale revisions, invalid times, IDs and fractions do not mutate authority
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "stale revisions\, invalid times\, IDs and fractions do not mutate authority"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"stale revisions, invalid times, IDs and fractions do not mutate authority" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "stale revisions\, invalid times\, IDs and fractions do not mutate authority"
+Randomness seeded to: 4288587817
+===============================================================================
+All tests passed (8 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"stale revisions, invalid times, IDs and fractions do not mutate authority" end time: Oct 08 09:38 UTC
+"stale revisions, invalid times, IDs and fractions do not mutate authority" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/23 Testing: zero and signed area preserve the conversion's linear domain
+23/23 Test: zero and signed area preserve the conversion's linear domain
+Command: "/home/runner/work/canopy-foundry/canopy-foundry/.build/core/canopy_core_tests" "zero and signed area preserve the conversion's linear domain"
+Directory: /home/runner/work/canopy-foundry/canopy-foundry/.build/core
+"zero and signed area preserve the conversion's linear domain" start time: Oct 08 09:38 UTC
+Output:
+----------------------------------------------------------
+Filters: "zero and signed area preserve the conversion's linear domain"
+Randomness seeded to: 4158318400
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"zero and signed area preserve the conversion's linear domain" end time: Oct 08 09:38 UTC
+"zero and signed area preserve the conversion's linear domain" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 08 09:38 UTC

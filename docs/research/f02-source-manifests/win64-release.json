@@ -1,0 +1,91 @@
+{
+  "abi": {
+    "crt": "MD",
+    "exceptions": false,
+    "rtti": false
+  },
+  "bootstrap_sha256": "9b515afe4beb6cde838d3656e72685dfa095604a1cd88d1bf1e8716b78f544cb",
+  "child_return_codes": {
+    "build": 0,
+    "configure": 0
+  },
+  "compiler": {
+    "binary_sha256": "cb461b804d4792db79046c59e17c42a0214cd5112560486114ebe52fcec107ad",
+    "id": "MSVC",
+    "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\cl.exe",
+    "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35739 for x64"
+  },
+  "config": "Release",
+  "host_sdk": {
+    "msvc": "14.50.35717",
+    "visual_studio": "18.0",
+    "windows_sdk": "10.0.26100.0\\"
+  },
+  "inputs_sha256": {
+    "CMakeLists.txt": "7e780520e0ff7462ec728db44daa8a99f930c9aaea27b1cde4a2cbbf7f04c0a9",
+    "CMakePresets.json": "a3e13290a6524dedbf277c9506f76d9728688f7fb0cc30f8d5cf4daf4754aeca",
+    "config\\toolchains.json": "d800187daf557819b77dbdc30f31c59ead0be7c8a42e06e169843c7c84e1ec75",
+    "core\\include\\canopy\\clock.hpp": "3e3130a4a5d85aa3c0fd199c9aba3a5d1100dd7fe65a6a45e25e8041c7581f9b",
+    "core\\include\\canopy\\command.hpp": "e6d04309f45303087dd5a181853aa198cbaf9c6d20b3852495dc7ec04b453294",
+    "core\\include\\canopy\\id.hpp": "246f4dc8a94a3fcaa6c2bfe364fac9c6e260c8526c909be667ce1d0798199883",
+    "core\\include\\canopy\\units.hpp": "df058f3fd05b35e9cc207e66e63b0e4f1d839c4ec15decc4cb883e49c1ebc3aa",
+    "core\\include\\canopy\\view.hpp": "dc518b8444b5acc84eb4d7cd413162e6041b76922eca6f703c31693a1ec31ff8",
+    "core\\include\\canopy\\world.hpp": "16a5eec80f37e8bfe00f2b607522b649691f6c59e91aa353829eb2932e542970",
+    "core\\src\\clock.cpp": "7bec46dd0ee5ee75d0be6f2655280e248f3880e845779e7dd04c07b6908a1840",
+    "core\\src\\receipts.cpp": "af6f07909f1d2733a017f094c0ea7ae6c759837ece2cb6f679650c3907a1f8ee",
+    "core\\src\\units.cpp": "5e51f3b39760f2fb74689ae35e3fc564a6ce24f8903edf5b6fe74c2390c15165",
+    "core\\src\\world.cpp": "7ece3043ad8865f1bed8f93a0048e96be64b8b694bb88d6ad37ce032931e0f7b",
+    "core\\tests\\clock_test.cpp": "8ae2424cb22f98bf232a1b5a18ccc66ed78efba38f283abebc82ac157c610530",
+    "core\\tests\\commands_test.cpp": "3909b470b88428e57a032d95c6326f600c6d6c76d10582cd481034cc7c10a250",
+    "core\\tests\\fixtures\\clock_world.hpp": "56ea1b5ce2c00f1b9a6f0d5d6eb60600388dadbeb941fa7149c2ea388b336ef2",
+    "core\\tests\\replay_test.cpp": "eb4f1099289544cbecd0368d920fc179b6bccc8a77723a96f1e3df135e987cf8",
+    "core\\tests\\units_test.cpp": "814bd480b42082ece30a7e4f82bf636bd5b6e7287ea5765f6dc630c28bf9a9db",
+    "dependencies\\native-lock.json": "a2b54ad2fc26ac9454e543822678be45215eac28d3f3af8107d681acf325eb0f",
+    "dependencies\\triplets\\arm64-osx-ue58.cmake": "5a6e4c99c4a44b9b4b00c55f8d8472889f935fe696e07eebc7e564ee06b98f3d",
+    "dependencies\\triplets\\v26-chainload.cmake": "4203e9097e0962291ca3d3e685f9c6c5a213229e9b6eef556d6171737dd59d5b",
+    "dependencies\\triplets\\x64-linux-ue-v26.cmake": "4310426fbe9c9404a42b1410371e80d93fe39d76d72d5db4c10c2615abcebf7b",
+    "dependencies\\triplets\\x64-windows-msvc.cmake": "a485236ee71bb464a51783df05a293dfe9346486344590d75f35ed216426a7c9",
+    "dependencies\\upstream\\growbim-0.1.0-py3-none-any.whl": "1e4999bef0cfecc86a95e58d0915fac29b0d6f1c6f80621a59e86cc8126428f2",
+    "dependencies\\upstream\\opencea-0.1.0-py3-none-any.whl": "6bc833fcf21644c260aeeb21ce6912443a36a8926ccf48a6fdd173550dcfbbb9",
+    "dependencies\\vcpkg-configuration.json": "999609a3cf1d6d33129e754912ea6f0b0f820f7ee1fe78a0bf0d139f160b46a1",
+    "dependencies\\vcpkg.json": "2f7363cbf0af4fff0da51758cd1c7be657f4216c1abd7ab482e21cae2de79dd6",
+    "pyproject.toml": "78b11bcb21f53e650e7f942b71b8a3098a487811086b27eb6a49d7e2b85c2932",
+    "scripts\\bootstrap_native.py": "36d326a557dcad130e9082fe611de43d1aceac77f711b22cf502e4bd053adb31",
+    "scripts\\build_common.py": "fa7a95cd2cdf839c47d07560c0d90e3f4fe918fa042fff67bbeb600bb31a5b97",
+    "scripts\\build_core.py": "2704742627454bb798484e243455c71a81efe69fe996162dd097333647f8a399",
+    "scripts\\build_game.py": "928574ca01fafc2de454f613d905e6a36fe4c06df3c0b0a46aa58d9eb20c75ad",
+    "uv.lock": "ed9389427c16691ced778b4d67a41c567564b34a2b8e5e1d0ede4dfeb5163689"
+  },
+  "library": {
+    "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.build\\core\\canopy_core.lib",
+    "sha256": "50dff4fd85e21af47e3b769cbb3b42438e4ccea0add96145e4340c222bf59388"
+  },
+  "platform": "win64",
+  "schema": 1,
+  "scope": "standalone-core",
+  "tools": {
+    "cmake": {
+      "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.venv\\Scripts\\cmake.exe",
+      "sha256": "94676d388cadf57a9858c0b57c9e192103e95cab6c380ebad29d6dd366de23ad",
+      "version": "cmake version 4.4.4"
+    },
+    "ninja": {
+      "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.venv\\Scripts\\ninja.exe",
+      "sha256": "a7f084e8ee37bff0872aa8bd3d17cc19632d2a37734f6c242dd3dee22d77c0b4",
+      "version": "1.13.2.git.kitware.jobserver-pipe-1"
+    },
+    "python": {
+      "path": "D:\\a\\canopy-foundry\\canopy-foundry\\.venv\\Scripts\\python.exe",
+      "sha256": "560b9ef7d856608ab8da02ded2dc8a1951ad1f424c382c0ec6a698874165a18e",
+      "version": "3.12.13"
+    },
+    "uv": {
+      "path": "C:\\hostedtoolcache\\windows\\uv\\0.12.3\\x86_64\\uv.exe",
+      "sha256": "68a22cbab1674647bcda32120b214e6480f875414e3333f49f87ae99b4b0e0fa",
+      "version": "uv 0.12.3 (507230998 2026-08-07 x86_64-pc-windows-msvc)"
+    }
+  },
+  "unreal_qualified": false,
+  "vcpkg_commit": "2750401336fb7c95f6619657a46a7e798661341c",
+  "vcpkg_triplet": "x64-windows-msvc"
+}

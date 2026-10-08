@@ -28,7 +28,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "growbim", extras = ["ifc"], path = "dependencies/upstream/growbim-0.1.0-py3-none-any.whl" },
+    { name = "growbim", extras = ["ifc"], path = "dependencies/upstream/growbim-0.2.0-py3-none-any.whl" },
     { name = "opencea", path = "dependencies/upstream/opencea-0.1.0-py3-none-any.whl" },
 ]
 
@@ -90,13 +90,13 @@ wheels = [
 
 [[package]]
 name = "growbim"
-version = "0.1.0"
-source = { path = "dependencies/upstream/growbim-0.1.0-py3-none-any.whl" }
+version = "0.2.0"
+source = { path = "dependencies/upstream/growbim-0.2.0-py3-none-any.whl" }
 dependencies = [
     { name = "opencea" },
 ]
 wheels = [
-    { filename = "growbim-0.1.0-py3-none-any.whl", hash = "sha256:1e4999bef0cfecc86a95e58d0915fac29b0d6f1c6f80621a59e86cc8126428f2" },
+    { filename = "growbim-0.2.0-py3-none-any.whl", hash = "sha256:299d153be788261bcb13d7ba508784338e9d91aee3965c25205dc7444a7779d2" },
 ]
 
 [package.optional-dependencies]

@@ -2,10 +2,10 @@
 name = "canopy-author"
 version = "0.1.0"
 requires-python = "==3.12.*"
-dependencies = ["growbim[ifc]==0.1.0", "opencea==0.1.0"]
+dependencies = ["growbim[ifc]==0.2.0", "opencea==0.1.0"]
 
 [tool.uv.sources]
-growbim = { path = "../../dependencies/upstream/growbim-0.1.0-py3-none-any.whl" }
+growbim = { path = "../../dependencies/upstream/growbim-0.2.0-py3-none-any.whl" }
 opencea = { path = "../../dependencies/upstream/opencea-0.1.0-py3-none-any.whl" }
 
 [build-system]

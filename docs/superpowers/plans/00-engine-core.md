@@ -78,6 +78,8 @@ Fixture specification, implemented as actual state transitions rather than expec
 receipt_revision=1 duplicate_deliveries=2 control=0.75 stop_second=60 resumed_second=120 climate=24 crop=2 partition_events=equal rng_domains=distinct
 ```
 
+**Approved-SDK standalone source matrix:** [run 37757332589](https://github.com/vhark/canopy-foundry/actions/runs/37757332589), commit `fdd9b34`, passed Debug and Release on native Windows, Linux and Apple Silicon macOS: all 23 CTests on each host/configuration. Exact bootstrap/core manifests and Release test logs are retained under `docs/research/f02-source-manifests/`; their original bytes preserve the linked bootstrap digests. This is standalone source qualification, not a replacement for F01's UE ABI checks or F03's packaged-game, input and GPU gates.
+
 
 ## F03 — Native first-/third-person game and state bridge
 
