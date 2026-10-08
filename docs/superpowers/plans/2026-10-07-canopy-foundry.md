@@ -237,7 +237,7 @@ Assign accountable roles before execution: one technical/integration lead; core 
 | Crop/MEP data not independently qualified | Domain review S08/T06 | Ship honestly illustrative models; stronger claims remain blocked until licensed data/review supports them |
 | First cycle feels like chores/dashboard/quiz | Design lead G08 | Observe fresh players, repair loop/interaction/investment choices before expanding art scope |
 | Rights expiry or pack/version change breaks old saves | Release lead F04/V03/R06 | Pin where lawful; otherwise explicit new-save migration and notice, never pretend unchanged physics |
-| Name, store, age/rating, signing or engine obligations unresolved | Producer/counsel R04 | Keep development private; block public release of affected product/content |
+| Name, store, age/rating, signing or engine obligations unresolved | Producer/counsel R04 | Original source may be public under its noncommercial license; keep restricted content private and block affected packaged/commercial releases until cleared |
 | Online credentials/terms/privacy approval missing | Network lead C02 | Base single-player unaffected; no claimed internet co-op pass without real service qualification |
 
 Schedule by demonstrated gates, not a fabricated fixed ship date. Gate C produces the first defensible production forecast because it measures the complete game loop, actual content throughput and real scale costs. Track outstanding prerequisite, responsible role and evidence needed; do all independent work without making up unavailable data.

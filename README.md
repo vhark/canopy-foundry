@@ -4,6 +4,12 @@ Build your growing operation, master its environment, and scale from your first 
 
 **Status: product specification and implementation plans. No executable game is included yet.** This is a new game repository, not a rename or fork of the existing Grownetics Sim training study. The title is a working commercial name, pending trademark/domain clearance.
 
+## License
+
+Original project code, documentation and project-owned content are available under [PolyForm Noncommercial 1.0.0](LICENSE), unless a file has its own license. Noncommercial use, modification and redistribution are permitted under those terms; commercial rights require a separate agreement with the relevant copyright holders. This is **source-available**, not OSI open source, because commercial use is restricted. Unreal Engine, third-party dependencies, assets and trademarks retain their own terms; the project license does not relicense them.
+
+Active implementation and its qualification evidence are on [`feat/canopy-foundry-implementation`](https://github.com/vhark/canopy-foundry/tree/feat/canopy-foundry-implementation). Public source availability is not a claim that a packaged game or commercial release is ready.
+
 ## Product decisions
 
 - First-person work, spatial construction, operations management and business progression in one coherent facility.
@@ -28,6 +34,6 @@ The master plan links the detailed subsystem plans. Every requirement has an imp
 
 ## Repository policy
 
-Private development repository. Do not commit vendor source CAD, confidential facility models, player data, engine binaries or credentials. Approved Unreal content uses Git LFS; restricted source masters and build artifacts use access-controlled object storage. See [asset governance](docs/bim-and-asset-pipeline.md) and [licensing boundaries](docs/licensing.md).
+Public source repository. Do not commit vendor source CAD, confidential facility models, player data, Unreal Engine source/binaries or credentials. Approved original Unreal content uses Git LFS; restricted source masters and engine/build artifacts remain in access-controlled storage. GitHub Actions logs and artifacts in this repository must be safe for public readers, even for owner-triggered workflows. See [asset governance](docs/bim-and-asset-pipeline.md) and [licensing boundaries](docs/licensing.md).
 
 Existing OpenCEA/GrowBIM contracts remain upstream; their schemas are not copied into a competing authority here. The old Grownetics Sim repository remains intact as evidence of its narrow authoring/replay qualification, not proof of this game's performance or crop accuracy.

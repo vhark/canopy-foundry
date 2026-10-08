@@ -1,12 +1,16 @@
 # Licensing, rights and distribution decisions
 
-Decision baseline 2026-10-07. This is an engineering/commercial control plan, not legal advice or a substitute for signed agreements.
+Decision baseline 2026-10-07; public noncommercial source licensing authorized 2026-10-08. This is an engineering/commercial control plan, not legal advice or a substitute for signed agreements.
 
 ## Original game and repository
 
-The new `vhark/canopy-foundry` repository is private. Original game code/art/plans are proprietary by default under the repository's reservation of rights; this does not appropriate rights in upstream open-source work. Resolve the eventual publishing entity, contributor/contractor assignments and title/trademark clearance before public announcement. The working title is **Grownetics: Canopy Foundry**; a web search finding no exact game match is not trademark clearance.
+The `vhark/canopy-foundry` repository publishes original project code, documentation and project-owned content under [PolyForm Noncommercial 1.0.0](../LICENSE), except files or components carrying their own license. The standard license permits noncommercial use, changes and redistribution and defines additional permitted personal and organizational uses. Preserve the full terms and required copyright notice when redistributing. Commercial rights outside those permissions require a separate agreement from the relevant copyright holders; the contributors retain their own rights.
 
-No existing Grownetics Sim or OpenCEA source, confidential model, licensed vendor asset or private dataset was copied into this repository as a fixture. Existing repositories remain separate. Future reused source must retain its original notices and comply with its license.
+This is **source-available**, not OSI open source: the [Open Source Definition](https://opensource.org/osd) does not permit restricting commercial fields of use. Publication does not transfer trademarks, grant rights in Unreal Engine or third-party assets, or replace upstream MIT/CC0 and other licenses. The immutable OpenCEA/GrowBIM distributions on the implementation branch retain their embedded upstream notices and grants; the project's noncommercial restriction does not override them.
+
+The working title is **Grownetics: Canopy Foundry**. Public source publication is not trademark clearance, a vendor endorsement, or approval to sell/distribute a packaged game. Resolve the publishing entity, contributor/contractor rights and title/store/signing obligations before commercial distribution.
+
+No confidential facility model, licensed vendor master or private dataset may be published as a fixture. Existing repositories remain separate. Public CI logs and artifacts require the same disclosure review as tracked source; owner-only execution does not make their output private. Engine archives, source trees, SDKs and raw engine build logs stay outside public repository artifacts.
 
 ## Unreal
 
