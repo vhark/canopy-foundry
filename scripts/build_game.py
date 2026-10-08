@@ -157,7 +157,9 @@ def qualified_compiler(root: Path, host: str, requirements: dict) -> dict:
     else:
         tc = os.environ.get("CANOPY_LINUX_TOOLCHAIN_ROOT", "")
         sysroot = os.environ.get("CANOPY_LINUX_SYSROOT", "")
-        if not tc or not sysroot or not Path(tc).is_absolute() or not Path(sysroot).is_absolute() or "v26" not in Path(tc).name or not Path(sysroot).is_dir():
+        if (not tc or not sysroot or not Path(tc).is_absolute() or not Path(sysroot).is_absolute()
+                or Path(tc).name != "x86_64-unknown-linux-gnu"
+                or Path(tc).parent.name != requirements["archive"]["root"] or not Path(sysroot).is_dir()):
             raise common.BuildFailure("Missing explicitly qualified v26 Linux toolchain/fixed sysroot")
         compiler_path = (Path(tc) / "bin/clang++").resolve()
         if not compiler_path.is_file():

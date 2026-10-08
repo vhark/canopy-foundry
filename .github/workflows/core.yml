@@ -65,9 +65,18 @@ jobs:
           if ($LASTEXITCODE -ne 0 -or -not $vs) { throw 'MSVC developer environment is unavailable' }
           Write-Output 'Installed MSVC compiler toolsets:'
           Get-ChildItem -LiteralPath (Join-Path $vs 'VC\Tools\MSVC') -Directory | ForEach-Object { $_.Name }
+          if (-not (Get-ChildItem -LiteralPath (Join-Path $vs 'VC\Tools\MSVC') -Directory -Filter '14.50.*')) {
+            $installer = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\setup.exe'
+            $channel = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property channelId
+            if ($LASTEXITCODE -ne 0 -or -not $channel) { throw 'Installed Visual Studio channel is unavailable' }
+            $arguments = 'modify --installPath "' + $vs + '" --channelId "' + $channel + '" --add Microsoft.VisualStudio.Component.VC.14.50.18.0.x86.x64 --quiet --norestart --noUpdateInstaller'
+            $install = Start-Process -FilePath $installer -ArgumentList $arguments -Wait -PassThru
+            if ($install.ExitCode -ne 0) { throw "MSVC 14.50 component installation failed: $($install.ExitCode)" }
+          }
           $vsdev = Join-Path $vs 'Common7\Tools\VsDevCmd.bat'
           if (-not (Test-Path $vsdev)) { throw 'VsDevCmd.bat is missing' }
-          $commands = 'call "' + $vsdev + '" -arch=amd64 -host_arch=amd64 && uv sync --frozen --all-packages --all-extras && uv run --frozen python scripts/bootstrap_native.py && uv run --frozen python scripts/build_core.py --config Debug && uv run --frozen ctest --test-dir .build/core --output-on-failure && uv run --frozen python -m pytest tests/build -q'
+          $check = 'uv run --frozen python -c "from pathlib import Path; from scripts import build_common as c, build_game as g; print(g.qualified_compiler(Path.cwd(), ''win64'', c.load_json(Path(''config/toolchains.json''))[''unreal''][''win64'']))"'
+          $commands = 'call "' + $vsdev + '" -arch=amd64 -host_arch=amd64 -vcvars_ver=14.50 -winsdk=10.0.26100.0 && uv sync --frozen --all-packages --all-extras && ' + $check + ' && uv run --frozen python scripts/bootstrap_native.py && uv run --frozen python scripts/build_core.py --config Debug && uv run --frozen ctest --test-dir .build/core --output-on-failure && uv run --frozen python -m pytest tests/build -q'
           & cmd.exe /d /c $commands
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Bootstrap pinned native dependencies
