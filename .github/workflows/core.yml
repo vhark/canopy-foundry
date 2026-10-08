@@ -12,8 +12,14 @@ jobs:
         os: [ubuntu-24.04, windows-2025, macos-15]
     runs-on: ${{ matrix.os }}
     env:
-      CANOPY_QUALIFY_ENGINE: ${{ github.event_name == 'push' && github.actor == github.repository_owner && contains(github.event.head_commit.message, '[qualify-engine]') }}
+      CANOPY_QUALIFY_ENGINE: ${{ github.event.repository.private && github.event_name == 'push' && github.actor == github.repository_owner && contains(github.event.head_commit.message, '[qualify-engine]') }}
     steps:
+      - name: Reject private engine qualification in public CI
+        if: github.event.repository.private != true && contains(github.event.head_commit.message, '[qualify-engine]')
+        shell: bash
+        run: |
+          echo '::error::Engine qualification produces private build logs. Run it locally or in a private build repository.'
+          exit 1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v7.1.4
         with:

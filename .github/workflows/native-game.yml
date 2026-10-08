@@ -19,8 +19,16 @@ on:
 permissions:
   contents: read
 jobs:
+  public-repository-refusal:
+    if: github.event.repository.private != true
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Refuse public engine build logs
+        run: |
+          echo '::error::Full Editor qualification requires a private build repository or local execution; public workflow logs are not private.'
+          exit 1
   native-game:
-    if: github.actor == github.repository_owner
+    if: github.event.repository.private && github.actor == github.repository_owner
     runs-on: ${{ inputs.runner }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

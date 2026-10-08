@@ -1,6 +1,8 @@
 [project]
 name = "canopy-author"
 version = "0.1.0"
+license = "PolyForm-Noncommercial-1.0.0"
+license-files = ["LICENSE"]
 requires-python = "==3.12.*"
 dependencies = ["growbim[ifc]==0.2.0", "opencea==0.1.0", "flatbuffers==25.12.19"]
 
